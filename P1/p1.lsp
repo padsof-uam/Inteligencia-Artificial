@@ -8,4 +8,8 @@
 	(/ 1
 		(+ 1 (exp z))))
 ; (defun h-recursive (x v sigma) ...)
-; (defun h-mapcar (x w sigma) ...)
+
+(defun h-mapcar (x w sigma) 
+	(funcall sigma 
+		(reduce #'+
+			(mapcar #'(lambda (a b) (* a b)) x w))))
