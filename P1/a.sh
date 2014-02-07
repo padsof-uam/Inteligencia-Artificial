@@ -4,9 +4,6 @@ rm Memoria.*
 files_lsp=$(ls *.lsp)
 echo $files_lsp
 for file in $files_lsp ; do
-	#functions=$(cat $file | grep defun | awk -v FS="defun " '{print $2}')
-	#echo $functions
-	#IFS="\n"
 	codes=$(awk '/;;%%/{n++}{print > f n}' f=code $file)
 	functions=$(ls code*)
 	for fun in $functions; do
@@ -37,8 +34,13 @@ for file in $files_lsp ; do
 		echo "\end{aibox}" >> Memoria/$name.tex
 		echo "\\\begin{aibox}{\\\code}" >> Memoria/$name.tex
 		echo >> Memoria/$name.tex
-		sed -i 's/#/\\#/g' $fun
+		#Con verbatim no hace falta.
+		#sed -i 's/#/\\#/g' $fun
+		sed -i ':a;N;$!ba;s/\t/    /g' $fun
+		echo "\\\begin{alltt}" >> Memoria/$name.tex
 		cat $fun >> Memoria/$name.tex
+		echo "\end{alltt}" >> Memoria/$name.tex
+
 		echo "\end{aibox}" >> Memoria/$name.tex
 	done
 done
@@ -48,6 +50,8 @@ done
 \\documentclass{aitemplate}
 
 \\usepackage{ai}
+\\usepackage{alltt}
+
 
 \\begin{document}
 
@@ -63,8 +67,8 @@ echo "\end{document}" >> Memoria.tex
 
 echo Source generated.
 echo Cleaning auxiliary files
-#rm code*
+rm code*
 echo Generating pdf...
-#latexmk -pdf -f -silent Memoria.tex
+latexmk -pdf -f -silent Memoria.tex
 
 
