@@ -4,7 +4,7 @@
 ;;%% code
 
 (defun combine-lst-lst (lst1 lst2)
-			(mapcan #'(lambda (x) (combine-elt-lst_red x lst2)) lst1))
+			(mapcan #'(lambda (x) (combine-elt-lst x lst2)) lst1))
 
 ;;%% code
 

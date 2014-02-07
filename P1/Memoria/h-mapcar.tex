@@ -26,7 +26,7 @@ SYNTAX: h-mapcar (x w sigma)
 
 (defun h-mapcar (x w sigma) 
 	(funcall sigma 
-		(reduce #'+
-			(mapcar #'(lambda (a b) (* a b)) x w))))
+		(reduce \#'+
+			(mapcar \#'(lambda (a b) (* a b)) x w))))
 
 \end{aibox}

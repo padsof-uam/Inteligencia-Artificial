@@ -37,6 +37,7 @@ for file in $files_lsp ; do
 		echo "\end{aibox}" >> Memoria/$name.tex
 		echo "\\\begin{aibox}{\\\code}" >> Memoria/$name.tex
 		echo >> Memoria/$name.tex
+		sed -i 's/#/\\#/g' $fun
 		cat $fun >> Memoria/$name.tex
 		echo "\end{aibox}" >> Memoria/$name.tex
 	done
@@ -62,8 +63,8 @@ echo "\end{document}" >> Memoria.tex
 
 echo Source generated.
 echo Cleaning auxiliary files
-rm code*
+#rm code*
 echo Generating pdf...
-latexmk -pdf -f -silent Memoria.tex
+#latexmk -pdf -f -silent Memoria.tex
 
 
