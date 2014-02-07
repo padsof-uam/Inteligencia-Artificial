@@ -4,18 +4,25 @@
 			(- (exp z) (exp x))
 			(+ (exp z) (exp x)))))
 
+;;%% code
+
 (defun logit (z) 
 	(/ 1
 		(+ 1 (exp z))))
-; (defun h-recursive (x v sigma) ...)
+
+;;%% code
 
 (defun h-mapcar (x w sigma) 
 	(funcall sigma 
 		(reduce #'+
 			(mapcar #'(lambda (a b) (* a b)) x w))))
 
+;;%% code
+
 (defun h-recursive (x w sigma) 
 		(funcall sigma (h-recursive-aux x w 0)))
+
+;;%% code
 
 (defun h-recursive-aux (x w acc)
 		(if (null x)
