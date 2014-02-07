@@ -1,0 +1,24 @@
+\usepackage{ai}
+egin{document}
+\printtitle{1}
+egin{aibox}{unction}
+;; 
+SYNTAX: code3
+\end{aibox}
+egin{aibox}{\examples}
+\end{aibox}
+egin{aibox}{\end{aibox}
+egin{aibox}{nswers}
+\end{aibox}
+egin{aibox}{\othercomments}
+\end{aibox}
+egin{aibox}{\pseudocode}
+\end{aibox}
+egin{aibox}{;;%%
+
+(defun combine-lst-of-lst (lst)
+	(if (null (cddr lst))
+		(combine-lst-lst (car lst) (car (cdr lst)))
+		(combine-lst-lst (car lst) (combine-lst-of-lst (cdr lst)))))
+\end{aibox}
+\end{document}	

@@ -1,0 +1,31 @@
+\begin{aibox}{\function}
+;; combine-lst-of-lst
+
+SYNTAX: combine-lst-of-lst (lst)
+\end{aibox}
+
+\begin{aibox}{\examples}
+
+\end{aibox}
+
+\begin{aibox}{\comments}
+
+\end{aibox}
+\begin{aibox}{\answers}
+
+\end{aibox}
+\begin{aibox}{\othercomments}
+
+\end{aibox}
+\begin{aibox}{\pseudocode}
+
+\end{aibox}
+\begin{aibox}{\code}
+
+;;%% code
+
+(defun combine-lst-of-lst (lst)
+	(if (null (cddr lst))
+		(combine-lst-lst (car lst) (car (cdr lst)))
+		(combine-lst-lst (car lst) (combine-lst-of-lst (cdr lst)))))
+\end{aibox}

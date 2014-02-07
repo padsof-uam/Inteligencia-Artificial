@@ -1,0 +1,32 @@
+\begin{aibox}{\function}
+;; h-mapcar
+
+SYNTAX: h-mapcar (x w sigma) 
+\end{aibox}
+
+\begin{aibox}{\examples}
+
+\end{aibox}
+
+\begin{aibox}{\comments}
+
+\end{aibox}
+\begin{aibox}{\answers}
+
+\end{aibox}
+\begin{aibox}{\othercomments}
+
+\end{aibox}
+\begin{aibox}{\pseudocode}
+
+\end{aibox}
+\begin{aibox}{\code}
+
+;;%% code
+
+(defun h-mapcar (x w sigma) 
+	(funcall sigma 
+		(reduce #'+
+			(mapcar #'(lambda (a b) (* a b)) x w))))
+
+\end{aibox}
