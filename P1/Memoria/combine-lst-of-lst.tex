@@ -22,10 +22,12 @@ SYNTAX: combine-lst-of-lst (lst)
 \end{aibox}
 \begin{aibox}{\code}
 
+\begin{alltt}
 ;;%% code
 
 (defun combine-lst-of-lst (lst)
-	(if (null (cddr lst))
-		(combine-lst-lst (car lst) (car (cdr lst)))
-		(combine-lst-lst (car lst) (combine-lst-of-lst (cdr lst)))))
+    (if (null (cddr lst))
+        (combine-lst-lst (car lst) (car (cdr lst)))
+        (combine-lst-lst (car lst) (combine-lst-of-lst (cdr lst)))))
+\end{alltt}
 \end{aibox}

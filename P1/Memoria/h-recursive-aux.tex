@@ -22,10 +22,12 @@ SYNTAX: h-recursive-aux (x w acc)
 \end{aibox}
 \begin{aibox}{\code}
 
+\begin{alltt}
 ;;%% code
 
 (defun h-recursive-aux (x w acc)
-		(if (null x)
-			acc
-		(h-recursive-aux (rest x) (rest w) ( + (* (first x)  (first w)) acc))))
+        (if (null x)
+            acc
+        (h-recursive-aux (rest x) (rest w) ( + (* (first x)  (first w)) acc))))
+\end{alltt}
 \end{aibox}

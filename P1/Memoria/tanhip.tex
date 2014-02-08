@@ -22,10 +22,12 @@ SYNTAX: tanhip (z)
 \end{aibox}
 \begin{aibox}{\code}
 
+\begin{alltt}
 (defun tanhip (z)  
-	(let ((x (- 0 z)))
-		(/ 
-			(- (exp z) (exp x))
-			(+ (exp z) (exp x)))))
+    (let ((x (- 0 z)))
+        (/ 
+            (- (exp z) (exp x))
+            (+ (exp z) (exp x)))))
 
+\end{alltt}
 \end{aibox}

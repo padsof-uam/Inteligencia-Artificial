@@ -22,9 +22,11 @@ SYNTAX: h-recursive (x w sigma)
 \end{aibox}
 \begin{aibox}{\code}
 
+\begin{alltt}
 ;;%% code
 
 (defun h-recursive (x w sigma) 
-		(funcall sigma (h-recursive-aux x w 0)))
+        (funcall sigma (h-recursive-aux x w 0)))
 
+\end{alltt}
 \end{aibox}

@@ -22,11 +22,13 @@ SYNTAX: h-mapcar (x w sigma)
 \end{aibox}
 \begin{aibox}{\code}
 
+\begin{alltt}
 ;;%% code
 
 (defun h-mapcar (x w sigma) 
-	(funcall sigma 
-		(reduce \#'+
-			(mapcar \#'(lambda (a b) (* a b)) x w))))
+    (funcall sigma 
+        (reduce #'+
+            (mapcar #'(lambda (a b) (* a b)) x w))))
 
+\end{alltt}
 \end{aibox}
