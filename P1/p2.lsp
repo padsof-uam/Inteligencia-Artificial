@@ -1,5 +1,5 @@
 (defun combine-elt-lst (elt lst)
-			(mapcar #'(lambda (x) (cons elt x)) lst))
+			(mapcar #'(lambda (x) (list elt x)) lst))
 
 ;;%% code
 
