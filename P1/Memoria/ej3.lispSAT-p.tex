@@ -1,11 +1,14 @@
 \begin{aibox}{\function}
-;; generate-interpretation
+;; SAT-p
 
-SYNTAX: generate-interpretation(lst1)
+SYNTAX: SAT-p (kb)
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
+(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) ; T
+
+(SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) ; NIL
 \end{alltt}
 
 \end{aibox}
@@ -25,10 +28,9 @@ SYNTAX: generate-interpretation(lst1)
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
 
-(defun generate-interpretation(lst1)
-            (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst1))
+(defun SAT-p (kb)
+  (not (null (encuentra-modelos kb))))
 
 \end{alltt}
 \end{aibox}

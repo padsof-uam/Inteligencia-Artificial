@@ -9,41 +9,40 @@ for file in $files_lsp ; do
 	for fun in $functions; do
 		name_arg=$(cat $fun | grep defun | awk -v FS="defun " '{print $2}')
 		name=$(echo $name_arg | cut -d '(' -f 1 | cut -d ' ' -f 1)
-		echo $name
-		echo "\\\begin{aibox}{\\\function}" > Memoria/$name.tex
-		echo ";; $name" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "SYNTAX: $name_arg" >> Memoria/$name.tex
-		echo "\end{aibox}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex	
-		echo "\\\begin{aibox}{\examples}" >> Memoria/$name.tex
-		echo "\\\begin{alltt}" >> Memoria/$name.tex
-		echo "\end{alltt}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "\end{aibox}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "\\\begin{aibox}{\\\comments}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "\end{aibox}" >> Memoria/$name.tex
-		echo "\\\begin{aibox}{\\\answers}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "\end{aibox}" >> Memoria/$name.tex
-		echo "\\\begin{aibox}{\othercomments}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "\end{aibox}" >> Memoria/$name.tex
-		echo "\\\begin{aibox}{\pseudocode}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
-		echo "\end{aibox}" >> Memoria/$name.tex
-		echo "\\\begin{aibox}{\\\code}" >> Memoria/$name.tex
-		echo >> Memoria/$name.tex
+		echo "\\\begin{aibox}{\\\function}" > Memoria/$file$name.tex
+		echo ";; $name" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "SYNTAX: $name_arg" >> Memoria/$file$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex	
+		echo "\\\begin{aibox}{\examples}" >> Memoria/$file$name.tex
+		echo "\\\begin{alltt}" >> Memoria/$file$name.tex
+		echo "\end{alltt}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "\\\begin{aibox}{\\\comments}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
+		echo "\\\begin{aibox}{\\\answers}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
+		echo "\\\begin{aibox}{\othercomments}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
+		echo "\\\begin{aibox}{\pseudocode}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
+		echo "\\\begin{aibox}{\\\code}" >> Memoria/$file$name.tex
+		echo >> Memoria/$file$name.tex
 		#Con verbatim no hace falta.
 		#sed -i 's/#/\\#/g' $fun
 		sed -i ':a;N;$!ba;s/\t/    /g' $fun
-		echo "\\\begin{alltt}" >> Memoria/$name.tex
-		cat $fun >> Memoria/$name.tex
-		echo "\end{alltt}" >> Memoria/$name.tex
+		echo "\\\begin{alltt}" >> Memoria/$file$name.tex
+		cat $fun >> Memoria/$file$name.tex
+		echo "\end{alltt}" >> Memoria/$file$name.tex
 
-		echo "\end{aibox}" >> Memoria/$name.tex
+		echo "\end{aibox}" >> Memoria/$file$name.tex
 	done
 done
 
@@ -61,6 +60,7 @@ done
 EOF
 
 texs=$(ls Memoria/*.tex)
+echo $texs
 for tex in $texs; do
 	echo "\input{$tex}" >> Memoria.tex
 	echo "\\\newpage">>Memoria.tex

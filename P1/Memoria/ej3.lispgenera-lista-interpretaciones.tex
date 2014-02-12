@@ -1,7 +1,7 @@
 \begin{aibox}{\function}
-;; tanhip
+;; genera-lista-interpretaciones
 
-SYNTAX: tanhip (z)  
+SYNTAX: genera-lista-interpretaciones (lst) 
 \end{aibox}
 
 \begin{aibox}{\examples}
@@ -25,11 +25,9 @@ SYNTAX: tanhip (z)
 \begin{aibox}{\code}
 
 \begin{alltt}
-(defun tanhip (z)  
-    (let ((x (- 0 z)))
-        (/ 
-            (- (exp z) (exp x))
-            (+ (exp z) (exp x)))))
+
+(defun genera-lista-interpretaciones (lst) 
+    (combine-lst-of-lst (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst)))
 
 \end{alltt}
 \end{aibox}

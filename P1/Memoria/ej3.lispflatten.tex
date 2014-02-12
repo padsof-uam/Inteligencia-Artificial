@@ -1,7 +1,7 @@
 \begin{aibox}{\function}
-;; logit
+;; flatten
 
-SYNTAX: logit (z) 
+SYNTAX: flatten (structure)
 \end{aibox}
 
 \begin{aibox}{\examples}
@@ -25,11 +25,11 @@ SYNTAX: logit (z)
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
 
-(defun logit (z) 
-    (/ 1
-        (+ 1 (exp z))))
+(defun flatten (structure)
+    (cond ((null structure) nil)
+        ((atom structure) (list structure))
+      (t (mapcan #'flatten structure))))
 
 \end{alltt}
 \end{aibox}

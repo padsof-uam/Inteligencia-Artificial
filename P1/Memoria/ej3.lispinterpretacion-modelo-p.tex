@@ -1,0 +1,40 @@
+\begin{aibox}{\function}
+;; interpretacion-modelo-p
+
+SYNTAX: interpretacion-modelo-p (kb interpretacion) 
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+
+
+(interpretacion-modelo-p 
+ '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P)) '((A NIL) (P NIL) (H T))); NIL
+
+(interpretacion-modelo-p
+ '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P)) '((A T) (P NIL) (H NIL)))
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\comments}
+
+\end{aibox}
+\begin{aibox}{\answers}
+
+\end{aibox}
+\begin{aibox}{\othercomments}
+
+\end{aibox}
+\begin{aibox}{\pseudocode}
+
+\end{aibox}
+\begin{aibox}{\code}
+
+\begin{alltt}
+
+(defun interpretacion-modelo-p (kb interpretacion) 
+  (every #'identity (mapcar #'(lambda (fbf) (eval-fbf fbf interpretacion)) kb)))
+
+\end{alltt}
+\end{aibox}

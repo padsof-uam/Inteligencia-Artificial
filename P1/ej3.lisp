@@ -27,6 +27,8 @@
 
 (setf Delta '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) (L)))
 
+;;%% Code
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO: extrae-simbolos
 ;;
@@ -55,6 +57,9 @@
 ;;
 ;;
 ;;
+
+;;%% Code
+
 (defun genera-lista-interpretaciones (lst) 
 	(combine-lst-of-lst (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst)))
 
@@ -109,6 +114,9 @@
 ;; EVALÚA A : T en caso de que la interpretación sea un modelo de KB
 ;;            NIL en caso contrario
 ;;
+
+;;%% Code
+
 (defun interpretacion-modelo-p (kb interpretacion) 
   (every #'identity (mapcar #'(lambda (fbf) (eval-fbf fbf interpretacion)) kb)))
 
@@ -126,6 +134,8 @@
 ;; EVALÚA A : lista de interpretaciones que son modelo para KB
 ;;
 ;;
+;;%% Code
+
 (defun encuentra-modelos (kb) 
   (remove-if-not 
     #'(lambda (int) (interpretacion-modelo-p kb int)) 
@@ -144,6 +154,9 @@
 ;;            NIL en caso contrario
 ;;
 ;;
+
+;;%% Code
+
 
 (defun SAT-p (kb)
   (not (null (encuentra-modelos kb))))
