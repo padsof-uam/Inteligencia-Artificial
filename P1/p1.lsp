@@ -12,7 +12,7 @@
 (defun h-mapcar (x w sigma) 
 	(funcall sigma 
 		(reduce #'+
-			(mapcar #'(lambda (a b) (* a b)) x w))))
+			(mapcar #'* x w))))
 
 (defun h-recursive (x w sigma) 
 		(funcall sigma (h-recursive-aux x w 0)))
