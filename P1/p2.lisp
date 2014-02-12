@@ -9,11 +9,6 @@
 
 ;;%% code
 
-(defun generate-interpretation(lst1)
-			(mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst1))
-
-;;%% code
-
 (defun combine-elt-lst-app (elt lst)
 			(mapcar #'(lambda (x) (append (list elt) x)) lst))
 
