@@ -2,6 +2,7 @@
 \ProvidesPackage{ai}[2014/01/01 Artificial Intelligence]
 
 \RequirePackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\RequirePackage{xifthen}
 \RequirePackage{mdframed}
 
 \newcounter{maincounter}
@@ -19,7 +20,7 @@
 \newcommand{\answers}{Respuestas a las preguntas}
 \newcommand{\othercomments}{Otros comentarios}
 \newcommand{\pseudocode}{Pseudocódigo}
-\newcommand{\code}{Código}
+\newcommand{\code}{Código \setcounter{maincounter}{0}}
 
 \newenvironment{aibox}[1]
 	{\noindent\textsc{\arabic{maincounter}. #1}\begin{mdframed}[linecolor=DarkBlue, linewidth=2pt]\vspace{5pt}}

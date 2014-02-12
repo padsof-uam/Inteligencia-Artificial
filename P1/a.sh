@@ -61,6 +61,7 @@ EOF
 texs=$(ls Memoria/*.tex)
 for tex in $texs; do
 	echo "\input{$tex}" >> Memoria.tex
+	echo "\\\newpage">>Memoria.tex
 done
 
 echo "\end{document}" >> Memoria.tex
