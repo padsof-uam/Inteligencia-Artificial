@@ -15,7 +15,7 @@
 (defun h-mapcar (x w sigma) 
 	(funcall sigma 
 		(reduce #'+
-			(mapcar #'(lambda (a b) (* a b)) x w))))
+			(mapcar #'* x w))))
 
 ;;%% code
 
