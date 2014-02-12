@@ -5,6 +5,8 @@ SYNTAX: h-mapcar (x w sigma)
 \end{aibox}
 
 \begin{aibox}{\examples}
+\begin{alltt}
+\end{alltt}
 
 \end{aibox}
 
@@ -28,7 +30,7 @@ SYNTAX: h-mapcar (x w sigma)
 (defun h-mapcar (x w sigma) 
     (funcall sigma 
         (reduce #'+
-            (mapcar #'(lambda (a b) (* a b)) x w))))
+            (mapcar #'* x w))))
 
 \end{alltt}
 \end{aibox}

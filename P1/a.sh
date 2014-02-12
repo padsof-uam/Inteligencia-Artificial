@@ -1,7 +1,7 @@
 #Clean
 rm Memoria/*
 rm Memoria.*
-files_lsp=$(ls *.lsp)
+files_lsp=$(ls *.lisp)
 echo $files_lsp
 for file in $files_lsp ; do
 	codes=$(awk '/;;%%/{n++}{print > f n}' f=code $file)
@@ -17,6 +17,8 @@ for file in $files_lsp ; do
 		echo "\end{aibox}" >> Memoria/$name.tex
 		echo >> Memoria/$name.tex	
 		echo "\\\begin{aibox}{\examples}" >> Memoria/$name.tex
+		echo "\\\begin{alltt}" >> Memoria/$name.tex
+		echo "\end{alltt}" >> Memoria/$name.tex
 		echo >> Memoria/$name.tex
 		echo "\end{aibox}" >> Memoria/$name.tex
 		echo >> Memoria/$name.tex
