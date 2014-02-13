@@ -6,6 +6,12 @@ SYNTAX: combine-lst-lst (lst1 lst2)
 
 \begin{aibox}{\examples}
 \begin{alltt}
+(combine-lst-lst '(a b c) '(1 2))
+; ((A 1) (A 2) (B 1) (B 2) (C 1) (C 2))
+
+(combine-lst-lst '(a b c) '()); NIL
+
+(combine-lst-lst '() '(a b c)); NIL
 \end{alltt}
 
 \end{aibox}
@@ -25,8 +31,6 @@ SYNTAX: combine-lst-lst (lst1 lst2)
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
-
 
 (defun combine-lst-lst (lst1 lst2)
             (mapcan #'(lambda (x) (combine-elt-lst x lst2)) lst1))

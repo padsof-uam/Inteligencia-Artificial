@@ -5,13 +5,16 @@ SYNTAX: combine-elt-lst (elt lst)
 \end{aibox}
 
 \begin{aibox}{\examples}
+
 \begin{alltt}
+(combine-elt-lst 'a '(1 2 3)); ((A 1) (A 2) (A 3))
+
+(combine-elt-lst 'a '()); NIL
 \end{alltt}
 
 \end{aibox}
 
 \begin{aibox}{\comments}
-
 \end{aibox}
 \begin{aibox}{\answers}
 
@@ -25,6 +28,7 @@ SYNTAX: combine-elt-lst (elt lst)
 \begin{aibox}{\code}
 
 \begin{alltt}
+
 (defun combine-elt-lst (elt lst)
             (mapcar #'(lambda (x) (list elt x)) lst))
 
