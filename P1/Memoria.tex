@@ -1,12 +1,17 @@
 \documentclass{aitemplate}
-
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
 \usepackage{ai}
 \usepackage{alltt}
 
 
+\DeclareUnicodeCharacter{172}{\not}
+
 \begin{document}
 
 \printtitle{1}
+
 \input{Memoria/ej1.lisph-mapcar.tex}
 %\newpage
 %\input{Memoria/ej1.lisph-recursive-aux.tex}
