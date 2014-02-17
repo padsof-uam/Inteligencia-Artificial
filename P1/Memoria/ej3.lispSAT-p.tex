@@ -1,10 +1,15 @@
 \begin{aibox}{\function}
-;; combine-lst-of-lst
+;; SAT-p
 
-SYNTAX: combine-lst-of-lst (lst)
+SYNTAX: SAT-p (kb)
 \end{aibox}
 
 \begin{aibox}{\examples}
+\begin{alltt}
+(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) ; T
+
+(SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) ; NIL
+\end{alltt}
 
 \end{aibox}
 
@@ -23,11 +28,9 @@ SYNTAX: combine-lst-of-lst (lst)
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
 
-(defun combine-lst-of-lst (lst)
-    (if (null (cddr lst))
-            (combine-lst-lst (car lst) (cadr lst))
-    (combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst)))))
+(defun SAT-p (kb)
+  (not (null (encuentra-modelos kb))))
+
 \end{alltt}
 \end{aibox}

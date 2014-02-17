@@ -1,0 +1,41 @@
+\begin{aibox}{\function}
+;; encuentra-modelos
+
+SYNTAX: encuentra-modelos (kb) 
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+(encuentra-modelos '((=> A (¬ H)) (<=> P (^ A  H)) (=> H P))) ;
+ (((A T) (P NIL) (H NIL)) ((A NIL) (P NIL) (H NIL)))
+
+(encuentra-modelos '((=> (^ P I)  L)  (=> (¬ P) (¬ L)) (¬ P) L)) ;
+ NIL
+
+\end{alltt}
+
+\end{aibox}
+
+\begin{aibox}{\comments}
+
+\end{aibox}
+\begin{aibox}{\answers}
+
+\end{aibox}
+\begin{aibox}{\othercomments}
+
+\end{aibox}
+\begin{aibox}{\pseudocode}
+
+\end{aibox}
+\begin{aibox}{\code}
+
+\begin{alltt}
+
+(defun encuentra-modelos (kb) 
+  (remove-if-not 
+    #'(lambda (int) (interpretacion-modelo-p kb int)) 
+    (genera-lista-interpretaciones (extrae-simbolos kb))))
+
+\end{alltt}
+\end{aibox}

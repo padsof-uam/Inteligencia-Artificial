@@ -1,10 +1,12 @@
 \begin{aibox}{\function}
-;; h-recursive-aux
+;; genera-lista-interpretaciones
 
-SYNTAX: h-recursive-aux (x w acc)
+SYNTAX: genera-lista-interpretaciones (lst) 
 \end{aibox}
 
 \begin{aibox}{\examples}
+\begin{alltt}
+\end{alltt}
 
 \end{aibox}
 
@@ -23,11 +25,9 @@ SYNTAX: h-recursive-aux (x w acc)
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
 
-(defun h-recursive-aux (x w acc)
-        (if (null x)
-            acc
-        (h-recursive-aux (rest x) (rest w) ( + (* (first x)  (first w)) acc))))
+(defun genera-lista-interpretaciones (lst) 
+    (combine-lst-of-lst (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst)))
+
 \end{alltt}
 \end{aibox}

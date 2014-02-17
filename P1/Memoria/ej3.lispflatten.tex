@@ -1,10 +1,12 @@
 \begin{aibox}{\function}
-;; h-recursive
+;; flatten
 
-SYNTAX: h-recursive (x w sigma) 
+SYNTAX: flatten (structure)
 \end{aibox}
 
 \begin{aibox}{\examples}
+\begin{alltt}
+\end{alltt}
 
 \end{aibox}
 
@@ -23,10 +25,11 @@ SYNTAX: h-recursive (x w sigma)
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
 
-(defun h-recursive (x w sigma) 
-        (funcall sigma (h-recursive-aux x w 0)))
+(defun flatten (structure)
+    (cond ((null structure) nil)
+        ((atom structure) (list structure))
+      (t (mapcan #'flatten structure))))
 
 \end{alltt}
 \end{aibox}

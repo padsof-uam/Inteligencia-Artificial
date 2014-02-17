@@ -1,10 +1,12 @@
 \begin{aibox}{\function}
-;; h-mapcar
+;; combine-elt-lst-app
 
-SYNTAX: h-mapcar (x w sigma) 
+SYNTAX: combine-elt-lst-app (elt lst)
 \end{aibox}
 
 \begin{aibox}{\examples}
+\begin{alltt}
+\end{alltt}
 
 \end{aibox}
 
@@ -25,10 +27,8 @@ SYNTAX: h-mapcar (x w sigma)
 \begin{alltt}
 ;;%% code
 
-(defun h-mapcar (x w sigma) 
-    (funcall sigma 
-        (reduce #'+
-            (mapcar #'(lambda (a b) (* a b)) x w))))
+(defun combine-elt-lst-app (elt lst)
+            (mapcar #'(lambda (x) (append (list elt) x)) lst))
 
 \end{alltt}
 \end{aibox}

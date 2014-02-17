@@ -10,7 +10,7 @@
 ;;%% code
 
 (defun combine-elt-lst-app (elt lst)
-			(mapcar #'(lambda (x) (append (list elt) x)) lst))
+			(mapcar #'(lambda (x) (cons elt x)) lst))
 
 ;;%% code
 
@@ -23,3 +23,4 @@
 	(if (null (cddr lst))
 			(combine-lst-lst (car lst) (cadr lst))
 	(combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst)))))
+

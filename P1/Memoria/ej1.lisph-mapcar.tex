@@ -1,0 +1,39 @@
+\begin{aibox}{\function}
+;; h-mapcar
+
+SYNTAX: h-mapcar (x w sigma) 
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+(h-mapcar '(0.1 -0.5 0.7) '() #'tanhip); 0.0
+(h-mapcar '(0.1 -0.5 0.7) '(1 2) #'tanhip); -0.7162978
+(h-mapcar '(0.1 -0.5 0.7) '(-0.1 0.2 0.3) #'tanhip); 0.09966801
+(h-mapcar '(0.1 -0.5 0.7) '(-0.1 0.2 0.3) #'logit); 0.4750208
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\comments}
+
+\end{aibox}
+\begin{aibox}{\answers}
+No hay preguntas.
+\end{aibox}
+
+\begin{aibox}{\othercomments}
+
+\end{aibox}
+\begin{aibox}{\pseudocode}
+\end{aibox}
+\begin{aibox}{\code}
+
+\begin{alltt}
+;;%% code
+
+(defun h-mapcar (x w sigma) 
+    (funcall sigma 
+        (reduce #'+
+            (mapcar #'* x w))))
+
+\end{alltt}
+\end{aibox}

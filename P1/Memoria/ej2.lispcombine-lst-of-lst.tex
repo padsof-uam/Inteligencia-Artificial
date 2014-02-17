@@ -1,0 +1,61 @@
+\begin{aibox}{\function}
+;; combine-lst-of-lst
+
+SYNTAX: combine-lst-of-lst (lst)
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+ (combine-lst-of-lst '((a b c) (+ -) (1 2 3)))
+
+;((A + 1) (A + 2) (A + 3) (A - 1) (A - 2) (A - 3) (B + 1) (B + 2) (B + 3)
+; (B - 1) (B - 2) (B - 3) (C + 1) (C + 2) (C + 3) (C - 1) (C - 2) (C - 3))
+
+(combine-lst-of-lst '((a b) (+ -) (1 2) (NIL T)))
+
+; ((A + 1 NIL) (A + 1 T) (A + 2 NIL) (A + 2 T) (A - 1 NIL) (A - 1 T) (A - 2 NIL)
+; (A - 2 T) (B + 1 NIL) (B + 1 T) (B + 2 NIL) (B + 2 T) (B - 1 NIL) (B - 1 T)
+; (B - 2 NIL) (B - 2 T))
+
+(combine-lst-of-lst '((a b) (+ -) (1 2) ()))
+; NIL
+\end{alltt}
+
+\end{aibox}
+
+\begin{aibox}{\comments}
+Esta función utiliza una combinación de elemento con lista distinta. 
+
+La hemos definido de forma recursiva (que nos parecía más fácil de pensar) pero utilizando una combinación de elemento con lista distinta a la del ejercicio 1, pero sólo en el caso recursivo. En el caso base hemos mantenido la función del ejercicio 2.1. 
+
+Esta decisión la tomamos para obtener como resultado una única lista de listas, con únicamente 2 niveles y no más. Empleando la función del ejercicio 2.1 no funcionaba correctamente este requisito.
+
+\end{aibox}
+\begin{aibox}{\answers}
+
+\end{aibox}
+\begin{aibox}{\othercomments}
+
+Las funciones auxiliares definidas son combine-lst-lst-app que simplemente llama a la función combine-elt-lst-app que utiliza \emph{cons} en vez de \emph{list}.
+
+Hemos pensado que no hacía falta rellenar la ficha de las funciones auxiliares (debido a su gran similitud con las soluciones de los ejercicios 2.1 y 2.2).
+
+\end{aibox}
+\begin{aibox}{\pseudocode}
+funcion CombinarListaDeListas:
+	Si (la lista tiene 2 listas)
+		CombinarListas(sublista1,sublista2)
+	sino
+		CombinarListas (Primera\_Sublista, CombinarListaDeListas (RestoDeSublistas))
+
+\end{aibox}
+\begin{aibox}{\code}
+
+\begin{alltt}
+(defun combine-lst-of-lst (lst)
+    (if (null (cddr lst))
+            (combine-lst-lst (car lst) (cadr lst))
+    (combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst)))))
+
+\end{alltt}
+\end{aibox}
