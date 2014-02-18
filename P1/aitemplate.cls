@@ -3,7 +3,7 @@
 
 \LoadClass[a4paper, 10pt]{article}
 
-\RequirePackage[spanish]{babel}
+\RequirePackage[spanish,es-noquoting,es-noshorthands]{babel}
 \usepackage[utf8]{inputenc}
 \RequirePackage{anysize}
 

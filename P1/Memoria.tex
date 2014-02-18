@@ -4,6 +4,7 @@
 \usepackage{ai}
 \usepackage{alltt}
 \usepackage{tikz}
+\usepackage{listings}
 
 \begin{document}
 
@@ -53,7 +54,103 @@
 
 \paragraph*{I)} El algoritmo de búsqueda en anchura expande un nodo, y después explora todos sus hijos. La implementación se haría con una cola FIFO: exploramos un nodo y añadimos sus hijos a la cola de abiertos, de tal forma que el orden de exploración va de forma descendiente, de nodos más cercanos a la raíz a los más alejados.
 
-\
+\begin{figure}[hbtp]
+\centering
+\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+\node (A) at (0,0) {0};
+\node (B) at (2,0) {2};
+\node (C) at (1,1) {1};
+\node (D) at (1,-1) {3};
 
+\draw[->] (A) -- (B);
+\draw[->] (A) -- (C);
+\draw[->] (A) -- (D);
+\end{tikzpicture}
+\caption{Caso típico (I) de búsqueda en anchura}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+\node (A) at (0,0) {0};
+\node (B) at (2,0) {2};
+\node (C) at (1,1) {1};
+\node (D) at (1,-1) {3};
+\node (E) at (3,0) {5};
+\node (F) at (3,1) {4};
+
+\draw[->] (A) -- (B);
+\draw[->] (A) -- (C);
+\draw[->] (A) -- (D);
+\draw[->] (C) -- (F);
+\draw[->] (B) -- (E);
+\end{tikzpicture}
+\caption{Caso típico (II) de búsqueda en anchura}
+\end{figure}
+
+
+\begin{figure}[hbtp]
+\centering
+\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+\node (A) at (0,0) {0};
+\node (B) at (2,0) {2};
+\node (C) at (1,1) {1};
+\node (D) at (1,-1) {3};
+\node (E) at (3,0) {5};
+\node (F) at (3,1) {4};
+\node (G) at (5,1) {6};
+
+\draw[->] (A) -- (B);
+\draw[->] (A) -- (C);
+\draw[->] (A) -- (D);
+\draw[->] (C) -- (F);
+\draw[->] (B) -- (E);
+\draw[->] (F) -- (G);
+\draw[->] (E) -- (G);
+\end{tikzpicture}
+\caption{Caso especial: grafo no árbol}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+\node (A) at (0,0) {0};
+\node (B) at (2,0) {1};
+\node (C) at (1,1) {2};
+\node (D) at (1,-1) {3};
+\node (E) at (3,0) {4};
+\node (F) at (3,1) {5};
+\node (G) at (5,1) {6};
+
+\draw[->] (A) -- (B);
+\draw[->] (B) -- (C);
+\draw[->] (C) -- (D);
+\draw[->] (D) -- (E);
+\draw[->] (E) -- (F);
+\draw[->] (F) -- (G);
+\end{tikzpicture}
+\caption{Caso especial: grafo estilo lista}
+\end{figure}
+
+\paragraph{II)} Ese código explora todo el grafo, y está claro que si los dos nodos están conectados, encontrará un camino. La cuestión está en discernir si hay un camino más corto que el que encuentra la función.
+
+Para nuestros propósitos, podemos reescribir el grafo de búsqueda como un árbol en el que la raíz es el nodo origen de la búsqueda y los nodos a nivel $n$ son los nodos que están a distancia $n$ del origen. A efectos de la búsqueda en anchura para buscar un camino, es equivalente buscar en el grafo original que en este árbol. Entonces, si encontramos el nodo destino en el nivel $k$ es imposible que haya un camino más corto, ya que el algoritmo explora por completo cada nivel antes de pasar al siguiente y habría encontrado el camino más corto antes.
+
+\paragraph{III)}
+\begin{lstlisting}
+funcion bfs(destino, cola, grafo)
+	si cola == nil:
+		devolver nil
+	
+	cola[0] -> path
+	path[0] -> node
+	
+	si el nodo es el destino:
+		invertir path
+		devolver path
+	si no
+		llamar a bfs
+	
+\end{lstlisting}
 
 \end{document}
