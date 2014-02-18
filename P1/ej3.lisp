@@ -27,12 +27,11 @@
 
 (setf Delta '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) (L)))
 
+;; Aplana una lista, eliminando funciones anidadas.
 (defun flatten (structure)
 	(cond ((null structure) nil)
 		((atom structure) (list structure))
 		(t (mapcan #'flatten structure))))
-
-;;%% Code
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO: extrae-simbolos
@@ -68,7 +67,7 @@
 (genera-lista-interpretaciones '(A))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Auxiliares
+;; Auxiliares: implementación de operadores
 
 (defun implies (a b)
   (or (not a) (and a b)))
@@ -82,6 +81,7 @@
 (defun myor (&rest r)
   (reduce #'(lambda (x y) (or x y)) r))
   
+;; Devuelve la función evaluadora correspondiente para el símbolo.
 (defun evaluator (sym)
   (cond 
     ((eql sym +not+) #'not)
@@ -91,12 +91,13 @@
     ((eql sym +or+) #'myor)
     ))
 
+;; Devuelve la interpretación de un símbolo con la lista de interpretaciones dada.
 (defun getint (sym int)
   (if (truth-value-p sym)
       sym
       (car (cdar (remove-if 
-          #'(lambda (x) (not (eql (car x) sym)))
-          int))))))
+          #'(lambda (x) (not (eql (car x) sym))) 
+          int)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AUXILIAR eval-fbf
@@ -124,15 +125,12 @@
 ;;            NIL en caso contrario
 ;;
 
-;;%% Code
-
 (defun interpretacion-modelo-p (kb interpretacion) 
   (every #'identity (mapcar #'(lambda (fbf) (eval-fbf fbf interpretacion)) kb)))
 
 
 (interpretacion-modelo-p  '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P))
                          '((A NIL) (P NIL) (H T)))
-;;; NIL
 (interpretacion-modelo-p '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P))
                          '((A T) (P NIL) (H NIL)))
 
@@ -143,17 +141,13 @@
 ;; EVALÚA A : lista de interpretaciones que son modelo para KB
 ;;
 ;;
-;;%% Code
-
 (defun encuentra-modelos (kb) 
   (remove-if-not 
     #'(lambda (int) (interpretacion-modelo-p kb int)) 
     (genera-lista-interpretaciones (extrae-simbolos kb))))
 
 (encuentra-modelos '((=> A (¬ H)) (<=> P (^ A  H)) (=> H P)))
-;;; (((A T) (P NIL) (H NIL)) ((A NIL) (P NIL) (H NIL)))
 (encuentra-modelos '((=> (^ P I)  L)  (=> (¬ P) (¬ L)) (¬ P) L))
-;;; NIL
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO SAT-p
@@ -163,13 +157,9 @@
 ;;            NIL en caso contrario
 ;;
 ;;
-
-;;%% Code
-
-
 (defun SAT-p (kb)
   (not (null (encuentra-modelos kb))))
 
-(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) ;; T
-(SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) ;; NIL
-(SAT-p '((v (<=> K (¬ (^ A (M => B))))) (=> (^ K A M B) J) (v (=> (^ J A) T) (<=> A NIL)))) ;; NIL
+(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) 
+(SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) 
+(SAT-p '((v (<=> K (¬ (^ A (M => B))))) (=> (^ K A M B) J) (v (=> (^ J A) T) (<=> A nil))))
