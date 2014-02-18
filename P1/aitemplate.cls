@@ -4,7 +4,7 @@
 \LoadClass[a4paper, 10pt]{article}
 
 \RequirePackage[spanish]{babel}
-\RequirePackage[utf8]{inputenc}
+\usepackage[utf8]{inputenc}
 \RequirePackage{anysize}
 
 \marginsize{2cm}{2cm}{0cm}{0cm}

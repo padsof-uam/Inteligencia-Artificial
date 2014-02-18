@@ -1,33 +1,36 @@
 \begin{aibox}{\function}
+\begin{alltt}
 ;; interpretacion-modelo-p
 
 SYNTAX: interpretacion-modelo-p (kb interpretacion) 
-\end{aibox}
-
-\begin{aibox}{\examples}
-\begin{alltt}
-
-
-(interpretacion-modelo-p 
- '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P)) '((A NIL) (P NIL) (H T))); NIL
-
-(interpretacion-modelo-p
- '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P)) '((A T) (P NIL) (H NIL)))
+RECIBE: - kb. Lista de fbfs.
+		- interpretacion. Lista con asignaciones de valores de verdad a cada símbolo.
 
 \end{alltt}
 \end{aibox}
 
+\begin{aibox}{\examples}
+\begin{alltt}
+(interpretacion-modelo-p 
+ '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P)) '((A NIL) (P NIL) (H T)))
+ ;;; NIL
+
+(interpretacion-modelo-p
+ '((<=> A (¬ H)) (<=> P (^ A  H)) (<=> H P)) '((A T) (P NIL) (H NIL)))
+;;; T
+\end{alltt}
+\end{aibox}
+
 \begin{aibox}{\comments}
-
+Evaluamos todas las fbf de la base de conocimiento y nos aseguramos que todas sean \texttt{T} con \texttt{every identity}.
 \end{aibox}
-\begin{aibox}{\answers}
 
-\end{aibox}
-\begin{aibox}{\othercomments}
-
-\end{aibox}
 \begin{aibox}{\pseudocode}
+\begin{alltt}
+evaluations = eval-fbf for each fbf in kb
+return every evaluation in evaluations is T
 
+\end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 

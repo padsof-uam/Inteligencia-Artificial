@@ -1,11 +1,23 @@
 \begin{aibox}{\function}
+\begin{alltt}
 ;; genera-lista-interpretaciones
 
 SYNTAX: genera-lista-interpretaciones (lst) 
+RECIBE   : Lista de N símbolos atómicos
+EVALÚA A : Lista de 2^N posibles interpretaciones
+             (lista de pares (<símbolo> <valor de verdad>))
+
+\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
+(genera-lista-interpretaciones '(P I L))
+;;; (((P T) (I T) (L T)) ((P T) (I T) (L NIL)) ((P T) (I NIL) (L T))
+ ((P T) (I NIL) (L NIL)) ((P NIL) (I T) (L T)) ((P NIL) (I T) (L NIL))
+ ((P NIL) (I NIL) (L T)) ((P NIL) (I NIL) (L NIL)))
+ (genera-lista-interpretaciones '(A))
+;;; (((A T) (A NIL)))
 \end{alltt}
 
 \end{aibox}
@@ -13,14 +25,10 @@ SYNTAX: genera-lista-interpretaciones (lst)
 \begin{aibox}{\comments}
 
 \end{aibox}
-\begin{aibox}{\answers}
-
-\end{aibox}
-\begin{aibox}{\othercomments}
-
-\end{aibox}
 \begin{aibox}{\pseudocode}
+\begin{alltt}
 
+\end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 
