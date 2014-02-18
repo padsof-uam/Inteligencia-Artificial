@@ -1,7 +1,11 @@
 \begin{aibox}{\function}
+\begin{alltt}
 ;; combine-lst-of-lst
 
 SYNTAX: combine-lst-of-lst (lst)
+RECIBE: una lista de listas
+EVALÚA A: una lista de todas las posibles combinaciones de los elementos del argumento. 
+\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
@@ -26,39 +30,48 @@ SYNTAX: combine-lst-of-lst (lst)
 \end{aibox}
 
 \begin{aibox}{\comments}
+
 Esta función utiliza una combinación de elemento con lista distinta. 
-
+\paragraph{}
 La hemos definido de forma recursiva (que nos parecía más fácil de pensar) pero utilizando una combinación de elemento con lista distinta a la del ejercicio 1, pero sólo en el caso recursivo. En el caso base hemos mantenido la función del ejercicio 2.1. 
-
+\paragraph{}
 Esta decisión la tomamos para obtener como resultado una única lista de listas, con únicamente 2 niveles y no más. Empleando la función del ejercicio 2.1 no funcionaba correctamente este requisito.
-
+\paragraph{}
 Las funciones auxiliares definidas son combine-lst-lst-app que simplemente llama a la función combine-elt-lst-app que utiliza \emph{cons} en vez de \emph{list}.
-
+\paragraph{}
 Hemos pensado que no hacía falta rellenar la ficha de las funciones auxiliares (debido a su gran similitud con las soluciones de los ejercicios 2.1 y 2.2).
-
+\paragraph{}
 La primera comprobación (no incluida en un primer momento) la tuvimos en cuenta al realizar el tercer ejercicio. En caso de recibir una lista de listas de esta forma: '(((A t) (A nil))) devolvía NIL.
-
 \end{aibox}
+\newpage
 \begin{aibox}{\pseudocode}
 \begin{alltt}
 funcion CombinarListaDeListas:
-	Si (la lista tiene 2 listas)
-		CombinarListas(sublista1,sublista2)
-	sino
-		CombinarListas (Primera\_Sublista, CombinarListaDeListas (RestoDeSublistas))
+    Si (la lista tiene 2 listas)
+        CombinarListas(sublista1,sublista2)
+    sino
+        CombinarListas (Primera\_Sublista, CombinarListaDeListas (RestoDeSublistas))
 \end{alltt}
 \end{aibox}
+
 \begin{aibox}{\code}
 
 \begin{alltt}
 
 (defun combine-lst-of-lst (lst)
-	(if (null (cdr lst))
-		(car lst)
-	(if (null (cddr lst))
-			(combine-lst-lst (car lst) (cadr lst))
-	(combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst))))))
+    (if (null (cdr lst))
+        (car lst)
+    (if (null (cddr lst))
+            (combine-lst-lst (car lst) (cadr lst))
+    (combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst))))))
 
+\end{alltt}
+Las funciones auxiliares son:
+\begin{alltt} 
+(defun combine-elt-lst-app (elt lst)
+     (mapcar #'(lambda (x) (cons elt x)) lst))
 
+(defun combine-lst-lst-app (lst1 lst2)
+     (mapcan #'(lambda (x) (combine-elt-lst-app x lst2)) lst1))
 \end{alltt}
 \end{aibox}

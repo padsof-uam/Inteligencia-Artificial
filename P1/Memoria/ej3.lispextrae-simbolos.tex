@@ -30,8 +30,8 @@ Para extraer los símbolos, aplanamos la lista (nos quitamos los paréntesis ani
 symbols = ()
 
 for atom in (flatten expr):
-	if (symbol-p atom)
-		append atom to symbols
+    if (symbol-p atom)
+        append atom to symbols
 
 remove duplicates in symbols
 return symbols
@@ -44,7 +44,7 @@ return symbols
 \begin{alltt}
 
 (defun extrae-simbolos (expr)
-	(remove-duplicates (remove-if-not #'symbol-p (flatten expr))))
+    (remove-duplicates (remove-if-not #'symbol-p (flatten expr))))
 
 \end{alltt}
 \end{aibox}

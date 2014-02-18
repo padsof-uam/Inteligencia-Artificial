@@ -1,7 +1,11 @@
 \begin{aibox}{\function}
+\begin{alltt}
 ;; h-recursive
 
 SYNTAX: h-recursive (x w sigma) 
+RECIBE: dos listas (\textbf{x} y \textbf{w}) y una función sigma
+EVALÚA A: el valor de la función sigma aplicada al producto escalar de las 2 listas.
+\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
@@ -38,6 +42,9 @@ h-recursiva (x w sigma)
 (defun h-recursive (x w sigma) 
         (funcall sigma (h-recursive-aux x w 0)))
 
+\end{alltt}
+Y la función auxiliar es:
+\begin{alltt}
 (defun h-recursive-aux (x w acc)
     (if (null x)
           acc
