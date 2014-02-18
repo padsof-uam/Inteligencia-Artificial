@@ -3,11 +3,13 @@
 \usepackage{textcomp}
 \usepackage{ai}
 \usepackage{alltt}
+\usepackage{tikz}
 
 \begin{document}
 
 \printtitle{1}
 
+\section*{Ejercicio 1}
 \input{Memoria/ej1.lisph-mapcar.tex}
 %\newpage
 %\input{Memoria/ej1.lisph-recursive-aux.tex}
@@ -20,6 +22,8 @@
 %\newpage
 %\input{Memoria/ej2.lispcombine-elt-lst-app.tex}
 \newpage
+
+\section*{Ejercicio 2}
 \input{Memoria/ej2.lispcombine-elt-lst.tex}
 %\newpage
 %\input{Memoria/ej2.lispcombine-lst-lst-app.tex}
@@ -28,6 +32,8 @@
 \newpage
 \input{Memoria/ej2.lispcombine-lst-of-lst.tex}
 \newpage
+
+\section*{Ejercicio 3}
 \input{Memoria/ej3.lispeval-fbf.tex}
 \newpage
 \input{Memoria/ej3.lispencuentra-modelos.tex}
@@ -42,4 +48,12 @@
 \newpage
 %\input{Memoria/ej3.lisptruth-value-p.tex}
 %\newpage
+
+\section*{Ejercicio 4}
+
+\paragraph*{I)} El algoritmo de búsqueda en anchura expande un nodo, y después explora todos sus hijos. La implementación se haría con una cola FIFO: exploramos un nodo y añadimos sus hijos a la cola de abiertos, de tal forma que el orden de exploración va de forma descendiente, de nodos más cercanos a la raíz a los más alejados.
+
+\
+
+
 \end{document}

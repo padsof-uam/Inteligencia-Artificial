@@ -57,9 +57,6 @@
 ;;
 ;;
 ;;
-
-;;%% Code
-
 (defun genera-lista-interpretaciones (lst) 
 	(combine-lst-of-lst (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst)))
 
@@ -96,11 +93,7 @@
   (if (truth-value-p sym)
       sym
       (car (cdar (remove-if 
-<<<<<<< HEAD
-          #'(lambda (x) (not (eql (car x) sym))) 
-=======
           #'(lambda (x) (not (eql (car x) sym)))
->>>>>>> 096b287c97f7a1ec2c613bafc979948545c5a5d2
           int)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
