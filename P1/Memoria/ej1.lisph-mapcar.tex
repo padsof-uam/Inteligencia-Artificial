@@ -14,26 +14,31 @@ SYNTAX: h-mapcar (x w sigma)
 \end{aibox}
 
 \begin{aibox}{\comments}
-
 \end{aibox}
 \begin{aibox}{\answers}
 No hay preguntas.
 \end{aibox}
 
 \begin{aibox}{\othercomments}
-
+No hemos incluido las funciones tanhip ni logit ya que son definiciones de expresiones matemáticas ya definidas en el enunciado.
 \end{aibox}
 \begin{aibox}{\pseudocode}
+Pensamos en un pseudocódigo así
+\begin{alltt}
+h-mapcar (x w sigma)
+    para i < longitud(x)
+        resultado += sigma(x[i]*w[i])
+        i++
+\end{alltt}
+
+Aunque luego en lisp no lo implementemos con un bucle, la función \emph{mapcar} nos permite recorrer \emph{x} y \emph{w} de la manera que necesitamos.
 \end{aibox}
 \begin{aibox}{\code}
 
 \begin{alltt}
-;;%% code
-
 (defun h-mapcar (x w sigma) 
     (funcall sigma 
         (reduce #'+
             (mapcar #'* x w))))
-
 \end{alltt}
 \end{aibox}
