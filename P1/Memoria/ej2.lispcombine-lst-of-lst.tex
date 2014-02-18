@@ -19,6 +19,8 @@ SYNTAX: combine-lst-of-lst (lst)
 
 (combine-lst-of-lst '((a b) (+ -) (1 2) ()))
 ; NIL
+
+(combine-lst-of-lst '(((A t) (A nil)))) ; ((A T) (A NIL))
 \end{alltt}
 
 \end{aibox}
@@ -34,6 +36,8 @@ Las funciones auxiliares definidas son combine-lst-lst-app que simplemente llama
 
 Hemos pensado que no hacía falta rellenar la ficha de las funciones auxiliares (debido a su gran similitud con las soluciones de los ejercicios 2.1 y 2.2).
 
+La primera comprobación (no incluida en un primer momento) la tuvimos en cuenta al realizar el tercer ejercicio. En caso de recibir una lista de listas de esta forma: '(((A t) (A nil))) devolvía NIL.
+
 \end{aibox}
 \begin{aibox}{\pseudocode}
 \begin{alltt}
@@ -47,10 +51,14 @@ funcion CombinarListaDeListas:
 \begin{aibox}{\code}
 
 \begin{alltt}
+
 (defun combine-lst-of-lst (lst)
-    (if (null (cddr lst))
-            (combine-lst-lst (car lst) (cadr lst))
-    (combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst)))))
+	(if (null (cdr lst))
+		(car lst)
+	(if (null (cddr lst))
+			(combine-lst-lst (car lst) (cadr lst))
+	(combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst))))))
+
 
 \end{alltt}
 \end{aibox}
