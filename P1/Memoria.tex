@@ -6,6 +6,10 @@
 \usepackage{tikz}
 \usepackage{listings}
 
+\lstset{numbers=left,numberstyle=\tiny,numbersep=5pt,language=Lisp,
+  stringstyle=\ttfamily\small,basicstyle=\ttfamily\footnotesize,
+  showstringspaces=false,breaklines}
+
 \begin{document}
 
 \printtitle{1}
@@ -111,7 +115,7 @@
 \caption{Caso especial: grafo no árbol}
 \end{figure}
 
-\begin{figure}[hbtp]
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
 \node (A) at (0,0) {0};
@@ -132,6 +136,8 @@
 \caption{Caso especial: grafo estilo lista}
 \end{figure}
 
+\newpage
+
 \paragraph{II)} Ese código explora todo el grafo, y está claro que si los dos nodos están conectados, encontrará un camino. La cuestión está en discernir si hay un camino más corto que el que encuentra la función.
 
 Para nuestros propósitos, podemos reescribir el grafo de búsqueda como un árbol en el que la raíz es el nodo origen de la búsqueda y los nodos a nivel $n$ son los nodos que están a distancia $n$ del origen. A efectos de la búsqueda en anchura para buscar un camino, es equivalente buscar en el grafo original que en este árbol. Entonces, si encontramos el nodo destino en el nivel $k$ es imposible que haya un camino más corto, ya que el algoritmo explora por completo cada nivel antes de pasar al siguiente y habría encontrado el camino más corto antes.
@@ -149,8 +155,67 @@ funcion bfs(destino, cola, grafo)
 		invertir path
 		devolver path
 	si no
-		llamar a bfs
-	
+		buscar nuevos caminos en grafo a partir de node -> caminos
+		bfs(destino, caminos, grafo)	
+\end{lstlisting}
+
+\paragraph{IV)}
+
+\begin{lstlisting}
+(defun bfs (end queue net) 
+  (if (null queue) 
+      nil
+    (let ((path (car queue))) ; Sacamos el primer camino de la lista
+      (let ((node (car path))) ; El ultimo nodo explorado es el primero
+        (if (eql node end) ; Si hemos llegado al final, devolvemos el camino.
+            (reverse path)
+          (bfs end ; Si no, hacemos una bfs
+               (append (cdr queue)
+                       (new-paths path node net)) ; con los caminos posibles desde el nodo
+               net))))))
+\end{lstlisting}
+
+\paragraph{V)}
+
+La secuencia de llamadas es
+
+\begin{verbatim}
+0: (BFS D ((A)) ((A B) (B C D) (C D) (D)))
+    1: (BFS D ((B A)) ((A B) (B C D) (C D) (D)))
+      2: (BFS D ((C B A) (D B A)) ((A B) (B C D) (C D) (D)))
+        3: (BFS D ((D B A) (D C B A)) ((A B) (B C D) (C D) (D)))
+        3: BFS returned (A B D)
+      2: BFS returned (A B D)
+    1: BFS returned (A B D)
+  0: BFS returned (A B D)
+\end{verbatim}
+
+\paragraph{VI)}
+
+El resultado es:
+
+\begin{verbatim}
+> (shortest-path 'c 'f '((a d h f) (b g e c) (c d b) (d a g c) (e f h b) (f a e) (g d h b) (h a g e)))
+< (C D A F)
+\end{verbatim}
+
+\paragraph{VII)}
+
+Añadimos una lista de nodos visitados:
+
+\begin{lstlisting}
+(defun bfs-improved (end queue net visited) 
+  (if (null queue) 
+      nil
+    (let ((path (car queue))) ; Sacamos el primer camino de la lista
+      (let ((node (car path))) ; El ultimo nodo explorado es el primero
+        (if (eql node end) ; Si hemos llegado al final, devolvemos el camino.
+            (reverse path)
+          (when (not (find node visited))
+	          (bfs end ; Si no, hacemos una bfs
+	               (append (cdr queue)
+	                       (new-paths path node net)) ; con los caminos posibles desde el nodo
+	               net (append node visited))))))
 \end{lstlisting}
 
 \end{document}
