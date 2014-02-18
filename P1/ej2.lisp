@@ -20,7 +20,9 @@
 ;;%% code
 
 (defun combine-lst-of-lst (lst)
+	(if (null (cdr lst))
+		(car lst)
 	(if (null (cddr lst))
 			(combine-lst-lst (car lst) (cadr lst))
-	(combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst)))))
+	(combine-lst-lst-app (car lst) (combine-lst-of-lst (cdr lst))))))
 
