@@ -16,15 +16,16 @@ SYNTAX: combine-elt-lst (elt lst)
 \end{aibox}
 
 \begin{aibox}{\comments}
-\end{aibox}
-\begin{aibox}{\answers}
-
-\end{aibox}
-\begin{aibox}{\othercomments}
-
+En una primera implementación utilizando \emph{cons} nos dimos cuenta de que no era del todo correcto, ya que el rest del último elemento no era NIL por defecto. En cambio si utilizamos \emph{list} esto queda bien definido.
 \end{aibox}
 \begin{aibox}{\pseudocode}
+El pseudocódigo que pensamos para resolver el problema:
 
+\begin{alltt}
+combine-elt-lst (elemento,lista)
+    Para cada atomo en lista
+        añadir ((elemento,atomo),resultado)
+\end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 

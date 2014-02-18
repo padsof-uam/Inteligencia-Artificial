@@ -17,16 +17,17 @@ SYNTAX: combine-lst-lst (lst1 lst2)
 \end{aibox}
 
 \begin{aibox}{\comments}
+Utilizamos la función definida en el ejercicio anterior (combine-elt-lst) lo que facilita la tarea.
 
-\end{aibox}
-\begin{aibox}{\answers}
-
-\end{aibox}
-\begin{aibox}{\othercomments}
-
+En este ejercicio vimos la diferencia entre mapcan y mapcar. Necesitábamos que el resultado fuera 1 única lista con todos los elementos y no una lista de listas. Este conocimiento fue realmente útil en la resolución del siguiente ejercicio.
 \end{aibox}
 \begin{aibox}{\pseudocode}
-
+Esta primera aproximación (traducida a programación funcional utilizando \emph{mapcar}) luego fue modificada (por el uso de mapcan en vez de mapcar) para que el resultado fuera una única lista de átomos.
+\begin{alltt}
+combine-lst-lst (lst1,lst2)
+    Para cada eltemento en lst1:
+        combine-elt-lst (elemento,lst2)
+\end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 

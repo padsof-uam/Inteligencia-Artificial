@@ -96,7 +96,11 @@
   (if (truth-value-p sym)
       sym
       (car (cdar (remove-if 
+<<<<<<< HEAD
           #'(lambda (x) (not (eql (car x) sym))) 
+=======
+          #'(lambda (x) (not (eql (car x) sym)))
+>>>>>>> 096b287c97f7a1ec2c613bafc979948545c5a5d2
           int)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -112,10 +116,10 @@
            (evaluator (first fbf)) 
            (mapcar #'(lambda (f) (eval-fbf f int)) (rest fbf)))))
 
-(eval-fbf '(<=> T NIL) '())
-(eval-fbf '(=> A NIL) '((A T)))
-(eval-fbf '(<=> P (^ A  H)) '((A NIL) (P NIL) (H T)))
-(eval-fbf '(<=> (v A P H) (^ A P H)) '((A NIL) (P NIL) (H T)))
+;;(eval-fbf '(<=> T NIL) '())
+;;(eval-fbf '(=> A NIL) '((A T)))
+;;(eval-fbf '(<=> P (^ A  H)) '((A NIL) (P NIL) (H T)))
+;;(eval-fbf '(<=> (v A P H) (^ A P H)) '((A NIL) (P NIL) (H T)))
  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO interpretacion-modelo-p
@@ -160,6 +164,6 @@
 (defun SAT-p (kb)
   (not (null (encuentra-modelos kb))))
 
-(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) 
 (SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) 
 (SAT-p '((v (<=> K (¬ (^ A (M => B))))) (=> (^ K A M B) J) (v (=> (^ J A) T) (<=> A nil))))
+(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P)))

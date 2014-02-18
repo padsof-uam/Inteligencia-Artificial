@@ -19,12 +19,13 @@
 
 ;;%% code
 
-(defun h-recursive (x w sigma) 
-		(funcall sigma (h-recursive-aux x w 0)))
-
-;;%% code
-
 (defun h-recursive-aux (x w acc)
 		(if (null x)
 			acc
 		(h-recursive-aux (rest x) (rest w) ( + (* (first x)  (first w)) acc))))
+
+;;%% code
+
+(defun h-recursive (x w sigma) 
+		(funcall sigma (h-recursive-aux x w 0)))
+

@@ -23,19 +23,23 @@ EVALÚA A : Lista de 2^N posibles interpretaciones
 \end{aibox}
 
 \begin{aibox}{\comments}
+Primero generamos todas las posibles interpretaciones de cada átomo (que solo puede ser T y NIL) y formamos una lista de listas de la forma (((Atomo1 T) (Atomo1 NIL)) ((Atomo2 T)(Atomo2 NIL)) ...)
 
+Ahora solo falta combinar estas listas (con la función del ejericico 2.3) para conseguir todas las posibles combinaciones.
 \end{aibox}
+
 \begin{aibox}{\pseudocode}
 \begin{alltt}
-
+genera-lista-interpretaciones (lst)
+    para cada elemento en lst
+        añadir ( combinar(elemento, (T, NIL), aux)
+    combine-lst-of-lst (aux)
 \end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 
 \begin{alltt}
-
 (defun genera-lista-interpretaciones (lst) 
     (combine-lst-of-lst (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst)))
-
 \end{alltt}
 \end{aibox}
