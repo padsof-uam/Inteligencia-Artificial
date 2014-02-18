@@ -1,14 +1,21 @@
 \begin{aibox}{\function}
+\begin{alltt}
 ;; SAT-p
 
 SYNTAX: SAT-p (kb)
+RECIBE   : base de conocimiento (KB)
+EVALÚA A : T si existe al menos un modelo para kb
+            NIL en caso contrario
+\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
-(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) ; T
+(SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) 
+; T
 
-(SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) ; NIL
+(SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) 
+; NIL
 \end{alltt}
 
 \end{aibox}
@@ -16,14 +23,14 @@ SYNTAX: SAT-p (kb)
 \begin{aibox}{\comments}
 
 \end{aibox}
-\begin{aibox}{\answers}
-
-\end{aibox}
-\begin{aibox}{\othercomments}
-
-\end{aibox}
 \begin{aibox}{\pseudocode}
-
+\begin{alltt}
+mods = encontrar modelos de kb
+si mods es vacía
+	devolver NIL
+si no
+	devolver T
+\end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 

@@ -1,16 +1,21 @@
 \begin{aibox}{\function}
+\begin{alltt}
 ;; encuentra-modelos
 
-SYNTAX: encuentra-modelos (kb) 
+SYNTAX: encuentra-modelos (kb)
+RECIBE   : base de conocimiento (KB)
+EVALÚA A : lista de interpretaciones que son modelo para KB
+
+\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
-(encuentra-modelos '((=> A (¬ H)) (<=> P (^ A  H)) (=> H P))) ;
- (((A T) (P NIL) (H NIL)) ((A NIL) (P NIL) (H NIL)))
+(encuentra-modelos '((=> A (¬ H)) (<=> P (^ A  H)) (=> H P))) 
+; (((A T) (P NIL) (H NIL)) ((A NIL) (P NIL) (H NIL)))
 
-(encuentra-modelos '((=> (^ P I)  L)  (=> (¬ P) (¬ L)) (¬ P) L)) ;
- NIL
+(encuentra-modelos '((=> (^ P I)  L)  (=> (¬ P) (¬ L)) (¬ P) L)) 
+; NIL
 
 \end{alltt}
 
@@ -19,14 +24,12 @@ SYNTAX: encuentra-modelos (kb)
 \begin{aibox}{\comments}
 
 \end{aibox}
-\begin{aibox}{\answers}
-
-\end{aibox}
-\begin{aibox}{\othercomments}
-
-\end{aibox}
 \begin{aibox}{\pseudocode}
+\begin{alltt}
+ints = interpretaciones(simbolos de kb)
+eliminar int de ints si no es interpretacion-modelo-p de kb
 
+\end{alltt}
 \end{aibox}
 \begin{aibox}{\code}
 

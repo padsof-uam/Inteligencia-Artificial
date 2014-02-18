@@ -1,0 +1,53 @@
+\begin{aibox}{\function}
+\begin{alltt}
+;; eval-fbf
+
+SYNTAX: eval-fbf (fbf int)
+RECIBE: fórmula bien formada e interpretación
+EVALÚA A : Valor de verdad de la fbf con la interpretación dada
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+(eval-fbf '(<=> T NIL) '())
+; NIL
+(eval-fbf '(=> A NIL) '((A T)))
+; NIL
+(eval-fbf '(<=> P (^ A  H)) '((A NIL) (P NIL) (H T)))
+; T
+(eval-fbf '(<=> (v A P H) (^ A P H)) '((A NIL) (P NIL) (H T)))
+; NIL
+\end{alltt}
+
+\end{aibox}
+
+\begin{aibox}{\comments}
+La función \texttt{evaluator} devuelve la función correspondiente al operador pasado como argumento. Después de evaluar todos los elementos de la lista de forma recursiva con \texttt{eval-fbf}, aplicamos el evaluador con los elementos de la lista como argumentos.
+\end{aibox}
+
+\begin{aibox}{\pseudocode}
+\begin{alltt}
+si fbf es un átomo
+	obtener valor de verdad de fbf con interp.
+si no
+	sym = primer elemento de fbf
+	evaluator = obtener función evaluadora para el operador
+	results = eval-fbf(resto de elementos de la fbf)
+	llamar a evaluator con results como argumentos
+
+\end{alltt}
+\end{aibox}
+\begin{aibox}{\code}
+
+\begin{alltt}
+(defun eval-fbf (fbf int)
+   	(if (atom fbf)
+         (getint fbf int)
+         (apply 
+           (evaluator (first fbf)) 
+           (mapcar #'(lambda (f) (eval-fbf f int)) (rest fbf)))))
+
+\end{alltt}
+\end{aibox}

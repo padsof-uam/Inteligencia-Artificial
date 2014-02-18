@@ -27,6 +27,11 @@
 
 (setf Delta '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) (L)))
 
+(defun flatten (structure)
+	(cond ((null structure) nil)
+		((atom structure) (list structure))
+		(t (mapcan #'flatten structure))))
+
 ;;%% Code
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -36,16 +41,12 @@
 ;; EVAlÚA A: Lista de símbolos atómicos (sin repeticiones)
 ;; utilizados en la fórmula bien formada. El orden en la lista no es
 ;; relevante.
-;;
-(defun flatten (structure)
-	(cond ((null structure) nil)
-		((atom structure) (list structure))
-		(t (mapcan #'flatten structure))))
 
 (defun extrae-simbolos (expr)
 	(remove-duplicates (remove-if-not #'symbol-p (flatten expr))))
 
-(extrae-simbolos Delta)
+(extrae-simbolos '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) (L)))
+(extrae-simbolos '((<=> (¬ (P ^ L)) (v (¬ (=> K P)) K P))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO: genera-lista-interpretaciones
@@ -62,6 +63,12 @@
 
 (defun genera-lista-interpretaciones (lst) 
 	(combine-lst-of-lst (mapcar #'(lambda (x) (combine-elt-lst x '(T NIL))) lst)))
+
+(genera-lista-interpretaciones '(P I L))
+(genera-lista-interpretaciones '(A))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auxiliares
 
 (defun implies (a b)
   (or (not a) (and a b)))
@@ -85,10 +92,18 @@
     ))
 
 (defun getint (sym int)
-  (car (cdar (remove-if 
+  (if (truth-value-p sym)
+      sym
+      (car (cdar (remove-if 
           #'(lambda (x) (not (eql (car x) sym)))
-          int))))
+          int))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AUXILIAR eval-fbf
+;;
+;; RECIBE   : fórmula bien formada e interpretación
+;; EVALÚA A : Valor de verdad de la fbf con la interpretación dada
+;;
 (defun eval-fbf (fbf int)
    	(if (atom fbf)
          (getint fbf int)
@@ -96,16 +111,10 @@
            (evaluator (first fbf)) 
            (mapcar #'(lambda (f) (eval-fbf f int)) (rest fbf)))))
 
-(defmacro feval (lst int)
-  (mapcar #'(lambda (x) 
-             (cond
-			    ((eql x +not+) 'not)
-			    ((eql x +cond+) 'implies)
-			    ((eql x +bicond+) 'bicond)
-			    ((eql x +and+) 'and)
-			    ((eql x +or+) 'or)
-       			(t (getint x int)))) lst))
- 
+(eval-fbf '(<=> T NIL) '())
+(eval-fbf '(=> A NIL) '((A T)))
+(eval-fbf '(<=> P (^ A  H)) '((A NIL) (P NIL) (H T)))
+(eval-fbf '(<=> (v A P H) (^ A P H)) '((A NIL) (P NIL) (H T)))
  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO interpretacion-modelo-p
@@ -163,3 +172,4 @@
 
 (SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P))) ;; T
 (SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) ;; NIL
+(SAT-p '((v (<=> K (¬ (^ A (M => B))))) (=> (^ K A M B) J) (v (=> (^ J A) T) (<=> A NIL)))) ;; NIL
