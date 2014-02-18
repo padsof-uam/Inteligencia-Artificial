@@ -158,5 +158,5 @@
   (not (null (encuentra-modelos kb))))
 
 (SAT-p '((=> (^ P I) L) (=> (¬ P) (¬ L)) (¬ P) L)) 
-;;(SAT-p '((v (<=> K (¬ (^ A (M => B))))) (=> (^ K A M B) J) (v (=> (^ J A) T) (<=> A nil))))
+(SAT-p '((v (<=> K (¬ (^ A (=> M B))))) (=> (^ K A M B) J) (v (=> (^ J A) T) (<=> A nil))))
 (SAT-p '((<=> A (¬ H)) (<=> P (^ A H)) (<=> H P)))
