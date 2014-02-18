@@ -3,7 +3,7 @@
 ;; h-recursive
 
 SYNTAX: h-recursive (x w sigma) 
-RECIBE: dos listas (\textbf{x} y \textbf{w}) y una función sigma
+RECIBE: dos listas (\textbf{x} y \textbf{w}) y una función sigma.
 EVALÚA A: el valor de la función sigma aplicada al producto escalar de las 2 listas.
 \end{alltt}
 \end{aibox}
@@ -19,12 +19,10 @@ EVALÚA A: el valor de la función sigma aplicada al producto escalar de las 2 l
 \end{aibox}
 
 \begin{aibox}{\comments}
-Salen los mismos resultados que con la función H-MAPCAR, como podíamos esperar. 
-
-Simplemente hay que tener cuidado con que las listas deben tener la misma longitud para que funcione correctamente.
-
-Utilizamos la llamada a la función auxiliar para optimizar el uso de la recursión. Con el uso de un acumulador conseguimos evitar la cadena de devoluciones para resolver la recursión.
-
+\paragraph{}
+Salen los mismos resultados que con la función H-MAPCAR, como podíamos esperar. \paragraph{}
+Simplemente hay que tener cuidado con que las listas deben tener la misma longitud para que funcione correctamente.\paragraph{}
+Utilizamos la llamada a la función auxiliar para optimizar el uso de la recursión. Con el uso de un acumulador conseguimos evitar la cadena de devoluciones para resolver la recursión.\paragraph{}
 Incluimos el código de la función auxiliar empleada en el apartado de código.
 \end{aibox}
 
