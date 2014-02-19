@@ -122,12 +122,35 @@
 (f-h-galaxy 'Sirtis *sensors*) ;-> 0
 (f-h-galaxy 'Avalon *sensors*) ;-> 5
 
+(defun navigate-generic (state routes is-route-func get-dest-func name)
+  (mapcar 
+    #'(lambda (x)
+       (make-action :Name name
+                    :origin state
+                    :final (funcall get-dest-func x)
+                    :cost (third x)))
+       (remove-if-not is-route-func routes)))
 
 (defun navigate-worm-hole (state worm-holes) 
-  ) 
+  (navigate-generic state 
+                    worm-holes
+                    #'(lambda (x) (or (eql state (first x)) 
+                                      (eql state (second x))))
+                    #'(lambda (x) (if (eql state (first x)) 
+                                      (second x)
+                                      (first x)))
+                    'navigate-worm-hole)) 
 
-(defun navigate-white-hole (state white-holes) )
+(defun navigate-white-hole (state white-holes)
+  (navigate-generic state 
+                    white-holes
+                    #'(lambda (x) (eql state (first x)))
+                    #'(lambda (x) (second x))
+                    'navigate-white-hole))
 
+(navigate-worm-hole 'Katril *worm-holes*)
+(navigate-white-hole 'Urano *white-holes*)
+(navigate-worm-hole 'Kentares *worm-holes*)
 
 ;;;;
 ;; 
@@ -170,12 +193,6 @@
 ;; Iterar atomo en (concatenar navigate-white-hole(node problem-whiteHoles) navigate-worm-hole(node problem-worm-holes))
 ;; 	make-nodo (node,atomo)
 ;;
-
-(defun navigate-worm-hole (state worm-holes) 
-  ) 
-
-(defun navigate-white-hole (state white-holes) ...)
-
 ;;REVISAR APPEND
 (defun expand-node (nodeArg problem)
 	(mapcar #'(lambda(x) (make-node
