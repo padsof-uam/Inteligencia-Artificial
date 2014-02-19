@@ -6,9 +6,9 @@
 ;; OUT: T si el planeta actual es una meta.
 ;; 
 ;; pseudocode
-;; Preguntar qué narices pongo aquí.
+;; comprobar si state está en planets-destination
 (defun f-goal-test-galaxy (state planets-destination) 
-  (member state planets-destination))
+  (not (null (member state planets-destination))))
 
 (f-goal-test-galaxy 'Sirtis *planets-destination*) ;-> T 
 (f-goal-test-galaxy 'Avalon *planets-destination*) ;-> NIL 
@@ -31,7 +31,8 @@
 (f-h-galaxy 'Sirtis *sensors*) ;-> 0
 (f-h-galaxy 'Avalon *sensors*) ;-> 5
 
+
 (defun navigate-worm-hole (state worm-holes) 
   ) 
 
-(defun navigate-white-hole (state white-holes) ...)
+(defun navigate-white-hole (state white-holes) )
