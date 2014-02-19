@@ -101,9 +101,10 @@
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
 
-(f-goal-test-galaxy 'Sirtis *planets-destination*) ;-> T 
-(f-goal-test-galaxy 'Avalon *planets-destination*) ;-> NIL 
-(f-goal-test-galaxy 'Urano *planets-destination*) ;-> NIL
+(f-goal-test-galaxy 'Sirtis '(Sirtis)) ;-> T 
+(f-goal-test-galaxy 'Avalon '(Sirtis)) ;-> NIL 
+(f-goal-test-galaxy 'Urano '(Sirtis)) ;-> NIL
+(f-goal-test-galaxy 'Urano '()) ;-> NIL
 
 ;;;;
 ;; Devuelve el valor de la heurística en el planeta actual.
@@ -122,6 +123,22 @@
 (f-h-galaxy 'Sirtis *sensors*) ;-> 0
 (f-h-galaxy 'Avalon *sensors*) ;-> 5
 
+;;;;
+;; Función genérica para crear las acciones a partir de una lista de rutas
+;; IN:	state: planeta actual
+;;		routes: lista de rutas
+;; 		is-route-func: función que decide si una ruta parte del planeta destino
+;;		get-dest-func: función que devuelve el destino a partir del triplete
+;;		name: nombre de la función que genera las rutas
+;; OUT:	Lista con las acciones correspondientes a las rutas posibles.
+;; 
+;; pseudocode
+;; por cada ruta en (filtrar routes con is-route-func):
+;; 	crear nueva acción con:
+;;		nombre: name
+;;		origen: state
+;;		final: (get-dest-func ruta)
+;;		coste: ruta[3]
 (defun navigate-generic (state routes is-route-func get-dest-func name)
   (mapcar 
     #'(lambda (x)
@@ -202,6 +219,8 @@
 							:depth (+ 1 node-depth nodeArg)
 							:g (+ (action-cost x) (node-g nodeArg))
 							:h (f-h-galaxy (action-final x))
-							:f (+ g h))) (append (navigate-white-hole (node-state nodeArg)) (navigate-worm-hole (node-state nodeArg)))))
+							:f (+ g h))) ; ¿Esto se puede hacer?
+         	(append (navigate-white-hole (node-state nodeArg) *white-holes*) 
+                  	(navigate-worm-hole (node-state nodeArg) *worm-holes*))))
 
-(defun insert-nodes (nodes lst-nodes strategy)...)
+(defun insert-nodes (nodes lst-nodes strategy))
