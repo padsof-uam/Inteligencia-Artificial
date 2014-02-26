@@ -1,5 +1,3 @@
-(setf *planets* '(Avalon Davion Manory Kentares Katril Proserpina Sirtis))
-
 (setf *white-holes*
 '((Avalon Mallory 2) (Avalon Proserpina 2) 
   (Mallory Katril 6) (Mallory Proserpina 7)
@@ -17,6 +15,9 @@
 
 (setf *sensors*
 '((Avalon 5) (Mallory 7) (Kentares 4) (Davion 1) (Proserpina 4) (Katril 3) (Sirtis 0)))
+
+(setf *planets* 
+'(Avalon Davion Manory Kentares Katril Proserpina Sirtis))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Problem definition
@@ -165,9 +166,9 @@
                     #'(lambda (x) (second x))
                     'navigate-white-hole))
 
-(navigate-worm-hole 'Katril *worm-holes*)
-(navigate-white-hole 'Urano *white-holes*)
-(navigate-worm-hole 'Kentares *worm-holes*)
+;(navigate-worm-hole 'Katril *worm-holes*)
+;(navigate-white-hole 'Kentares *white-holes*)
+;(navigate-worm-hole 'Kentares *worm-holes*)
 
 ;;;;
 ;; 
@@ -190,18 +191,25 @@
 
 ;;;;Ejercicio 5
 
-(setf *galaxy-M35* 
+(setf *galaxy-M35*
 	(make-problem
 		:states *planets*
 		:initial-state	'Sirtis
 		:fn-goal-test 'f-goal-test-galaxy
 		:fn-h 'f-h-galaxy
 		:fn-strategy 'insert-nodes
-		:operators 'expand-node))
-
+		:operators (list
+					(make-fn
+						:name 'navigate-worm-hole 
+						:lst-args *worm-holes*)
+					(make-fn
+						:name 'navigate-white-hole
+						:lst-args *white-holes*))))
 ;;;; 
-;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem para saber a qué planetas podemos viajar (qué nodos son los sucesores) y crearemos 
-;; una estructura nodo para cada sucesor con toda la información necesaria.
+;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
+;; la información sobre a qué planetas podemos viajar (qué nodos son los sucesores) 
+;; y crearemos una estructura nodo para cada sucesor 
+;; con toda la información necesaria.
 ;;
 ;; IN: 	node: el nodo a expandir
 ;;		problem: estructura con toda la información necesaria
@@ -210,17 +218,41 @@
 ;; Iterar atomo en (concatenar navigate-white-hole(node problem-whiteHoles) navigate-worm-hole(node problem-worm-holes))
 ;; 	make-nodo (node,atomo)
 ;;
-;;REVISAR APPEND
 (defun expand-node (nodeArg problem)
-	(mapcar #'(lambda(x) (make-node
+	(let ((lst
+        	(mapcan
+	        	#'(lambda(x)  (funcall (fn-name x) (node-state nodeArg) (fn-lst-args x))) (problem-operators problem))))
+			(mapcar #'(lambda(x) 
+				(let ((g (+ (action-cost x) (node-g nodeArg)))
+					(h (f-h-galaxy (action-final x) *sensors*)))
+						(make-node
 							:state (action-final x)
 							:parent nodeArg
 							:action x
-							:depth (+ 1 node-depth nodeArg)
-							:g (+ (action-cost x) (node-g nodeArg))
-							:h (f-h-galaxy (action-final x))
-							:f (+ g h))) ; ¿Esto se puede hacer?
-         	(append (navigate-white-hole (node-state nodeArg) *white-holes*) 
-                  	(navigate-worm-hole (node-state nodeArg) *worm-holes*))))
+							:depth (+ 1 (node-depth nodeArg))
+							:g g
+							:h h
+							:f (+ g h)))) lst)))
+
+;; Examples
+(setf *node-00*
+	(make-node
+		:state 'Proserpina 
+		:depth 12 
+		:g 10 
+		:f 20))
+
+;(print
+;	(setf *lst-nodes-0*
+;		(expand-node *node-00* *galaxy-M35*))) 
+
 
 (defun insert-nodes (nodes lst-nodes strategy))
+
+
+;(setf node-01
+	;(make-node:state 'Avalon :depth 0 :g 0 :f 0) )
+
+;(setf node-02
+	;(make-node:state 'Kentares :depth 2 :g 50 :f 50) )
+;
