@@ -115,9 +115,9 @@
 (defun f-h-galaxy (state sensors)
   (if (null sensors)
       nil
-	  (let (sensor (first sensors))
-	    (if (eql state (car sensor))
-	        (cdr sensor)
+	  (let ((sensor (first sensors)))
+	    (if (equal state (car sensor))
+	        (cadr sensor)
 	        (f-h-galaxy state (rest sensors))))))
 
 (f-h-galaxy 'Sirtis *sensors*) ;-> 0
