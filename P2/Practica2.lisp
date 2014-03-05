@@ -256,3 +256,31 @@
 ;(setf node-02
 	;(make-node:state 'Kentares :depth 2 :g 50 :f 50) )
 ;
+
+(defun tree-search-aux (problem strategy open-nodes)
+  (if (null open-nodes)
+        nil
+        (let ((n (first open-nodes)))
+          (if (funcall (problem-f-goal-test problem) n)
+              n
+              (tree-search-aux (problem strategy (insert-nodes open-nodes (expand-node n)) strategy))))))
+
+(defun tree-search (problem strategy)
+  (tree-search-aux problem strategy (problem-initial-state problem)))
+
+(tree-search *galaxy-M35* *A-star*);-> ;
+; #S(NODE :STATE SIRTIS
+; :PARENT
+;         #S(NODE :STATE ...
+
+; Realiza la búsqueda A* para el problema dado
+; Evalúa:
+;    Si no hay solución: NIL
+; Si hay solución: el nodo correspondiente al estado-objetivo ;
+
+(a-star-search *galaxy-M35*
+               (tree-search *galaxy-M35* *A-star*));->
+;
+; #S(NODE :STATE SIRTIS
+; :PARENT
+;         #S(NODE :STATE ...
