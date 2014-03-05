@@ -246,7 +246,8 @@
 	        	#'(lambda(x)  (funcall (fn-name x) (node-state nodeArg) (fn-lst-args x))) (problem-operators problem))))
 			(mapcar #'(lambda(x) 
 				(let ((g (+ (action-cost x) (node-g nodeArg)))
-					(h (f-h-galaxy (action-final x) *sensors*)))
+					(h ((funcall problem-fn-h-name problem) (append (problem-fn-h-lst-args problem) (action-final x))))
+
 						(make-node
 							:state (action-final x)
 							:parent nodeArg
@@ -330,18 +331,18 @@
 				(_aux-insert-nodes 
 					(cdr nodes) 
 					lst-nodes 
-					(append acc (car nodes)) 
+					(list acc (car nodes)) 
 					strategy)
 				(_aux-insert-nodes nodes 
 					(cdr lst-nodes) 
-					(append acc (car lst-nodes))
+					(list acc (car lst-nodes))
 					strategy)))))
 
 (defun insert-nodes (nodes lst-nodes strategy)
 	(_aux-insert-nodes nodes lst-nodes () strategy))
 
 
-(print
-	(insert-nodes (list *node-00* *node-01* *node-02*) 
-		*lst-nodes-0*
-		*uniform-cost*))
+;(print
+;	(insert-nodes (list *node-00* *node-01* *node-02*) 
+;		*lst-nodes-0*
+;		*uniform-cost*))
