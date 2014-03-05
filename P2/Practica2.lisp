@@ -19,6 +19,8 @@
 (setf *planets* 
 '(Avalon Davion Manory Kentares Katril Proserpina Sirtis))
 
+(setf *planets-destination* '(Sirtis))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Problem definition
 ;;
@@ -205,9 +207,15 @@
 	(make-problem
 		:states *planets*
 		:initial-state	'Sirtis
-		:fn-goal-test 'f-goal-test-galaxy
-		:fn-h 'f-h-galaxy
-		:fn-strategy 'insert-nodes
+		:fn-goal-test (make-fn
+                  		:name 'f-goal-test-galaxy
+                    	:lst-args '(*planets-destination*))
+		:fn-h (make-fn
+          		:name 'f-h-galaxy
+            	:lst-args '(*sensors))
+		:fn-strategy (make-fn
+                 		:name 'insert-nodes
+                   		:lst-args '(*A-star*))
 		:operators (list
 					(make-fn
 						:name 'navigate-worm-hole 
@@ -222,6 +230,9 @@
 		:depth 12 
 		:g 10 
 		:f 20))
+
+(defun fncall (f &rest args)
+  (apply (fn-name f) (append args (fn-lst-args f))))
 
 ;;;; 
 ;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
@@ -330,11 +341,11 @@
 				(_aux-insert-nodes 
 					(cdr nodes) 
 					lst-nodes 
-					(append acc (car nodes)) 
+					(append acc (list (car nodes))) 
 					strategy)
 				(_aux-insert-nodes nodes 
 					(cdr lst-nodes) 
-					(append acc (car lst-nodes))
+					(append acc (list (car lst-nodes))
 					strategy)))))
 
 (defun insert-nodes (nodes lst-nodes strategy)
@@ -346,23 +357,18 @@
 		*lst-nodes-0*
 		*uniform-cost*))
 
-
-;(setf node-02
-	;(make-node:state 'Kentares :depth 2 :g 50 :f 50) )
-;
-
 (defun tree-search-aux (problem strategy open-nodes)
   (if (null open-nodes)
         nil
         (let ((n (first open-nodes)))
-          (if (funcall (problem-f-goal-test problem) n)
+          (if (fncall (problem-f-goal-test problem) (node-name n))
               n
               (tree-search-aux (problem strategy (insert-nodes open-nodes (expand-node n)) strategy))))))
 
 (defun tree-search (problem strategy)
   (tree-search-aux problem strategy (problem-initial-state problem)))
 
-(tree-search *galaxy-M35* *A-star*);-> ;
+;(tree-search *galaxy-M35* *A-star*);-> ;
 ; #S(NODE :STATE SIRTIS
 ; :PARENT
 ;         #S(NODE :STATE ...
@@ -372,8 +378,8 @@
 ;    Si no hay solución: NIL
 ; Si hay solución: el nodo correspondiente al estado-objetivo ;
 
-(a-star-search *galaxy-M35*
-               (tree-search *galaxy-M35* *A-star*));->
+;(a-star-search *galaxy-M35*
+;               (tree-search *galaxy-M35* *A-star*));->
 ;
 ; #S(NODE :STATE SIRTIS
 ; :PARENT
