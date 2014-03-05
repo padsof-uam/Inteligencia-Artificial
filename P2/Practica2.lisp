@@ -126,6 +126,7 @@
 
 ;;;;
 ;; Función genérica para crear las acciones a partir de una lista de rutas
+;;
 ;; IN:	state: planeta actual
 ;;		routes: lista de rutas
 ;; 		is-route-func: función que decide si una ruta parte del planeta destino
@@ -170,6 +171,15 @@
 ;(navigate-white-hole 'Kentares *white-holes*)
 ;(navigate-worm-hole 'Kentares *worm-holes*)
 
+(setf *uniform-cost*
+	(make-strategy
+		:name 'uniform-cost
+		:node-compare-p 'node-g-<=))
+
+(defun node-g-<= (node-1 node-2)
+	(<= (node-g node-1)	(node-g node-2)))
+
+
 ;;;;
 ;; 
 ;;
@@ -205,19 +215,31 @@
 					(make-fn
 						:name 'navigate-white-hole
 						:lst-args *white-holes*))))
+
+(setf *node-00*
+	(make-node
+		:state 'Proserpina 
+		:depth 12 
+		:g 10 
+		:f 20))
+
 ;;;; 
 ;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
 ;; la información sobre a qué planetas podemos viajar (qué nodos son los sucesores) 
 ;; y crearemos una estructura nodo para cada sucesor 
 ;; con toda la información necesaria.
 ;;
+;; No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
+;; Dejamos esa comprrobación para la tarea superior.
+;;
 ;; IN: 	node: el nodo a expandir
 ;;		problem: estructura con toda la información necesaria
 ;; OUT: lista de los nodos hijos. En el problema de la galaxia, lista de los nodos planeta a los que podemos viajar
 ;; pseudocode:
-;; Iterar atomo en (concatenar navigate-white-hole(node problem-whiteHoles) navigate-worm-hole(node problem-worm-holes))
+;; Iterar atomo en planetas_destino
 ;; 	make-nodo (node,atomo)
 ;;
+
 (defun expand-node (nodeArg problem)
 	(let ((lst
         	(mapcan
@@ -235,24 +257,82 @@
 							:f (+ g h)))) lst)))
 
 ;; Examples
-(setf *node-00*
+(print 
+	(setf *lst-nodes-0*
+		(expand-node *node-00* *galaxy-M35*)))
+
+; (#S(NODE :STATE MALLORY
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
+;    :DEPTH 13 :G 16 :H 7 :F 23)
+; #S(NODE :STATE SIRTIS
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
+;    :DEPTH 13 :G 17 :H 0 :F 17)
+; #S(NODE :STATE KENTARES
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
+;    :DEPTH 13 :G 11 :H 4 :F 15)
+; #S(NODE :STATE MALLORY
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
+;    :DEPTH 13 :G 17 :H 7 :F 24)
+; #S(NODE :STATE AVALON
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
+;    :DEPTH 13 :G 12 :H 5 :F 17)
+; #S(NODE :STATE DAVION
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
+;    :DEPTH 13 :G 14 :H 1 :F 15)
+; #S(NODE :STATE SIRTIS
+;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
+;    :DEPTH 13 :G 20 :H 0 :F 20))
+
+
+
+;;;;
+;; Inserta una lista de nodos en otra (ya ordenada) de acuerdo con una estrategia.
+;;
+;; IN: 	nodes: lista de nodos para insertar.
+;;		lst-nodes:	lista de nodos en la que insertar.
+;;		strategy:	estrategia que seguir a la hora de insertar.
+;; OUT:	una lista de nodos ordenados de acuerdo a la estrategia.
+;;
+;; pseudocode:
+;;	insert-nodes(nodes lst strategy)
+;;		iterar at1 en nodes
+;;			iterar at2 en lst
+;;				si ato1 < at2
+;;					insertar ato1 y desplazar el resto
+;;				
+
+(defun _aux-insert-nodes (nodes lst-nodes acc strategy)
+	(if (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
+			(_aux-insert-nodes (cdr nodes) lst-nodes (append acc (car nodes)) strategy)
+		(_aux-insert-nodes nodes (cdr lst-nodes) (append acc (car lst-nodes)) strategy)))
+
+(defun insert-nodes-strategy (nodes lst-nodes strategy)
+	(_aux-insert-nodes nodes lst-nodes () strategy))
+
+
+(setf *node-01*
 	(make-node
-		:state 'Proserpina 
-		:depth 12 
-		:g 10 
-		:f 20))
+		:state 'Avalon 
+		:depth 0 
+		:g 0 
+		:f 0))
 
-;(print
-;	(setf *lst-nodes-0*
-;		(expand-node *node-00* *galaxy-M35*))) 
+(setf *node-02*
+	(make-node
+		:state 'Kentares 
+		:depth 2 
+		:g 50 
+		:f 50))
 
 
-(defun insert-nodes (nodes lst-nodes strategy))
-
-
-;(setf node-01
-	;(make-node:state 'Avalon :depth 0 :g 0 :f 0) )
-
-;(setf node-02
-	;(make-node:state 'Kentares :depth 2 :g 50 :f 50) )
-;
+(print
+	(insert-nodes-strategy (list *node-00* *node-01* *node-02*) 
+		*lst-nodes-0*
+		*uniform-cost*))
