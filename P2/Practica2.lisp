@@ -291,6 +291,19 @@
 ;    :DEPTH 13 :G 20 :H 0 :F 20))
 
 
+(setf *node-01*
+	(make-node
+		:state 'Avalon 
+		:depth 0 
+		:g 0 
+		:f 0))
+
+(setf *node-02*
+	(make-node
+		:state 'Kentares 
+		:depth 2 
+		:g 50 
+		:f 50))
 
 ;;;;
 ;; Inserta una lista de nodos en otra (ya ordenada) de acuerdo con una estrategia.
@@ -309,31 +322,27 @@
 ;;				
 
 (defun _aux-insert-nodes (nodes lst-nodes acc strategy)
-	(if (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
-			(_aux-insert-nodes (cdr nodes) lst-nodes (append acc (car nodes)) strategy)
-		(_aux-insert-nodes nodes (cdr lst-nodes) (append acc (car lst-nodes)) strategy)))
+	(if (null nodes)
+		(append acc lst-nodes)
+		(if (null lst-nodes)
+			(append acc nodes)
+			(if (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
+				(_aux-insert-nodes 
+					(cdr nodes) 
+					lst-nodes 
+					(append acc (car nodes)) 
+					strategy)
+				(_aux-insert-nodes nodes 
+					(cdr lst-nodes) 
+					(append acc (car lst-nodes))
+					strategy)))))
 
-(defun insert-nodes-strategy (nodes lst-nodes strategy)
+(defun insert-nodes (nodes lst-nodes strategy)
 	(_aux-insert-nodes nodes lst-nodes () strategy))
 
 
-(setf *node-01*
-	(make-node
-		:state 'Avalon 
-		:depth 0 
-		:g 0 
-		:f 0))
-
-(setf *node-02*
-	(make-node
-		:state 'Kentares 
-		:depth 2 
-		:g 50 
-		:f 50))
-
-
 (print
-	(insert-nodes-strategy (list *node-00* *node-01* *node-02*) 
+	(insert-nodes (list *node-00* *node-01* *node-02*) 
 		*lst-nodes-0*
 		*uniform-cost*))
 
