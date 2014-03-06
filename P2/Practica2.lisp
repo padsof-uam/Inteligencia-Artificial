@@ -19,6 +19,8 @@
 (setf *planets* 
 '(Avalon Davion Manory Kentares Katril Proserpina Sirtis))
 
+(setf *planets-destination* '(Sirtis))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Problem definition
 ;;
@@ -99,6 +101,9 @@
 ;; 
 ;; pseudocode
 ;; comprobar si state está en planets-destination
+(defun fn-f-goal-test-galaxy (lst-args)
+	(f-goal-test-galaxy (car lst-args) (cdr lst-args)))
+
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
 
@@ -205,9 +210,15 @@
 	(make-problem
 		:states *planets*
 		:initial-state	'Sirtis
-		:fn-goal-test 'f-goal-test-galaxy
-		:fn-h 'f-h-galaxy
-		:fn-strategy 'insert-nodes
+		:fn-goal-test (make-fn
+                  		:name 'fn-f-goal-test-galaxy
+                    	:lst-args '(*planets-destination*))
+		:fn-h (make-fn
+          		:name 'f-h-galaxy
+            	:lst-args '(*sensors))
+		:fn-strategy (make-fn
+                 		:name 'insert-nodes
+                   		:lst-args '(*A-star*))
 		:operators (list
 					(make-fn
 						:name 'navigate-worm-hole 
@@ -222,6 +233,9 @@
 		:depth 12 
 		:g 10 
 		:f 20))
+
+(defun fncall (f &rest args)
+  (apply (fn-name f) (append args (fn-lst-args f))))
 
 ;;;; 
 ;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
@@ -243,11 +257,13 @@
 (defun expand-node (nodeArg problem)
 	(let ((lst
         	(mapcan
-	        	#'(lambda(x)  (funcall (fn-name x) (node-state nodeArg) (fn-lst-args x))) (problem-operators problem))))
+            	#'(lambda(x)  (funcall (fn-name x)
+            							 (node-state nodeArg)
+            							  (fn-lst-args x)))
+            				 (problem-operators problem))))
 			(mapcar #'(lambda(x) 
-				(let ((g (+ (action-cost x) (node-g nodeArg)))
-					(h ((funcall problem-fn-h-name problem) (append (problem-fn-h-lst-args problem) (action-final x))))
-
+				(let ((g (+ (action-cost x) (node-g nodeArg))))
+					(h ((funcall (problem-fn-h-name problem)) (append (problem-fn-h-lst-args problem) (action-final x))))
 						(make-node
 							:state (action-final x)
 							:parent nodeArg
@@ -331,12 +347,12 @@
 				(_aux-insert-nodes 
 					(cdr nodes) 
 					lst-nodes 
-					(list acc (car nodes)) 
+					(append acc (list (car nodes))) 
 					strategy)
 				(_aux-insert-nodes nodes 
 					(cdr lst-nodes) 
-					(list acc (car lst-nodes))
-					strategy)))))
+					(append acc (list (car lst-nodes))
+					strategy))))))
 
 (defun insert-nodes (nodes lst-nodes strategy)
 	(_aux-insert-nodes nodes lst-nodes () strategy))
@@ -346,3 +362,31 @@
 ;	(insert-nodes (list *node-00* *node-01* *node-02*) 
 ;		*lst-nodes-0*
 ;		*uniform-cost*))
+
+(defun tree-search-aux (problem strategy open-nodes)
+  (if (null open-nodes)
+        nil
+        (let ((n (first open-nodes)))
+          (if (fncall (problem-f-goal-test problem) (node-name n))
+              n
+              (tree-search-aux (problem strategy (insert-nodes open-nodes (expand-node n)) strategy))))))
+
+(defun tree-search (problem strategy)
+  (tree-search-aux problem strategy (problem-initial-state problem)))
+
+;(tree-search *galaxy-M35* *A-star*);-> ;
+; #S(NODE :STATE SIRTIS
+; :PARENT
+;         #S(NODE :STATE ...
+
+; Realiza la búsqueda A* para el problema dado
+; Evalúa:
+;    Si no hay solución: NIL
+; Si hay solución: el nodo correspondiente al estado-objetivo ;
+
+;(a-star-search *galaxy-M35*
+;               (tree-search *galaxy-M35* *A-star*));->
+;
+; #S(NODE :STATE SIRTIS
+; :PARENT
+;         #S(NODE :STATE ...
