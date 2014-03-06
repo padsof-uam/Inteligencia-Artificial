@@ -1,3 +1,4 @@
+;; Ignore ;;%%
 (setf *white-holes*
 '((Avalon Mallory 2) (Avalon Proserpina 2) 
   (Mallory Katril 6) (Mallory Proserpina 7)
@@ -92,6 +93,8 @@
 
 ;;;;;;;UNA VEZ DEFINIDAS LAS ESTRUCTURAS VAMOS CON LAS FUNCIONES:
 
+;;%%
+
 ;;;;
 ;; Comprueba que si planeta pasado como argumento es una meta.
 ;;
@@ -101,11 +104,14 @@
 ;; 
 ;; pseudocode
 ;; comprobar si state está en planets-destination
+
 (defun fn-f-goal-test-galaxy (lst-args)
 	(f-goal-test-galaxy (car lst-args) (cdr lst-args)))
 
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
+
+;; Examples
 
 (f-goal-test-galaxy 'Sirtis '(Sirtis)) ;-> T 
 (f-goal-test-galaxy 'Avalon '(Sirtis)) ;-> NIL 
@@ -118,6 +124,9 @@
 ;; IN: 	state: planeta actual
 ;; 		sensors: lista de tuplas planeta-heurística
 ;; OUT: valor de la heurística en el planeta actual
+;;
+;; pseudocode
+
 (defun f-h-galaxy (state sensors)
   (if (null sensors)
       nil
@@ -125,6 +134,8 @@
 	    (if (equal state (car sensor))
 	        (cadr sensor)
 	        (f-h-galaxy state (rest sensors))))))
+
+;; Examples
 
 (f-h-galaxy 'Sirtis *sensors*) ;-> 0
 (f-h-galaxy 'Avalon *sensors*) ;-> 5
@@ -146,6 +157,8 @@
 ;;		origen: state
 ;;		final: (get-dest-func ruta)
 ;;		coste: ruta[3]
+;;
+
 (defun navigate-generic (state routes is-route-func get-dest-func name)
   (mapcar 
     #'(lambda (x)
@@ -172,10 +185,28 @@
                     #'(lambda (x) (second x))
                     'navigate-white-hole))
 
-;(navigate-worm-hole 'Katril *worm-holes*)
-;(navigate-white-hole 'Kentares *white-holes*)
-;(navigate-worm-hole 'Kentares *worm-holes*)
+;; Examples
 
+(navigate-worm-hole 'Katril *worm-holes*)
+
+;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL MALLORY :COST 5)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL SIRTIS :COST 10))
+
+(navigate-white-hole 'Kentares *white-holes*)
+
+;; (#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 3)
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 2))
+
+(navigate-worm-hole 'Kentares *worm-holes*)
+
+;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 4)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 1))
+
+
+
+;;; Ignore ;;;;
 (setf *uniform-cost*
 	(make-strategy
 		:name 'uniform-cost
@@ -186,7 +217,7 @@
 
 
 ;;;;
-;; 
+;; Estrategia A*
 ;;
 ;; IN: 	node-1 y node-2 a comparar.
 ;; 	
@@ -203,19 +234,21 @@
 (defun node-f-compare (node-1 node-2)
 	(<= (node-f node-1) (node-f node-2)))
 
+;; Examples
 
-;;;;Ejercicio 5
+;;;;
+;; Ejercicio 5
 
 (setf *galaxy-M35*
 	(make-problem
 		:states *planets*
-		:initial-state	'Sirtis
+		:initial-state 'Avalon
 		:fn-goal-test (make-fn
                   		:name 'fn-f-goal-test-galaxy
-                    	:lst-args '(*planets-destination*))
+                    	:lst-args *planets-destination*)
 		:fn-h (make-fn
           		:name 'f-h-galaxy
-            	:lst-args '(*sensors))
+            	:lst-args *sensors*)
 		:fn-strategy (make-fn
                  		:name 'insert-nodes
                    		:lst-args '(*A-star*))
@@ -227,6 +260,7 @@
 						:name 'navigate-white-hole
 						:lst-args *white-holes*))))
 
+;;; Ignore ;;;;
 (setf *node-00*
 	(make-node
 		:state 'Proserpina 
@@ -235,7 +269,7 @@
 		:f 20))
 
 (defun fncall (f &rest args)
-  (apply (fn-name f) (append args (fn-lst-args f))))
+  (funcall (fn-name f) (append args (fn-lst-args f))))
 
 ;;;; 
 ;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
@@ -257,13 +291,11 @@
 (defun expand-node (nodeArg problem)
 	(let ((lst
         	(mapcan
-            	#'(lambda(x)  (funcall (fn-name x)
-            							 (node-state nodeArg)
-            							  (fn-lst-args x)))
-            				 (problem-operators problem))))
+            	#'(lambda(x)  (funcall (fn-name x) (node-state nodeArg) (fn-lst-args x))) (problem-operators problem))))
 			(mapcar #'(lambda(x) 
-				(let ((g (+ (action-cost x) (node-g nodeArg))))
-					(h ((funcall (problem-fn-h-name problem)) (append (problem-fn-h-lst-args problem) (action-final x))))
+				(let (
+					(g (+ (action-cost x) (node-g nodeArg)))
+					(h (funcall (fn-name (problem-fn-h problem)) (action-final x) ( fn-lst-args (problem-fn-h problem)))))
 						(make-node
 							:state (action-final x)
 							:parent nodeArg
@@ -274,40 +306,40 @@
 							:f (+ g h)))) lst)))
 
 ;; Examples
-(print 
-	(setf *lst-nodes-0*
-		(expand-node *node-00* *galaxy-M35*)))
+(setf *lst-nodes-0*
+	(expand-node *node-00* *galaxy-M35*))
 
-; (#S(NODE :STATE MALLORY
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
-;    :DEPTH 13 :G 16 :H 7 :F 23)
-; #S(NODE :STATE SIRTIS
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
-;    :DEPTH 13 :G 17 :H 0 :F 17)
-; #S(NODE :STATE KENTARES
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
-;    :DEPTH 13 :G 11 :H 4 :F 15)
-; #S(NODE :STATE MALLORY
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
-;    :DEPTH 13 :G 17 :H 7 :F 24)
-; #S(NODE :STATE AVALON
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
-;    :DEPTH 13 :G 12 :H 5 :F 17)
-; #S(NODE :STATE DAVION
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
-;    :DEPTH 13 :G 14 :H 1 :F 15)
-; #S(NODE :STATE SIRTIS
-;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
-;    :DEPTH 13 :G 20 :H 0 :F 20))
+;; (#S(NODE :STATE MALLORY
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
+;;    :DEPTH 13 :G 16 :H 7 :F 23)
+;; #S(NODE :STATE SIRTIS
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
+;;    :DEPTH 13 :G 17 :H 0 :F 17)
+;; #S(NODE :STATE KENTARES
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
+;;    :DEPTH 13 :G 11 :H 4 :F 15)
+;; #S(NODE :STATE MALLORY
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
+;;    :DEPTH 13 :G 17 :H 7 :F 24)
+;; #S(NODE :STATE AVALON
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
+;;    :DEPTH 13 :G 12 :H 5 :F 17)
+;; #S(NODE :STATE DAVION
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
+;;    :DEPTH 13 :G 14 :H 1 :F 15)
+;; #S(NODE :STATE SIRTIS
+;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
+;;    :DEPTH 13 :G 20 :H 0 :F 20))
 
 
+;;; Ignore ;;;;
 (setf *node-01*
 	(make-node
 		:state 'Avalon 
@@ -336,49 +368,149 @@
 ;;			iterar at2 en lst
 ;;				si ato1 < at2
 ;;					insertar ato1 y desplazar el resto
-;;				
+;;
+;; Opción b (que encontramos mejor, porque modificar una lista sobre la que estamos iterando es peligroso)
+;;	insert-nodes(nodes lst strategy acc)
+;;		iterar at1 en nodes
+;;			iterar at2 en lst
+;;				si ato1 < at2
+;;					insertar ato1 en acc
+;;					insert-nodes (rest(nodes) lst-nodes strategy acc)
+;;				sino
+;;					insertar ato2 en acc
+;;					insertar-nodes (nodes rest(lst-nodes) strategy acc)
 
 (defun _aux-insert-nodes (nodes lst-nodes acc strategy)
 	(if (null nodes)
 		(append acc lst-nodes)
 		(if (null lst-nodes)
 			(append acc nodes)
-			(if (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
+			(if  (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
+
 				(_aux-insert-nodes 
-					(cdr nodes) 
-					lst-nodes 
-					(append acc (list (car nodes))) 
+					(cdr nodes)
+					lst-nodes
+					(append acc (list (car nodes)))
 					strategy)
-				(_aux-insert-nodes nodes 
-					(cdr lst-nodes) 
-					(append acc (list (car lst-nodes))
-					strategy))))))
+				(_aux-insert-nodes
+					nodes
+					(cdr lst-nodes)
+					(append acc (list (car lst-nodes)))
+					strategy)))))
 
 (defun insert-nodes (nodes lst-nodes strategy)
-	(_aux-insert-nodes nodes lst-nodes () strategy))
+	(_aux-insert-nodes nodes lst-nodes '() strategy))
+
+;; Examples
+(insert-nodes 
+	(list *node-00* *node-01* *node-02*) 
+	*lst-nodes-0*
+	*uniform-cost*)
+
+;;Sale esto, que ni está ordenado ni nada.
+;;(#S(NODE :STATE PROSERPINA 
+;;	:PARENT NIL
+;;	:ACTION NIL
+;;	:DEPTH 12 :G 10 :H NIL :F 20)
+;; #S(NODE :STATE AVALON 
+;;	:PARENT NIL
+;;	:ACTION NIL
+;;	:DEPTH 0 :G 0 :H NIL :F 0)
+;; #S(NODE :STATE MALLORY
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
+;;	:DEPTH 13 :G 16 :H 7 :F 23)
+;; #S(NODE :STATE SIRTIS
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
+;;	:DEPTH 13 :G 17 :H 0 :F 17)
+;; #S(NODE :STATE KENTARES
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
+;;	:DEPTH 13 :G 11 :H 4 :F 15)
+;; #S(NODE :STATE MALLORY
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
+;;	:DEPTH 13 :G 17 :H 7 :F 24)
+;; #S(NODE :STATE AVALON
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
+;;	:DEPTH 13 :G 12 :H 5 :F 17)
+;; #S(NODE :STATE DAVION
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
+;;	:DEPTH 13 :G 14 :H 1 :F 15)
+;; #S(NODE :STATE SIRTIS
+;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
+;;	:DEPTH 13 :G 20 :H 0 :F 20)
+;; #S(NODE :STATE KENTARES :PARENT NIL :ACTION NIL :DEPTH 2 :G 50 :H NIL :F 50))
 
 
-;(print
-;	(insert-nodes (list *node-00* *node-01* *node-02*) 
-;		*lst-nodes-0*
-;		*uniform-cost*))
+;;;;
+;; Realiza la búsqueda en un problema según una estrategia
+;;
+;;	IN: problem 	estructura con la información del problema.
+;;		strategy 	estrategia a seguir para la búsqueda.
+;;	
+;;	OUT: Evalúa a un único nodo meta o nil si no hay solución.
+;;
+;;	Utilizamos una auxiliar recursiva con la lista de nodos.
+;;
+;;	pseudocode:
+;;
+;;	aux_fun(problema estrategia lista_nodos)
+;;		si lista_nodos no está vacía
+;;			si ( es_solución first lista_nodos)
+;;				first lista_nodos
+;;			sino
+;;				nueva_lista_nodos = insertar(lista_nodos (expandir_nodo first lista_nodos) estrategia)
+;;				aux_fun (problema estrategia nueva_lista_nodos)
+;;	
 
 (defun tree-search-aux (problem strategy open-nodes)
-  (if (null open-nodes)
-        nil
-        (let ((n (first open-nodes)))
-          (if (fncall (problem-f-goal-test problem) (node-name n))
+    (let ((n (first open-nodes)))
+        (if ( or (null open-nodes) (null n))
+            nil
+            (if  (fncall (problem-fn-goal-test problem) (node-state n))
               n
-              (tree-search-aux (problem strategy (insert-nodes open-nodes (expand-node n)) strategy))))))
+              (tree-search-aux problem strategy  (insert-nodes (cdr open-nodes)  (expand-node n problem) strategy))))))
 
 (defun tree-search (problem strategy)
-  (tree-search-aux problem strategy (problem-initial-state problem)))
+  (tree-search-aux problem strategy (list (make-node
+  										:state (problem-initial-state problem)
+  										:depth 0
+  										:g 0
+  										:f 0))))
 
-;(tree-search *galaxy-M35* *A-star*);-> ;
-; #S(NODE :STATE SIRTIS
-; :PARENT
-;         #S(NODE :STATE ...
+;; Examples
+(TREE-SEARCH *galaxy-M35* *A-STAR*)
 
+;;#S(NODE :STATE SIRTIS
+;;   :PARENT
+;;   #S(NODE :STATE DAVION
+;;      :PARENT
+;;      #S(NODE :STATE KATRIL
+;;         :PARENT
+;;         #S(NODE :STATE KENTARES
+;;            :PARENT
+;;            #S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H NIL
+;;               :F 0)
+;;            :ACTION
+;;            #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES
+;;               :COST 4)
+;;            :DEPTH 1 :G 4 :H 4 :F 8)
+;;         :ACTION
+;;         #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL
+;;            :COST 2)
+;;         :DEPTH 2 :G 6 :H 3 :F 9)
+;;      :ACTION
+;;      #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+;;      :DEPTH 3 :G 7 :H 1 :F 8)
+;;   :ACTION
+;;   #S(ACTION :NAME NAVIGATE-W
+
+;;; Ignore ;;;;
 ; Realiza la búsqueda A* para el problema dado
 ; Evalúa:
 ;    Si no hay solución: NIL
@@ -390,3 +522,73 @@
 ; #S(NODE :STATE SIRTIS
 ; :PARENT
 ;         #S(NODE :STATE ...
+
+
+;;;;
+;;	Devuelve el camino a recorrer para llegar desde un nodo origen
+;;	a un estado meta (por defecto también del problema *galaxy-m35*)
+;; 
+;;	IN:
+;;		node: nodo del que iniciar la búsqueda
+;; 	OUT:
+;;		Una lista de estados, es decir, de los nombres de los planetas que forman el camino,
+;;			donde el primer elemento es el destino, y el último el origen.
+;;
+;;	pseudocode:
+;;	Utilizando una función auxiliar de la forma:
+;;	aux_fun (nodo acumulador)
+;;		si (nodo no es nulo)
+;;			añadir el nodo al acumulador
+;;			aux_fun(padre(nodo) acumulador)
+;;		sino
+;;			devolver acumulador.
+;;
+
+(defun get-states (node acc)
+	(if (null node)
+		(print acc)
+		(get-states (node-parent node) (append (print acc) (list (node-state node))))))
+
+(defun tree-path (node)
+	(get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+
+;; Examples 
+
+(TREE-PATH *node-01*)
+
+;;(SIRTIS DAVION KATRIL KENTARES AVALON)
+
+;;;;
+;; Obtención de la secuencia de acciones de un camino, desde un nodo origen hasta un nodo meta
+;; 	(definido por *galaxy-M35*, según la estrategia *A-star*)
+;; 
+;; IN: 
+;;		node: nodo origen desde el que empezar la búsqueda.
+;; OUT:
+;;		una lista de acciones que llevan desde el nodo origen hasta el destino.
+;;
+;; pseudocode:
+;; Utilizando una función auxiliar de la forma:
+;; aux_fun (nodo acumulador)
+;;		si (nodo no es nulo)
+;;			añadir acción(nodo) al acumulador
+;;			aux_fun(padre(nodo) acumulador)
+;;		sino
+;;			devolver acumulador
+
+(defun  _aux_action-sequence (node acc)
+	(if (null (node-action node))
+		acc
+		(_aux_action-sequence (node-parent node) (append acc (list (node-action node))))))
+
+(defun  action-sequence (node)
+	(_aux_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+
+;; Examples
+
+(ACTION-SEQUENCE *node-01*)
+
+;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
