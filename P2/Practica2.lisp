@@ -1,4 +1,4 @@
-;; Ignore ;;%%
+;;; Ignore ;;%%
 (setf *white-holes*
 '((Avalon Mallory 2) (Avalon Proserpina 2) 
   (Mallory Katril 6) (Mallory Proserpina 7)
@@ -21,6 +21,7 @@
 '(Avalon Davion Manory Kentares Katril Proserpina Sirtis))
 
 (setf *planets-destination* '(Sirtis))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Problem definition
@@ -95,6 +96,7 @@
 
 ;;%%
 
+
 ;;;;
 ;; Comprueba que si planeta pasado como argumento es una meta.
 ;;
@@ -118,6 +120,10 @@
 (f-goal-test-galaxy 'Urano '(Sirtis)) ;-> NIL
 (f-goal-test-galaxy 'Urano '()) ;-> NIL
 
+;; end
+
+
+
 ;;;;
 ;; Devuelve el valor de la heurística en el planeta actual.
 ;; 
@@ -139,6 +145,9 @@
 
 (f-h-galaxy 'Sirtis *sensors*) ;-> 0
 (f-h-galaxy 'Avalon *sensors*) ;-> 5
+
+;; end
+
 
 ;;;;
 ;; Función genérica para crear las acciones a partir de una lista de rutas
@@ -204,9 +213,10 @@
 ;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 4)
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 1))
 
+;; end
 
+;;; Ignore ;;%%
 
-;;; Ignore ;;;;
 (setf *uniform-cost*
 	(make-strategy
 		:name 'uniform-cost
@@ -215,6 +225,11 @@
 (defun node-g-<= (node-1 node-2)
 	(<= (node-g node-1)	(node-g node-2)))
 
+
+;; end
+
+
+;;%%
 
 ;;;;
 ;; Estrategia A*
@@ -235,6 +250,9 @@
 	(<= (node-f node-1) (node-f node-2)))
 
 ;; Examples
+
+;; end
+
 
 ;;;;
 ;; Ejercicio 5
@@ -259,8 +277,9 @@
 					(make-fn
 						:name 'navigate-white-hole
 						:lst-args *white-holes*))))
+;; end
 
-;;; Ignore ;;;;
+;;; Ignore ;;%%
 (setf *node-00*
 	(make-node
 		:state 'Proserpina 
@@ -271,13 +290,13 @@
 (defun fncall (f &rest args)
   (funcall (fn-name f) (append args (fn-lst-args f))))
 
+
+;;%%
+
 ;;;; 
 ;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
 ;; la información sobre a qué planetas podemos viajar (qué nodos son los sucesores) 
-;; y crearemos una estructura nodo para cada sucesor 
-;; con toda la información necesaria.
-;;
-;; No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
+;; y crearemos una estructura nodo para cada sucesor con toda la información necesaria.  No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
 ;; Dejamos esa comprrobación para la tarea superior.
 ;;
 ;; IN: 	node: el nodo a expandir
@@ -339,7 +358,10 @@
 ;;    :DEPTH 13 :G 20 :H 0 :F 20))
 
 
-;;; Ignore ;;;;
+;; end
+
+
+;;; Ignore ;;%%
 (setf *node-01*
 	(make-node
 		:state 'Avalon 
@@ -353,6 +375,9 @@
 		:depth 2 
 		:g 50 
 		:f 50))
+
+
+;;%%
 
 ;;;;
 ;; Inserta una lista de nodos en otra (ya ordenada) de acuerdo con una estrategia.
@@ -447,12 +472,14 @@
 ;; #S(NODE :STATE KENTARES :PARENT NIL :ACTION NIL :DEPTH 2 :G 50 :H NIL :F 50))
 
 
+;; end
+
+
 ;;;;
 ;; Realiza la búsqueda en un problema según una estrategia
 ;;
 ;;	IN: problem 	estructura con la información del problema.
 ;;		strategy 	estrategia a seguir para la búsqueda.
-;;	
 ;;	OUT: Evalúa a un único nodo meta o nil si no hay solución.
 ;;
 ;;	Utilizamos una auxiliar recursiva con la lista de nodos.
@@ -510,6 +537,9 @@
 ;;   :ACTION
 ;;   #S(ACTION :NAME NAVIGATE-W
 
+;; end
+
+
 ;;; Ignore ;;;;
 ; Realiza la búsqueda A* para el problema dado
 ; Evalúa:
@@ -522,6 +552,9 @@
 ; #S(NODE :STATE SIRTIS
 ; :PARENT
 ;         #S(NODE :STATE ...
+
+
+;; end
 
 
 ;;;;
@@ -558,6 +591,8 @@
 
 ;;(SIRTIS DAVION KATRIL KENTARES AVALON)
 
+;; end
+
 ;;;;
 ;; Obtención de la secuencia de acciones de un camino, desde un nodo origen hasta un nodo meta
 ;; 	(definido por *galaxy-M35*, según la estrategia *A-star*)
@@ -592,3 +627,5 @@
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
 ;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
+
+;; end

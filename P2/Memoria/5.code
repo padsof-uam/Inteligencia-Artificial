@@ -1,0 +1,25 @@
+;; Ejercicio 5
+
+(setf *galaxy-M35*
+	(make-problem
+		:states *planets*
+		:initial-state 'Avalon
+		:fn-goal-test (make-fn
+                  		:name 'fn-f-goal-test-galaxy
+                    	:lst-args *planets-destination*)
+		:fn-h (make-fn
+          		:name 'f-h-galaxy
+            	:lst-args *sensors*)
+		:fn-strategy (make-fn
+                 		:name 'insert-nodes
+                   		:lst-args '(*A-star*))
+		:operators (list
+					(make-fn
+						:name 'navigate-worm-hole 
+						:lst-args *worm-holes*)
+					(make-fn
+						:name 'navigate-white-hole
+						:lst-args *white-holes*))))
+;; end
+
+

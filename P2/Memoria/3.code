@@ -1,0 +1,66 @@
+;; Función genérica para crear las acciones a partir de una lista de rutas
+;;
+;; IN:	state: planeta actual
+;;		routes: lista de rutas
+;; 		is-route-func: función que decide si una ruta parte del planeta destino
+;;		get-dest-func: función que devuelve el destino a partir del triplete
+;;		name: nombre de la función que genera las rutas
+;; OUT:	Lista con las acciones correspondientes a las rutas posibles.
+;; 
+;; pseudocode
+;; por cada ruta en (filtrar routes con is-route-func):
+;; 	crear nueva acción con:
+;;		nombre: name
+;;		origen: state
+;;		final: (get-dest-func ruta)
+;;		coste: ruta[3]
+;;
+
+(defun navigate-generic (state routes is-route-func get-dest-func name)
+  (mapcar 
+    #'(lambda (x)
+       (make-action :Name name
+                    :origin state
+                    :final (funcall get-dest-func x)
+                    :cost (third x)))
+       (remove-if-not is-route-func routes)))
+
+(defun navigate-worm-hole (state worm-holes) 
+  (navigate-generic state 
+                    worm-holes
+                    #'(lambda (x) (or (eql state (first x)) 
+                                      (eql state (second x))))
+                    #'(lambda (x) (if (eql state (first x)) 
+                                      (second x)
+                                      (first x)))
+                    'navigate-worm-hole)) 
+
+(defun navigate-white-hole (state white-holes)
+  (navigate-generic state 
+                    white-holes
+                    #'(lambda (x) (eql state (first x)))
+                    #'(lambda (x) (second x))
+                    'navigate-white-hole))
+
+;; Examples
+
+(navigate-worm-hole 'Katril *worm-holes*)
+
+;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL MALLORY :COST 5)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL SIRTIS :COST 10))
+
+(navigate-white-hole 'Kentares *white-holes*)
+
+;; (#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 3)
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 2))
+
+(navigate-worm-hole 'Kentares *worm-holes*)
+
+;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 4)
+;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 1))
+
+;; end
+
+

@@ -1,0 +1,24 @@
+;; Devuelve el valor de la heurística en el planeta actual.
+;; 
+;; IN: 	state: planeta actual
+;; 		sensors: lista de tuplas planeta-heurística
+;; OUT: valor de la heurística en el planeta actual
+;;
+;; pseudocode
+
+(defun f-h-galaxy (state sensors)
+  (if (null sensors)
+      nil
+	  (let ((sensor (first sensors)))
+	    (if (equal state (car sensor))
+	        (cadr sensor)
+	        (f-h-galaxy state (rest sensors))))))
+
+;; Examples
+
+(f-h-galaxy 'Sirtis *sensors*) ;-> 0
+(f-h-galaxy 'Avalon *sensors*) ;-> 5
+
+;; end
+
+

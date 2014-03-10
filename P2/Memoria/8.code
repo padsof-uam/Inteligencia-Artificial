@@ -1,0 +1,99 @@
+;; Realiza la búsqueda en un problema según una estrategia
+;;
+;;	IN: problem 	estructura con la información del problema.
+;;		strategy 	estrategia a seguir para la búsqueda.
+;;	OUT: Evalúa a un único nodo meta o nil si no hay solución.
+;;
+;;	Utilizamos una auxiliar recursiva con la lista de nodos.
+;;
+;;	pseudocode:
+;;
+;;	aux_fun(problema estrategia lista_nodos)
+;;		si lista_nodos no está vacía
+;;			si ( es_solución first lista_nodos)
+;;				first lista_nodos
+;;			sino
+;;				nueva_lista_nodos = insertar(lista_nodos (expandir_nodo first lista_nodos) estrategia)
+;;				aux_fun (problema estrategia nueva_lista_nodos)
+;;	
+
+(defun tree-search-aux (problem strategy open-nodes)
+    (let ((n (first open-nodes)))
+        (if ( or (null open-nodes) (null n))
+            nil
+            (if  (fncall (problem-fn-goal-test problem) (node-state n))
+              n
+              (tree-search-aux problem strategy  (insert-nodes (cdr open-nodes)  (expand-node n problem) strategy))))))
+
+(defun tree-search (problem strategy)
+  (tree-search-aux problem strategy (list (make-node
+  										:state (problem-initial-state problem)
+  										:depth 0
+  										:g 0
+  										:f 0))))
+
+;; Examples
+(TREE-SEARCH *galaxy-M35* *A-STAR*)
+
+;;#S(NODE :STATE SIRTIS
+;;   :PARENT
+;;   #S(NODE :STATE DAVION
+;;      :PARENT
+;;      #S(NODE :STATE KATRIL
+;;         :PARENT
+;;         #S(NODE :STATE KENTARES
+;;            :PARENT
+;;            #S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H NIL
+;;               :F 0)
+;;            :ACTION
+;;            #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES
+;;               :COST 4)
+;;            :DEPTH 1 :G 4 :H 4 :F 8)
+;;         :ACTION
+;;         #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL
+;;            :COST 2)
+;;         :DEPTH 2 :G 6 :H 3 :F 9)
+;;      :ACTION
+;;      #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+;;      :DEPTH 3 :G 7 :H 1 :F 8)
+;;   :ACTION
+;;   #S(ACTION :NAME NAVIGATE-W
+
+;; end
+
+
+;;	Devuelve el camino a recorrer para llegar desde un nodo origen
+;;	a un estado meta (por defecto también del problema *galaxy-m35*)
+;; 
+;;	IN:
+;;		node: nodo del que iniciar la búsqueda
+;; 	OUT:
+;;		Una lista de estados, es decir, de los nombres de los planetas que forman el camino,
+;;			donde el primer elemento es el destino, y el último el origen.
+;;
+;;	pseudocode:
+;;	Utilizando una función auxiliar de la forma:
+;;	aux_fun (nodo acumulador)
+;;		si (nodo no es nulo)
+;;			añadir el nodo al acumulador
+;;			aux_fun(padre(nodo) acumulador)
+;;		sino
+;;			devolver acumulador.
+;;
+
+(defun get-states (node acc)
+	(if (null node)
+		(print acc)
+		(get-states (node-parent node) (append (print acc) (list (node-state node))))))
+
+(defun tree-path (node)
+	(get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+
+;; Examples 
+
+(TREE-PATH *node-01*)
+
+;;(SIRTIS DAVION KATRIL KENTARES AVALON)
+
+;; end
+

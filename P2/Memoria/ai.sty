@@ -1,0 +1,30 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ai}[2014/01/01 Artificial Intelligence]
+
+\RequirePackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\RequirePackage{xifthen}
+\RequirePackage{mdframed}
+
+\newcounter{maincounter}
+\setcounter{maincounter}{1}
+
+\newcommand{\printtitle}[1]
+	{\begin{center}\textbf{Memoria Práctica #1\\Guillermo Julián Moreno\hspace{15pt} Víctor de Juan Sanz}\\Pareja 10\end{center}\vspace{5mm}}
+	
+\newcommand{\function}{Nombre y sintaxis de la función}
+\newcommand{\fname}[2]{\texttt{;;} \textbf{#1}: \texttt{#2}\\}
+\newcommand{\fsyntax}[1]{\texttt{;;} \textbf{SYNTAX:} \textit{#1}}
+
+\newcommand{\examples}{Batería de ejemplos de prueba}
+\newcommand{\comments}{Comentarios sobre la implementación}
+\newcommand{\answers}{Respuestas a las preguntas}
+\newcommand{\othercomments}{Otros comentarios}
+\newcommand{\pseudocode}{Pseudocódigo}
+\newcommand{\code}{Código \setcounter{maincounter}{0}}
+
+\newenvironment{aibox}[1]
+	{\noindent\textsc{\arabic{maincounter}. #1}\begin{mdframed}[linecolor=DarkBlue, linewidth=2pt]\vspace{5pt}}
+	{\vspace{5pt}\end{mdframed}\vspace{5mm} \stepcounter{maincounter}}
+	
+
+\endinput
