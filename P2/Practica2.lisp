@@ -256,7 +256,7 @@
 (setf *galaxy-M35*
     (make-problem
         :states *planets*
-        :initial-state 'Proserpina
+        :initial-state 'Kentares
         :fn-goal-test (make-fn
                 :name 'f-goal-test-galaxy
                 :lst-args (list *planets-destination*))
@@ -300,7 +300,7 @@
 ;; Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
 ;; la información sobre a qué planetas podemos viajar (qué nodos son los sucesores) 
 ;; y crearemos una estructura nodo para cada sucesor con toda la información necesaria.  No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
-;; Dejamos esa comprrobación para la tarea superior.
+;; Dejamos esa comprobación para la tarea superior.
 ;;
 ;; IN:     node: el nodo a expandir
 ;;        problem: estructura con toda la información necesaria
@@ -309,6 +309,10 @@
 ;; Iterar atomo en planetas_destino
 ;;     make-nodo (node,atomo)
 ;;
+
+(mapcan #'(lambda(x)  
+        (fncall x (node-state *node-00*))) 
+        (problem-operators *galaxy-M35*))
 
 (defun expand-node (nodeArg problem)
     (let ((lst
@@ -396,7 +400,7 @@
 ;; OUT:    una lista de nodos ordenados de acuerdo a la estrategia.
 ;;
 ;; pseudocode:
-;;    insert-nodes(nodes lst strategy)
+;;    insert-nodes-strategy(nodes lst strategy)
 ;;        iterar at1 en nodes
 ;;            iterar at2 en lst
 ;;                si ato1 < at2
@@ -407,44 +411,41 @@
 ;; porque modificar una lista sobre la que estamos iterando es peligroso):
 ;;
 ;;
-;;    insert-nodes(nodes lst strategy acc)
+;;    insert-nodes-strategy(nodes lst strategy acc)
 ;;        iterar at1 en nodes
 ;;            iterar at2 en lst
 ;;                si ato1 < at2
 ;;                    insertar ato1 en acc
-;;                    insert-nodes 
+;;                    insert-nodes-strategy 
 ;;                          (rest(nodes) lst-nodes strategy acc)
 ;;                sino
 ;;                    insertar ato2 en acc
 ;;                    insertar-nodes (nodes rest(lst-nodes) strategy acc)
 
-(defun _aux-insert-nodes (nodes lst-nodes acc strategy)
+(defun _aux-insert-nodes-strategy (nodes lst-nodes acc strategy)
     (if (null nodes)
         (append acc lst-nodes)
         (if (null lst-nodes)
             (append acc nodes)
             (if  (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
-                (_aux-insert-nodes 
+                (_aux-insert-nodes-strategy 
                     (cdr nodes)
                     lst-nodes
                     (append acc (list (car nodes)))
                     strategy)
-                (_aux-insert-nodes
+                (_aux-insert-nodes-strategy
                     nodes
                     (cdr lst-nodes)
                     (append acc (list (car lst-nodes)))
                     strategy)))))
 
-(defun insert-nodes (nodes lst-nodes strategy)
-    (_aux-insert-nodes nodes lst-nodes '() strategy))
+(defun insert-nodes-strategy (nodes lst-nodes strategy)
+    (_aux-insert-nodes-strategy (sort (copy-seq nodes) (strategy-node-compare-p strategy)) lst-nodes '() strategy))
 
 ;; Examples
-(insert-nodes 
-    (list *node-00* *node-01* *node-02*) 
-    (insert-nodes 
-        (list *node-00* *node-01* *node-02*) 
-        *lst-nodes-0*
-        *uniform-cost*)
+(insert-nodes-strategy 
+    (list *node-00* *node-01* *node-02*)
+    (sort (copy-seq *lst-nodes-0*) (strategy-node-compare-p *uniform-cost*))
     *uniform-cost*)
 
 ;;(#S(NODE :STATE PROSERPINA 
@@ -511,15 +512,14 @@
 ;;    
 
 (defun tree-search-aux (problem strategy open-nodes)
-    (let ((n (first open-nodes)))
-        (if ( or (null open-nodes) (null n))
-            nil
-            (if  (fncall (problem-fn-goal-test problem) (list (node-state n)))
+    (when open-nodes
+        (let ((n (first open-nodes)))
+            (if (fncall (problem-fn-goal-test problem) (node-state n))
               n
               (tree-search-aux problem strategy  
-                    (insert-nodes 
-                        (cdr open-nodes)
+                    (insert-nodes-strategy 
                         (expand-node n problem)
+                        (rest open-nodes)
                         strategy))))))
 
 (defun tree-search (problem strategy)
@@ -531,47 +531,101 @@
 
 ;; Examples
 (tree-search *galaxy-M35* *A-STAR*)
-
-;;#S(NODE :STATE SIRTIS
-;;   :PARENT
-;;   #S(NODE :STATE DAVION
-;;      :PARENT
-;;      #S(NODE :STATE KATRIL
-;;         :PARENT
-;;         #S(NODE :STATE KENTARES
-;;            :PARENT
-;;            #S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H NIL
-;;               :F 0)
-;;            :ACTION
-;;            #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES
-;;               :COST 4)
-;;            :DEPTH 1 :G 4 :H 4 :F 8)
-;;         :ACTION
-;;         #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL
-;;            :COST 2)
-;;         :DEPTH 2 :G 6 :H 3 :F 9)
-;;      :ACTION
-;;      #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-;;      :DEPTH 3 :G 7 :H 1 :F 8)
-;;   :ACTION
-;;   #S(ACTION :NAME NAVIGATE-W
+;; #S(NODE
+;;    :STATE SIRTIS
+;;    :PARENT #S(NODE
+;;               :STATE DAVION
+;;               :PARENT #S(NODE
+;;                          :STATE KATRIL
+;;                          :PARENT #S(NODE
+;;                                     :STATE KENTARES
+;;                                     :PARENT NIL
+;;                                     :ACTION NIL
+;;                                     :DEPTH 0
+;;                                     :G 0
+;;                                     :H NIL
+;;                                     :F 0)
+;;                          :ACTION #S(ACTION
+;;                                     :NAME NAVIGATE-WHITE-HOLE
+;;                                     :ORIGIN KENTARES
+;;                                     :FINAL KATRIL
+;;                                     :COST 2)
+;;                          :DEPTH 1
+;;                          :G 2
+;;                          :H 3
+;;                          :F 5)
+;;               :ACTION #S(ACTION
+;;                          :NAME NAVIGATE-WORM-HOLE
+;;                          :ORIGIN KATRIL
+;;                          :FINAL DAVION
+;;                          :COST 1)
+;;               :DEPTH 2
+;;               :G 3
+;;               :H 1
+;;               :F 4)
+;;    :ACTION #S(ACTION
+;;               :NAME NAVIGATE-WHITE-HOLE
+;;               :ORIGIN DAVION
+;;               :FINAL SIRTIS
+;;               :COST 1)
+;;    :DEPTH 3
+;;    :G 4
+;;    :H 0
 
 ;; end
 
 
-;;; Ignore ;;%%
 ; Realiza la búsqueda A* para el problema dado
 ; Evalúa:
 ;    Si no hay solución: NIL
 ; Si hay solución: el nodo correspondiente al estado-objetivo ;
 
-;(a-star-search *galaxy-M35*
-;               (tree-search *galaxy-M35* *A-star*));->
-;
-; #S(NODE :STATE SIRTIS
-; :PARENT
-;         #S(NODE :STATE ...
+(defun a-star-search (problem)
+    (tree-search problem *A-star*))
 
+
+(a-star-search *galaxy-M35*)
+;; #S(NODE
+;;    :STATE SIRTIS
+;;    :PARENT #S(NODE
+;;               :STATE DAVION
+;;               :PARENT #S(NODE
+;;                          :STATE KATRIL
+;;                          :PARENT #S(NODE
+;;                                     :STATE KENTARES
+;;                                     :PARENT NIL
+;;                                     :ACTION NIL
+;;                                     :DEPTH 0
+;;                                     :G 0
+;;                                     :H NIL
+;;                                     :F 0)
+;;                          :ACTION #S(ACTION
+;;                                     :NAME NAVIGATE-WHITE-HOLE
+;;                                     :ORIGIN KENTARES
+;;                                     :FINAL KATRIL
+;;                                     :COST 2)
+;;                          :DEPTH 1
+;;                          :G 2
+;;                          :H 3
+;;                          :F 5)
+;;               :ACTION #S(ACTION
+;;                          :NAME NAVIGATE-WORM-HOLE
+;;                          :ORIGIN KATRIL
+;;                          :FINAL DAVION
+;;                          :COST 1)
+;;               :DEPTH 2
+;;               :G 3
+;;               :H 1
+;;               :F 4)
+;;    :ACTION #S(ACTION
+;;               :NAME NAVIGATE-WHITE-HOLE
+;;               :ORIGIN DAVION
+;;               :FINAL SIRTIS
+;;               :COST 1)
+;;    :DEPTH 3
+;;    :G 4
+;;    :H 0
+;;    :F 4)
 
 ;; end
 
@@ -600,11 +654,12 @@
         (get-states (node-parent node) (append acc (list (node-state node))))))
 
 (defun tree-path (node)
-    (get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+    (get-states node '()))
 
 ;; Examples 
 
-(tree-path *node-01*)
+(setf *node-end* (a-star-search *galaxy-M35*))
+(tree-path *node-end*)
 
 ;;(SIRTIS DAVION KATRIL KENTARES AVALON)
 
@@ -632,20 +687,18 @@
 (defun  _aux_action-sequence (node acc)
     (if (null (node-action node))
         acc
-        (_aux_action-sequence (node-parent node) (append acc (list (node-action node))))))
+        (_aux_action-sequence (node-parent node) (append (list (node-action node)) acc))))
 
-(defun  action-sequence (node)
+(defun action-sequence (node)
     (_aux_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
 ;; Examples
 
-(action-sequence *node-01*)
+(action-sequence *node-end*)
 
-;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
+;; (#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
-;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
-
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 1))
 ;; end
 
 
