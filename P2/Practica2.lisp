@@ -530,7 +530,7 @@
                                           :f 0))))
 
 ;; Examples
-(TREE-SEARCH *galaxy-M35* *A-STAR*)
+(tree-search *galaxy-M35* *A-STAR*)
 
 ;;#S(NODE :STATE SIRTIS
 ;;   :PARENT
@@ -604,7 +604,7 @@
 
 ;; Examples 
 
-(TREE-PATH *node-01*)
+(tree-path *node-01*)
 
 ;;(SIRTIS DAVION KATRIL KENTARES AVALON)
 
