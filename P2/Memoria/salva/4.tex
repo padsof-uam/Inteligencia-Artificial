@@ -1,0 +1,42 @@
+\begin{aibox}{\function}
+\begin{alltt}
+Definimos la funcion:
+
+node-f-compare (node-1 node-2)
+
+IN:     node-1 y node-2 a comparar.
+OUT: 	el resultado de comparar node-1-f <= node-2-f
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\comments}
+Estrategia A*
+
+\end{aibox}
+
+\begin{aibox}{\pseudocode}
+\begin{alltt}
+
+    Comparamos los valores de la f de cada nodo
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\code}
+\begin{alltt}
+(setf *A-star*
+    (make-strategy 
+        :name 'A-star
+        :node-compare-p 'node-f-compare))
+
+(defun node-f-compare (node-1 node-2)
+    (<= (node-f node-1) (node-f node-2)))
+
+\end{alltt}
+\end{aibox}

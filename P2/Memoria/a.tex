@@ -1,0 +1,81 @@
+\begin{aibox}{\function}
+\begin{alltt}
+a-star-search (problem)
+
+  IN: El problema al que aplicar A*
+  OUT: Si no hay solución: NIL
+    Si hay solución: el nodo correspondiente al estado-objetivo ;
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+Examples
+
+(a-star-search *galaxy-M35*)
+
+\#S(NODE
+   :STATE SIRTIS
+   :PARENT \#S(NODE
+              :STATE DAVION
+              :PARENT \#S(NODE
+                         :STATE KATRIL
+                         :PARENT \#S(NODE
+                                    :STATE KENTARES
+                                    :PARENT NIL
+                                    :ACTION NIL
+                                    :DEPTH 0
+                                    :G 0
+                                    :H NIL
+                                    :F 0)
+                         :ACTION \#S(ACTION
+                                    :NAME NAVIGATE-WHITE-HOLE
+                                    :ORIGIN KENTARES
+                                    :FINAL KATRIL
+                                    :COST 2)
+                         :DEPTH 1
+                         :G 2
+                         :H 3
+                         :F 5)
+              :ACTION \#S(ACTION
+                         :NAME NAVIGATE-WORM-HOLE
+                         :ORIGIN KATRIL
+                         :FINAL DAVION
+                         :COST 1)
+              :DEPTH 2
+              :G 3
+              :H 1
+              :F 4)
+   :ACTION \#S(ACTION
+              :NAME NAVIGATE-WHITE-HOLE
+              :ORIGIN DAVION
+              :FINAL SIRTIS
+              :COST 1)
+   :DEPTH 3
+   :G 4
+   :H 0
+   :F 4)
+
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\comments}
+Realiza la búsqueda en un problema según la estrategia A*
+
+\end{aibox}
+
+\begin{aibox}{\pseudocode}
+\begin{alltt}
+  \end{alltt}
+\end{aibox}
+
+\begin{aibox}{\code}
+\begin{alltt}
+
+(defun a-star-search (problem)
+    (tree-search problem *A-star*))
+
+\end{alltt}
+\end{aibox}
