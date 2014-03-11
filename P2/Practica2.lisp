@@ -105,10 +105,6 @@
 ;; 
 ;; pseudocode
 ;; comprobar si state está en planets-destination
-
-(defun fn-f-goal-test-galaxy (lst-args)
-    (f-goal-test-galaxy (car lst-args) (cdr lst-args)))
-
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
 
@@ -260,20 +256,20 @@
 (setf *galaxy-M35*
     (make-problem
         :states *planets*
-        :initial-state 'PROSERPINA
+        :initial-state 'Proserpina
         :fn-goal-test (make-fn
-                :name 'fn-f-goal-test-galaxy
-                :lst-args *planets-destination*)
+                :name 'f-goal-test-galaxy
+                :lst-args (list *planets-destination*))
         :fn-h (make-fn
                 :name 'f-h-galaxy
-                :lst-args *sensors*)
+                :lst-args (list *sensors*))
         :operators (list
                     (make-fn
                         :name 'navigate-worm-hole 
-                        :lst-args *worm-holes*)
+                        :lst-args (list *worm-holes*))
                     (make-fn
                         :name 'navigate-white-hole
-                        :lst-args *white-holes*))))
+                        :lst-args (list *white-holes*)))))
 
 ;; Examples
 
@@ -295,7 +291,7 @@
         :f 20))
 
 (defun fncall (f &rest args)
-  (funcall (fn-name f) (append args (fn-lst-args f))))
+  (apply (fn-name f) (append args (fn-lst-args f))))
 
 
 ;;%%
@@ -318,16 +314,14 @@
     (let ((lst
             (mapcan
                 #'(lambda(x)  
-                    (funcall 
-                        (fn-name x) (node-state nodeArg) (fn-lst-args x))) 
+                    (fncall x (node-state nodeArg))) 
                 (problem-operators problem))))
             (mapcar #'(lambda(x) 
                 (let (
                     (g (+ (action-cost x) (node-g nodeArg)))
-                    (h (funcall 
-                            (fn-name (problem-fn-h problem)) 
-                            (action-final x) 
-                            ( fn-lst-args (problem-fn-h problem)))))
+                    (h (fncall 
+                            (problem-fn-h problem)
+                            (action-final x))))
                         (make-node
                             :state (action-final x)
                             :parent nodeArg
@@ -336,6 +330,7 @@
                             :g g
                             :h h
                             :f (+ g h)))) lst)))
+
 
 ;; Examples
 (setf *lst-nodes-0*
@@ -429,7 +424,6 @@
         (if (null lst-nodes)
             (append acc nodes)
             (if  (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
-
                 (_aux-insert-nodes 
                     (cdr nodes)
                     lst-nodes
@@ -520,7 +514,7 @@
     (let ((n (first open-nodes)))
         (if ( or (null open-nodes) (null n))
             nil
-            (if  (fncall (problem-fn-goal-test problem) (node-state n))
+            (if  (fncall (problem-fn-goal-test problem) (list (node-state n)))
               n
               (tree-search-aux problem strategy  
                     (insert-nodes 
@@ -645,7 +639,7 @@
 
 ;; Examples
 
-(ACTION-SEQUENCE *node-01*)
+(action-sequence *node-01*)
 
 ;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
