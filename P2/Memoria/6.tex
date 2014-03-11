@@ -3,47 +3,47 @@
 expand-node (nodeArg problem)
 
 
-IN: 	node: el nodo a expandir
-	problem: estructura con toda la información necesaria
-OUT: lista de los nodos hijos. En el problema de la galaxia, lista de los nodos planeta a los que podemos viajar
+IN:     node: el nodo a expandir
+       problem: estructura con toda la información necesaria
+OUT: lista de los nodos hijos
 
 \end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
-;; Examples
+Examples
 (setf *lst-nodes-0*
-	(expand-node *node-00* *galaxy-M35*))
+    (expand-node *node-00* *galaxy-M35*))
 
-;; (\#S(NODE :STATE MALLORY
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
-;;    :DEPTH 13 :G 16 :H 7 :F 23)
-;; \#S(NODE :STATE SIRTIS
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
-;;    :DEPTH 13 :G 17 :H 0 :F 17)
-;; \#S(NODE :STATE KENTARES
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
-;;    :DEPTH 13 :G 11 :H 4 :F 15)
-;; \#S(NODE :STATE MALLORY
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
-;;    :DEPTH 13 :G 17 :H 7 :F 24)
-;; \#S(NODE :STATE AVALON
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
-;;    :DEPTH 13 :G 12 :H 5 :F 17)
-;; \#S(NODE :STATE DAVION
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
-;;    :DEPTH 13 :G 14 :H 1 :F 15)
-;; \#S(NODE :STATE SIRTIS
-;;    :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
-;;    :DEPTH 13 :G 20 :H 0 :F 20))
+(\#S(NODE :STATE MALLORY
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
+ :DEPTH 13 :G 16 :H 7 :F 23)
+\#S(NODE :STATE SIRTIS
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
+ :DEPTH 13 :G 17 :H 0 :F 17)
+\#S(NODE :STATE KENTARES
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
+ :DEPTH 13 :G 11 :H 4 :F 15)
+\#S(NODE :STATE MALLORY
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
+ :DEPTH 13 :G 17 :H 7 :F 24)
+\#S(NODE :STATE AVALON
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
+ :DEPTH 13 :G 12 :H 5 :F 17)
+\#S(NODE :STATE DAVION
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
+ :DEPTH 13 :G 14 :H 1 :F 15)
+\#S(NODE :STATE SIRTIS
+ :PARENT  \#S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+ :ACTION  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
+ :DEPTH 13 :G 20 :H 0 :F 20))
 
 
 
@@ -52,13 +52,16 @@ OUT: lista de los nodos hijos. En el problema de la galaxia, lista de los nodos 
 
 \begin{aibox}{\comments}
 Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
+la información sobre a qué planetas podemos viajar (qué nodos son los sucesores) 
+y crearemos una estructura nodo para cada sucesor con toda la información necesaria.  No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
+Dejamos esa comprrobación para la tarea superior.
 
 \end{aibox}
 
 \begin{aibox}{\pseudocode}
 \begin{alltt}
 Iterar atomo en planetas\_destino
-	make-nodo (node,atomo)
+    make-nodo (node,atomo)
 
 \end{alltt}
 \end{aibox}
@@ -66,21 +69,27 @@ Iterar atomo en planetas\_destino
 \begin{aibox}{\code}
 \begin{alltt}
 (defun expand-node (nodeArg problem)
-	(let ((lst
-        	(mapcan
-            	\#'(lambda(x)  (funcall (fn-name x) (node-state nodeArg) (fn-lst-args x))) (problem-operators problem))))
-			(mapcar \#'(lambda(x) 
-				(let (
-					(g (+ (action-cost x) (node-g nodeArg)))
-					(h (funcall (fn-name (problem-fn-h problem)) (action-final x) ( fn-lst-args (problem-fn-h problem)))))
-						(make-node
-							:state (action-final x)
-							:parent nodeArg
-							:action x
-							:depth (+ 1 (node-depth nodeArg))
-							:g g
-							:h h
-							:f (+ g h)))) lst)))
+    (let ((lst
+            (mapcan
+                \#'(lambda(x)  
+                    (funcall 
+                        (fn-name x) (node-state nodeArg) (fn-lst-args x))) 
+                (problem-operators problem))))
+            (mapcar \#'(lambda(x) 
+                (let (
+                    (g (+ (action-cost x) (node-g nodeArg)))
+                    (h (funcall 
+                            (fn-name (problem-fn-h problem)) 
+                            (action-final x) 
+                            ( fn-lst-args (problem-fn-h problem)))))
+                        (make-node
+                            :state (action-final x)
+                            :parent nodeArg
+                            :action x
+                            :depth (+ 1 (node-depth nodeArg))
+                            :g g
+                            :h h
+                            :f (+ g h)))) lst)))
 
 
 

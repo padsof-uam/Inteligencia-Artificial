@@ -1,14 +1,14 @@
 ;; Comprueba que si planeta pasado como argumento es una meta.
 ;;
-;; IN: 	state: planeta actual
-;; 		planets-destination: lista de planetas de destino
+;; IN:     state: planeta actual
+;;         planets-destination: lista de planetas de destino
 ;; OUT: T si el planeta actual es una meta.
 ;; 
 ;; pseudocode
 ;; comprobar si state está en planets-destination
 
 (defun fn-f-goal-test-galaxy (lst-args)
-	(f-goal-test-galaxy (car lst-args) (cdr lst-args)))
+    (f-goal-test-galaxy (car lst-args) (cdr lst-args)))
 
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
@@ -21,6 +21,5 @@
 (f-goal-test-galaxy 'Urano '()) ;-> NIL
 
 ;; end
-
 
 

@@ -1,35 +1,34 @@
-;; Obtención de la secuencia de acciones de un camino, desde un nodo origen hasta un nodo meta
-;; 	(definido por *galaxy-M35*, según la estrategia *A-star*)
+;;    Devuelve el camino a recorrer para llegar desde un nodo origen. En la lista devuelta, el primer elemento es el destino, y el último el origen.
+;;    a un estado meta (por defecto también del problema *galaxy-m35*)
 ;; 
-;; IN: 
-;;		node: nodo origen desde el que empezar la búsqueda.
-;; OUT:
-;;		una lista de acciones que llevan desde el nodo origen hasta el destino.
+;;    IN:node: nodo del que iniciar la búsqueda
+;;    OUT: Una lista de los nombres de los planetas que forman el camino
 ;;
-;; pseudocode:
-;; Utilizando una función auxiliar de la forma:
-;; aux_fun (nodo acumulador)
-;;		si (nodo no es nulo)
-;;			añadir acción(nodo) al acumulador
-;;			aux_fun(padre(nodo) acumulador)
-;;		sino
-;;			devolver acumulador
+;;    pseudocode:
+;;    Utilizando una función auxiliar de la forma:
+;;    aux_fun (nodo acumulador)
+;;        si (nodo no es nulo)
+;;            añadir el nodo al acumulador
+;;            aux_fun(padre(nodo) acumulador)
+;;        sino
+;;            devolver acumulador.
+;;
 
-(defun  _aux_action-sequence (node acc)
-	(if (null (node-action node))
-		acc
-		(_aux_action-sequence (node-parent node) (append acc (list (node-action node))))))
+(defun get-states (node acc)
+    (if (null node)
+        acc
+        (get-states (node-parent node) (append acc (list (node-state node))))))
 
-(defun  action-sequence (node)
-	(_aux_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+(defun tree-path (node)
+    (get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
-;; Examples
+;; Examples 
 
-(ACTION-SEQUENCE *node-01*)
+(TREE-PATH *node-01*)
 
-;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
-;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
-;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
+;;(SIRTIS DAVION KATRIL KENTARES AVALON)
 
 ;; end
+
+
+

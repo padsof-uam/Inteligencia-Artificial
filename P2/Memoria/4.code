@@ -1,19 +1,19 @@
 ;; Estrategia A*
 ;;
-;; IN: 	node-1 y node-2 a comparar.
-;; 	
+;; IN:     node-1 y node-2 a comparar.
+;;     
 ;; OUT: 
 ;; 
 ;; pseudocode
-;; 	Comparamos los valores de la f de cada nodo
+;;     Comparamos los valores de la f de cada nodo
 
 (setf *A-star*
     (make-strategy 
-    	:name 'A-star
-    	:node-compare-p 'node-f-compare))
+        :name 'A-star
+        :node-compare-p 'node-f-compare))
 
 (defun node-f-compare (node-1 node-2)
-	(<= (node-f node-1) (node-f node-2)))
+    (<= (node-f node-1) (node-f node-2)))
 
 ;; Examples
 

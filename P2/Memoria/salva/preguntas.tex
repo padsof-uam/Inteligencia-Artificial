@@ -1,0 +1,53 @@
+ \subsection*{Pregunta 1}\textbf{¿Es la heurística empleada monótona?}
+
+ No es monótona, porque no es admisible.
+
+\subsection*{Pregunta 2} \textbf{¿Es la heurística empleada admisible?}
+
+No es admisible porque en el caso del camino Katril-Kentares la herística sobreestima el coste real de la acción.
+
+\subsection*{Pregunta 3}\textbf{¿Garantiza la búsqueda de coste uniforme sin eliminación de estados repetidos encontrar la solución óptima? ¿Por qué?}
+Sí, ya que la búsqueda de coste uniforme es óptima y completa siempre que los costes sean mayores que 0. Si tenemos 2 nodos repetidos, uno de ellos tendrá un valor g menor, con lo que se expandirá antes no habiendo ningún problema.
+
+\subsection*{Pregunta 4}\textbf{ ¿Garantiza la búsqueda de coste uniforme con eliminación de estados repetidos encontrar la solución óptima? ¿Por qué?}
+
+Depende de cómo sea la eliminación de estados repetidos. Si se tiene cuidad de eliminar el estado repetido con mayor g, entonces sí es óptima, pero si "eliminar" lo tratamos como no insertar un nodo si ya lo tenemos en la lista, podemos llegar a una solución que pasa por ese nodo pero por un camino más largo que el óptimo.
+
+\subsection*{Pregunta 5}\textbf{¿Garantiza la búsqueda A* sin eliminación de estados repetidos encontrar la solución óptima? ¿Por qué?}
+En este problema, no lo garantiza, porque la herística no es admisible. En general, si la heurística es admisible sí encontraremos la solución óptima.
+
+\subsection*{Pregunta 6}\textbf{ ¿Garantiza la búsqueda A* con eliminación de estados repetidos encontrar la solución óptima? ¿Por qué?}
+En este problema, no lo garantiza, porque la heurística no es monótona. 
+
+En general, si la heurística fuera monótona, no habría problema. Si simplemente fuera admisible, tendríamos que tener cuidado con cómo eliminamos los nodos repetidos (como en el caso de la pregunta 4)
+
+\subsection*{Pregunta 7}\textbf{Diseñe una estrategia para realizar búsqueda en profundidad}
+
+Utilizamos el campo depth, y expandiremos antes los que tengan mayor porfundidad.
+\begin{alltt}
+(setf *depth-first*
+    (make-strategy
+        :name 'depth-first
+        :node-compare-p 'depth-first-node-compare-p))
+
+(defun depth-first-node-compare-p (node-1 node-2)
+    (>= (node-depth node-1) (node-depth node-2)))
+
+(tree-path (tree-search *galaxy-M35* *depth-first*))
+\end{alltt}
+
+\subsection*{Pregunta 8}\textbf{ Diseñe una estrategia para realizar búsqueda en anchura}
+
+Utilizamos el campo depth, y expandiremos antes los que tengan menor porfundidad.
+
+\begin{alltt}
+(setf *breadth-first*
+    (make-strategy
+        :name 'breadth-first
+        :node-compare-p 'breadth-first-node-compare-p))
+
+(defun breadth-first-node-compare-p (node-1 node-2)
+    (<= (node-depth node-1) (node-depth node-2)))
+
+(tree-path (tree-search *galaxy-M35* *breadth-first*))
+\end{alltt}

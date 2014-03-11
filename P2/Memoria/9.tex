@@ -3,28 +3,57 @@
 tree-path (node)
 
 
+   IN:node: nodo del que iniciar la búsqueda
+   OUT: Una lista de los nombres de los planetas que forman el camino
 
 \end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
+Examples 
+
+(TREE-PATH *node-01*)
+
+SIRTIS DAVION KATRIL KENTARES AVALON)
+
 
 \end{alltt}
 \end{aibox}
 
 \begin{aibox}{\comments}
+   Devuelve el camino a recorrer para llegar desde un nodo origen. En la lista devuelta, el primer elemento es el destino, y el último el origen.
+   a un estado meta (por defecto también del problema *galaxy-m35*)
+
 
 \end{aibox}
 
 \begin{aibox}{\pseudocode}
 \begin{alltt}
+   Utilizando una función auxiliar de la forma:
+   aux\_fun (nodo acumulador)
+       si (nodo no es nulo)
+           añadir el nodo al acumulador
+           aux\_fun(padre(nodo) acumulador)
+       sino
+           devolver acumulador.
 
 \end{alltt}
 \end{aibox}
 
 \begin{aibox}{\code}
 \begin{alltt}
+(defun get-states (node acc)
+    (if (null node)
+        acc
+        (get-states (node-parent node) (append acc (list (node-state node))))))
+
+(defun tree-path (node)
+    (get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+
+
+
+
 
 \end{alltt}
 \end{aibox}

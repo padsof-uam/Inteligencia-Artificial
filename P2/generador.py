@@ -39,6 +39,8 @@ while (line!=''):
 		i=i+1
 		ignore=0
 	line = fin.readline()
+
+f_aux.close()
 		
 
 
@@ -58,8 +60,11 @@ syntax=''
 
 for i in xrange(1,num_fichero+1):
 
-	fcode = open('Memoria/'+str(i)+'.code')
+	fcode = open('Memoria/'+str(i)+'.code','r')
 	todo = fcode.readlines()
+	print i,num_fichero
+	if i==10:
+		print todo
 	comments=''
 	ejemplos=''
 	pseudocodigo=''
@@ -70,11 +75,14 @@ for i in xrange(1,num_fichero+1):
 	j=0
 
 	#Generacion de lo interesante
-	#for j in xrange(0,len(todo)-1):
 	while j < len(todo):
 		if  comments == '' and len(todo[j])!=1:
-			comments = todo[j][3:]
-		elif syntax=='' and todo[j].find('IN: ')>0:
+			while todo[j].find('IN:') == -1:
+				comments+= todo[j][3:]
+				j+=1
+				#print j,todo[j]
+			j-=1
+		elif syntax=='' and todo[j].find('IN:')>0:
 			while end_aux == 0:
 				syntax+=todo[j][3:]
 				j+=1
@@ -88,13 +96,16 @@ for i in xrange(1,num_fichero+1):
 				j += 1;
 		elif todo[j].find('Examples') != -1:
 			while todo[j].find(';; end') == -1:
-				ejemplos += todo[j]
+				if todo[j].find(';;') != -1:
+					ejemplos += todo[j][3:]
+				else :
+					ejemplos += todo[j]
 				j+=1
 		elif todo[j].find(';;') == -1:
 			codigo += todo[j]
 			if todo[j].find('defun')!=-1:
 				name = todo[j][todo[j].find('defun ')+len('defun '):]
-			print todo[j],todo[j].find('defun')
+			#print todo[j],todo[j].find('defun')
 		j += 1
 #			a=2
 	#Generacion del tex
@@ -114,4 +125,5 @@ for i in xrange(1,num_fichero+1):
 
 
 f_general.write('\section{Preguntas}')
+f_general.write('\input{salva/preguntas.tex}')
 f_general.write('\end{document}')

@@ -3,30 +3,36 @@
 navigate-white-hole (state white-holes)
 
 
+IN:    state: planeta actual
+       routes: lista de rutas
+        is-route-func: función que decide si una ruta parte del planeta destino
+       get-dest-func: función que devuelve el destino a partir del triplete
+       name: nombre de la función que genera las rutas
+OUT:    Lista con las acciones correspondientes a las rutas posibles.
 
 \end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
-;; Examples
+Examples
 
 (navigate-worm-hole 'Katril *worm-holes*)
 
-;; (\#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-;;  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL MALLORY :COST 5)
-;;  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL SIRTIS :COST 10))
+(\#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+ \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL MALLORY :COST 5)
+ \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL SIRTIS :COST 10))
 
 (navigate-white-hole 'Kentares *white-holes*)
 
-;; (\#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 3)
-;;  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
-;;  \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 2))
+(\#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 3)
+ \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
+ \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 2))
 
 (navigate-worm-hole 'Kentares *worm-holes*)
 
-;; (\#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 4)
-;;  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 1))
+(\#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL AVALON :COST 4)
+ \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KENTARES :FINAL PROSERPINA :COST 1))
 
 
 \end{alltt}
@@ -40,12 +46,18 @@ Función genérica para crear las acciones a partir de una lista de rutas
 \begin{aibox}{\pseudocode}
 \begin{alltt}
 
+por cada ruta en (filtrar routes con is-route-func):
+    crear nueva acción con:
+       nombre: name
+       origen: state
+       final: (get-dest-func ruta)
+       coste: ruta[3]
+
 \end{alltt}
 \end{aibox}
-
+\newpage
 \begin{aibox}{\code}
 \begin{alltt}
-
 (defun navigate-generic (state routes is-route-func get-dest-func name)
   (mapcar 
     \#'(lambda (x)

@@ -27,12 +27,11 @@
 ;; Problem definition
 ;;
 (defstruct problem
-	states 			; List of states
-	initial-state 	; Initial state
-	fn-goal-test 	; Function (in fn format) that determines; whether a state fulfills the goal
-	fn-h 			; Function (in fn format) that evaluates; to the value of the heuristic of a state
-	fn-strategy 	; Function (in fn format) that inserts a node in; a list of nodes, according to a specified strategy
-	operators) 		; list of operators (in fn format); to generate succesors
+    states             ; List of states
+    initial-state     ; Initial state
+    fn-goal-test     ; Function (in fn format) that determines; whether a state fulfills the goal
+    fn-h             ; Function (in fn format) that evaluates; to the value of the heuristic of a state
+    operators)         ; list of operators (in fn format); to generate succesors
 ;;
 
 
@@ -44,13 +43,13 @@
 ;; Node in search tree
 ;;
 (defstruct node
-	state     ; state label
-	parent    ; parent node
-	action    ; action that generated the current node from its parent
-	(depth 0) ; depth in the search tree
-	(g 0)     ; cost of the path from the initial state to this node
-	h         ; value of the heurstic
-	(f 0))    ; g + h
+    state     ; state label
+    parent    ; parent node
+    action    ; action that generated the current node from its parent
+    (depth 0) ; depth in the search tree
+    (g 0)     ; cost of the path from the initial state to this node
+    h         ; value of the heurstic
+    (f 0))    ; g + h
 ;;
 
 
@@ -60,10 +59,10 @@
 ;; Actions
 ;;
 (defstruct action
-	Name   ; Name of the operator that generated the action
-	origin ; State on which the action is applied
-	final  ; State that results from the application of the action
-	cost ) ; Cost of the action
+    Name   ; Name of the operator that generated the action
+    origin ; State on which the action is applied
+    final  ; State that results from the application of the action
+    cost ) ; Cost of the action
 ;;
 
 
@@ -73,8 +72,8 @@
 ;; Search strategies
 ;;
 (defstruct strategy
-	name 			; Name of the search strategy
-	node-compare-p) ; boolean comparison
+    name             ; Name of the search strategy
+    node-compare-p) ; boolean comparison
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -86,8 +85,8 @@
 ;;
 
 (defstruct fn
-	name 		; Function name
-	lst-args) 	; List of additional arguments
+    name         ; Function name
+    lst-args)     ; List of additional arguments
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -100,15 +99,15 @@
 ;;;;
 ;; Comprueba que si planeta pasado como argumento es una meta.
 ;;
-;; IN: 	state: planeta actual
-;; 		planets-destination: lista de planetas de destino
+;; IN:     state: planeta actual
+;;         planets-destination: lista de planetas de destino
 ;; OUT: T si el planeta actual es una meta.
 ;; 
 ;; pseudocode
 ;; comprobar si state está en planets-destination
 
 (defun fn-f-goal-test-galaxy (lst-args)
-	(f-goal-test-galaxy (car lst-args) (cdr lst-args)))
+    (f-goal-test-galaxy (car lst-args) (cdr lst-args)))
 
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
@@ -123,12 +122,11 @@
 ;; end
 
 
-
 ;;;;
 ;; Devuelve el valor de la heurística en el planeta actual.
 ;; 
-;; IN: 	state: planeta actual
-;; 		sensors: lista de tuplas planeta-heurística
+;; IN:     state: planeta actual
+;;         sensors: lista de tuplas planeta-heurística
 ;; OUT: valor de la heurística en el planeta actual
 ;;
 ;; pseudocode
@@ -136,10 +134,10 @@
 (defun f-h-galaxy (state sensors)
   (if (null sensors)
       nil
-	  (let ((sensor (first sensors)))
-	    (if (equal state (car sensor))
-	        (cadr sensor)
-	        (f-h-galaxy state (rest sensors))))))
+      (let ((sensor (first sensors)))
+        (if (equal state (car sensor))
+            (cadr sensor)
+            (f-h-galaxy state (rest sensors))))))
 
 ;; Examples
 
@@ -152,20 +150,20 @@
 ;;;;
 ;; Función genérica para crear las acciones a partir de una lista de rutas
 ;;
-;; IN:	state: planeta actual
-;;		routes: lista de rutas
-;; 		is-route-func: función que decide si una ruta parte del planeta destino
-;;		get-dest-func: función que devuelve el destino a partir del triplete
-;;		name: nombre de la función que genera las rutas
-;; OUT:	Lista con las acciones correspondientes a las rutas posibles.
+;; IN:    state: planeta actual
+;;        routes: lista de rutas
+;;         is-route-func: función que decide si una ruta parte del planeta destino
+;;        get-dest-func: función que devuelve el destino a partir del triplete
+;;        name: nombre de la función que genera las rutas
+;; OUT:    Lista con las acciones correspondientes a las rutas posibles.
 ;; 
 ;; pseudocode
 ;; por cada ruta en (filtrar routes con is-route-func):
-;; 	crear nueva acción con:
-;;		nombre: name
-;;		origen: state
-;;		final: (get-dest-func ruta)
-;;		coste: ruta[3]
+;;     crear nueva acción con:
+;;        nombre: name
+;;        origen: state
+;;        final: (get-dest-func ruta)
+;;        coste: ruta[3]
 ;;
 
 (defun navigate-generic (state routes is-route-func get-dest-func name)
@@ -218,12 +216,12 @@
 ;;; Ignore ;;%%
 
 (setf *uniform-cost*
-	(make-strategy
-		:name 'uniform-cost
-		:node-compare-p 'node-g-<=))
+    (make-strategy
+        :name 'uniform-cost
+        :node-compare-p 'node-g-<=))
 
 (defun node-g-<= (node-1 node-2)
-	(<= (node-g node-1)	(node-g node-2)))
+    (<= (node-g node-1)    (node-g node-2)))
 
 
 ;; end
@@ -234,20 +232,20 @@
 ;;;;
 ;; Estrategia A*
 ;;
-;; IN: 	node-1 y node-2 a comparar.
-;; 	
+;; IN:     node-1 y node-2 a comparar.
+;;     
 ;; OUT: 
 ;; 
 ;; pseudocode
-;; 	Comparamos los valores de la f de cada nodo
+;;     Comparamos los valores de la f de cada nodo
 
 (setf *A-star*
     (make-strategy 
-    	:name 'A-star
-    	:node-compare-p 'node-f-compare))
+        :name 'A-star
+        :node-compare-p 'node-f-compare))
 
 (defun node-f-compare (node-1 node-2)
-	(<= (node-f node-1) (node-f node-2)))
+    (<= (node-f node-1) (node-f node-2)))
 
 ;; Examples
 
@@ -256,36 +254,45 @@
 
 ;;;;
 ;; Ejercicio 5
+;; IN:
+;; OUT:
 
 (setf *galaxy-M35*
-	(make-problem
-		:states *planets*
-		:initial-state 'Avalon
-		:fn-goal-test (make-fn
-                  		:name 'fn-f-goal-test-galaxy
-                    	:lst-args *planets-destination*)
-		:fn-h (make-fn
-          		:name 'f-h-galaxy
-            	:lst-args *sensors*)
-		:fn-strategy (make-fn
-                 		:name 'insert-nodes
-                   		:lst-args '(*A-star*))
-		:operators (list
-					(make-fn
-						:name 'navigate-worm-hole 
-						:lst-args *worm-holes*)
-					(make-fn
-						:name 'navigate-white-hole
-						:lst-args *white-holes*))))
+    (make-problem
+        :states *planets*
+        :initial-state 'PROSERPINA
+        :fn-goal-test (make-fn
+                :name 'fn-f-goal-test-galaxy
+                :lst-args *planets-destination*)
+        :fn-h (make-fn
+                :name 'f-h-galaxy
+                :lst-args *sensors*)
+        :operators (list
+                    (make-fn
+                        :name 'navigate-worm-hole 
+                        :lst-args *worm-holes*)
+                    (make-fn
+                        :name 'navigate-white-hole
+                        :lst-args *white-holes*))))
+
+;; Examples
+
 ;; end
 
 ;;; Ignore ;;%%
 (setf *node-00*
-	(make-node
-		:state 'Proserpina 
-		:depth 12 
-		:g 10 
-		:f 20))
+    (make-node
+        :state 'Proserpina 
+        :depth 12 
+        :g 10 
+        :f 20))
+
+(setf *node-08*
+    (make-node
+        :state 'Proserpina 
+        :depth 12 
+        :g 10 
+        :f 20))
 
 (defun fncall (f &rest args)
   (funcall (fn-name f) (append args (fn-lst-args f))))
@@ -299,63 +306,69 @@
 ;; y crearemos una estructura nodo para cada sucesor con toda la información necesaria.  No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
 ;; Dejamos esa comprrobación para la tarea superior.
 ;;
-;; IN: 	node: el nodo a expandir
-;;		problem: estructura con toda la información necesaria
-;; OUT: lista de los nodos hijos. En el problema de la galaxia, lista de los nodos planeta a los que podemos viajar
+;; IN:     node: el nodo a expandir
+;;        problem: estructura con toda la información necesaria
+;; OUT: lista de los nodos hijos
 ;; pseudocode:
 ;; Iterar atomo en planetas_destino
-;; 	make-nodo (node,atomo)
+;;     make-nodo (node,atomo)
 ;;
 
 (defun expand-node (nodeArg problem)
-	(let ((lst
-        	(mapcan
-            	#'(lambda(x)  (funcall (fn-name x) (node-state nodeArg) (fn-lst-args x))) (problem-operators problem))))
-			(mapcar #'(lambda(x) 
-				(let (
-					(g (+ (action-cost x) (node-g nodeArg)))
-					(h (funcall (fn-name (problem-fn-h problem)) (action-final x) ( fn-lst-args (problem-fn-h problem)))))
-						(make-node
-							:state (action-final x)
-							:parent nodeArg
-							:action x
-							:depth (+ 1 (node-depth nodeArg))
-							:g g
-							:h h
-							:f (+ g h)))) lst)))
+    (let ((lst
+            (mapcan
+                #'(lambda(x)  
+                    (funcall 
+                        (fn-name x) (node-state nodeArg) (fn-lst-args x))) 
+                (problem-operators problem))))
+            (mapcar #'(lambda(x) 
+                (let (
+                    (g (+ (action-cost x) (node-g nodeArg)))
+                    (h (funcall 
+                            (fn-name (problem-fn-h problem)) 
+                            (action-final x) 
+                            ( fn-lst-args (problem-fn-h problem)))))
+                        (make-node
+                            :state (action-final x)
+                            :parent nodeArg
+                            :action x
+                            :depth (+ 1 (node-depth nodeArg))
+                            :g g
+                            :h h
+                            :f (+ g h)))) lst)))
 
 ;; Examples
 (setf *lst-nodes-0*
-	(expand-node *node-00* *galaxy-M35*))
+    (expand-node *node-00* *galaxy-M35*))
 
 ;; (#S(NODE :STATE MALLORY
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
-;;    :DEPTH 13 :G 16 :H 7 :F 23)
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
+;;  :DEPTH 13 :G 16 :H 7 :F 23)
 ;; #S(NODE :STATE SIRTIS
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
-;;    :DEPTH 13 :G 17 :H 0 :F 17)
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
+;;  :DEPTH 13 :G 17 :H 0 :F 17)
 ;; #S(NODE :STATE KENTARES
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
-;;    :DEPTH 13 :G 11 :H 4 :F 15)
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
+;;  :DEPTH 13 :G 11 :H 4 :F 15)
 ;; #S(NODE :STATE MALLORY
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
-;;    :DEPTH 13 :G 17 :H 7 :F 24)
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
+;;  :DEPTH 13 :G 17 :H 7 :F 24)
 ;; #S(NODE :STATE AVALON
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
-;;    :DEPTH 13 :G 12 :H 5 :F 17)
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
+;;  :DEPTH 13 :G 12 :H 5 :F 17)
 ;; #S(NODE :STATE DAVION
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
-;;    :DEPTH 13 :G 14 :H 1 :F 15)
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
+;;  :DEPTH 13 :G 14 :H 1 :F 15)
 ;; #S(NODE :STATE SIRTIS
-;;    :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;    :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
-;;    :DEPTH 13 :G 20 :H 0 :F 20))
+;;  :PARENT  #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
+;;  :DEPTH 13 :G 20 :H 0 :F 20))
 
 
 ;; end
@@ -363,18 +376,18 @@
 
 ;;; Ignore ;;%%
 (setf *node-01*
-	(make-node
-		:state 'Avalon 
-		:depth 0 
-		:g 0 
-		:f 0))
+    (make-node
+        :state 'Avalon 
+        :depth 0 
+        :g 0 
+        :f 0))
 
 (setf *node-02*
-	(make-node
-		:state 'Kentares 
-		:depth 2 
-		:g 50 
-		:f 50))
+    (make-node
+        :state 'Kentares 
+        :depth 2 
+        :g 50 
+        :f 50))
 
 
 ;;%%
@@ -382,93 +395,100 @@
 ;;;;
 ;; Inserta una lista de nodos en otra (ya ordenada) de acuerdo con una estrategia.
 ;;
-;; IN: 	nodes: lista de nodos para insertar.
-;;		lst-nodes:	lista de nodos en la que insertar.
-;;		strategy:	estrategia que seguir a la hora de insertar.
-;; OUT:	una lista de nodos ordenados de acuerdo a la estrategia.
+;; IN:     nodes: lista de nodos para insertar.
+;;        lst-nodes:    lista de nodos en la que insertar.
+;;        strategy:    estrategia que seguir a la hora de insertar.
+;; OUT:    una lista de nodos ordenados de acuerdo a la estrategia.
 ;;
 ;; pseudocode:
-;;	insert-nodes(nodes lst strategy)
-;;		iterar at1 en nodes
-;;			iterar at2 en lst
-;;				si ato1 < at2
-;;					insertar ato1 y desplazar el resto
+;;    insert-nodes(nodes lst strategy)
+;;        iterar at1 en nodes
+;;            iterar at2 en lst
+;;                si ato1 < at2
+;;                    insertar ato1 y desplazar el resto
 ;;
-;; Opción b (que encontramos mejor, porque modificar una lista sobre la que estamos iterando es peligroso)
-;;	insert-nodes(nodes lst strategy acc)
-;;		iterar at1 en nodes
-;;			iterar at2 en lst
-;;				si ato1 < at2
-;;					insertar ato1 en acc
-;;					insert-nodes (rest(nodes) lst-nodes strategy acc)
-;;				sino
-;;					insertar ato2 en acc
-;;					insertar-nodes (nodes rest(lst-nodes) strategy acc)
+;;
+;; Opción b (que encontramos mejor,
+;; porque modificar una lista sobre la que estamos iterando es peligroso):
+;;
+;;
+;;    insert-nodes(nodes lst strategy acc)
+;;        iterar at1 en nodes
+;;            iterar at2 en lst
+;;                si ato1 < at2
+;;                    insertar ato1 en acc
+;;                    insert-nodes 
+;;                          (rest(nodes) lst-nodes strategy acc)
+;;                sino
+;;                    insertar ato2 en acc
+;;                    insertar-nodes (nodes rest(lst-nodes) strategy acc)
 
 (defun _aux-insert-nodes (nodes lst-nodes acc strategy)
-	(if (null nodes)
-		(append acc lst-nodes)
-		(if (null lst-nodes)
-			(append acc nodes)
-			(if  (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
+    (if (null nodes)
+        (append acc lst-nodes)
+        (if (null lst-nodes)
+            (append acc nodes)
+            (if  (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
 
-				(_aux-insert-nodes 
-					(cdr nodes)
-					lst-nodes
-					(append acc (list (car nodes)))
-					strategy)
-				(_aux-insert-nodes
-					nodes
-					(cdr lst-nodes)
-					(append acc (list (car lst-nodes)))
-					strategy)))))
+                (_aux-insert-nodes 
+                    (cdr nodes)
+                    lst-nodes
+                    (append acc (list (car nodes)))
+                    strategy)
+                (_aux-insert-nodes
+                    nodes
+                    (cdr lst-nodes)
+                    (append acc (list (car lst-nodes)))
+                    strategy)))))
 
 (defun insert-nodes (nodes lst-nodes strategy)
-	(_aux-insert-nodes nodes lst-nodes '() strategy))
+    (_aux-insert-nodes nodes lst-nodes '() strategy))
 
 ;; Examples
 (insert-nodes 
-	(list *node-00* *node-01* *node-02*) 
-	*lst-nodes-0*
-	*uniform-cost*)
+    (list *node-00* *node-01* *node-02*) 
+    (insert-nodes 
+        (list *node-00* *node-01* *node-02*) 
+        *lst-nodes-0*
+        *uniform-cost*)
+    *uniform-cost*)
 
-;;Sale esto, que ni está ordenado ni nada.
 ;;(#S(NODE :STATE PROSERPINA 
-;;	:PARENT NIL
-;;	:ACTION NIL
-;;	:DEPTH 12 :G 10 :H NIL :F 20)
+;;  :PARENT NIL
+;;  :ACTION NIL
+;;  :DEPTH 12 :G 10 :H NIL :F 20)
 ;; #S(NODE :STATE AVALON 
-;;	:PARENT NIL
-;;	:ACTION NIL
-;;	:DEPTH 0 :G 0 :H NIL :F 0)
+;;  :PARENT NIL
+;;  :ACTION NIL
+;;  :DEPTH 0 :G 0 :H NIL :F 0)
 ;; #S(NODE :STATE MALLORY
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
-;;	:DEPTH 13 :G 16 :H 7 :F 23)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 6)
+;;  :DEPTH 13 :G 16 :H 7 :F 23)
 ;; #S(NODE :STATE SIRTIS
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
-;;	:DEPTH 13 :G 17 :H 0 :F 17)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 7)
+;;  :DEPTH 13 :G 17 :H 0 :F 17)
 ;; #S(NODE :STATE KENTARES
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
-;;	:DEPTH 13 :G 11 :H 4 :F 15)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN PROSERPINA :FINAL KENTARES :COST 1)
+;;  :DEPTH 13 :G 11 :H 4 :F 15)
 ;; #S(NODE :STATE MALLORY
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
-;;	:DEPTH 13 :G 17 :H 7 :F 24)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL MALLORY :COST 7)
+;;  :DEPTH 13 :G 17 :H 7 :F 24)
 ;; #S(NODE :STATE AVALON
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
-;;	:DEPTH 13 :G 12 :H 5 :F 17)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL AVALON :COST 2)
+;;  :DEPTH 13 :G 12 :H 5 :F 17)
 ;; #S(NODE :STATE DAVION
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
-;;	:DEPTH 13 :G 14 :H 1 :F 15)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL DAVION :COST 4)
+;;  :DEPTH 13 :G 14 :H 1 :F 15)
 ;; #S(NODE :STATE SIRTIS
-;;	:PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
-;;	:ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
-;;	:DEPTH 13 :G 20 :H 0 :F 20)
+;;  :PARENT #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H NIL :F 20)
+;;  :ACTION #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN PROSERPINA :FINAL SIRTIS :COST 10)
+;;  :DEPTH 13 :G 20 :H 0 :F 20)
 ;; #S(NODE :STATE KENTARES :PARENT NIL :ACTION NIL :DEPTH 2 :G 50 :H NIL :F 50))
 
 
@@ -478,22 +498,23 @@
 ;;;;
 ;; Realiza la búsqueda en un problema según una estrategia
 ;;
-;;	IN: problem 	estructura con la información del problema.
-;;		strategy 	estrategia a seguir para la búsqueda.
-;;	OUT: Evalúa a un único nodo meta o nil si no hay solución.
+;;    IN: problem     estructura con la información del problema.
+;;        strategy     estrategia a seguir para la búsqueda.
+;;    OUT: Evalúa a un único nodo meta o nil si no hay solución.
 ;;
-;;	Utilizamos una auxiliar recursiva con la lista de nodos.
+;;    Utilizamos una auxiliar recursiva con la lista de nodos.
 ;;
-;;	pseudocode:
+;;    pseudocode:
 ;;
-;;	aux_fun(problema estrategia lista_nodos)
-;;		si lista_nodos no está vacía
-;;			si ( es_solución first lista_nodos)
-;;				first lista_nodos
-;;			sino
-;;				nueva_lista_nodos = insertar(lista_nodos (expandir_nodo first lista_nodos) estrategia)
-;;				aux_fun (problema estrategia nueva_lista_nodos)
-;;	
+;;    aux_fun(problema estrategia lista_nodos)
+;;        si lista_nodos no está vacía
+;;            si ( es_solución first lista_nodos)
+;;                first lista_nodos
+;;            sino
+;;                nueva_lista_nodos = insertar
+;;                          (lista_nodos (expandir_nodo first lista_nodos) estrategia)
+;;                aux_fun (problema estrategia nueva_lista_nodos)
+;;    
 
 (defun tree-search-aux (problem strategy open-nodes)
     (let ((n (first open-nodes)))
@@ -501,14 +522,18 @@
             nil
             (if  (fncall (problem-fn-goal-test problem) (node-state n))
               n
-              (tree-search-aux problem strategy  (insert-nodes (cdr open-nodes)  (expand-node n problem) strategy))))))
+              (tree-search-aux problem strategy  
+                    (insert-nodes 
+                        (cdr open-nodes)
+                        (expand-node n problem)
+                        strategy))))))
 
 (defun tree-search (problem strategy)
   (tree-search-aux problem strategy (list (make-node
-  										:state (problem-initial-state problem)
-  										:depth 0
-  										:g 0
-  										:f 0))))
+                                          :state (problem-initial-state problem)
+                                          :depth 0
+                                          :g 0
+                                          :f 0))))
 
 ;; Examples
 (TREE-SEARCH *galaxy-M35* *A-STAR*)
@@ -540,7 +565,7 @@
 ;; end
 
 
-;;; Ignore ;;;;
+;;; Ignore ;;%%
 ; Realiza la búsqueda A* para el problema dado
 ; Evalúa:
 ;    Si no hay solución: NIL
@@ -556,34 +581,32 @@
 
 ;; end
 
+;;%%
 
 ;;;;
-;;	Devuelve el camino a recorrer para llegar desde un nodo origen
-;;	a un estado meta (por defecto también del problema *galaxy-m35*)
+;;    Devuelve el camino a recorrer para llegar desde un nodo origen. En la lista devuelta, el primer elemento es el destino, y el último el origen.
+;;    a un estado meta (por defecto también del problema *galaxy-m35*)
 ;; 
-;;	IN:
-;;		node: nodo del que iniciar la búsqueda
-;; 	OUT:
-;;		Una lista de estados, es decir, de los nombres de los planetas que forman el camino,
-;;			donde el primer elemento es el destino, y el último el origen.
+;;    IN:node: nodo del que iniciar la búsqueda
+;;    OUT: Una lista de los nombres de los planetas que forman el camino
 ;;
-;;	pseudocode:
-;;	Utilizando una función auxiliar de la forma:
-;;	aux_fun (nodo acumulador)
-;;		si (nodo no es nulo)
-;;			añadir el nodo al acumulador
-;;			aux_fun(padre(nodo) acumulador)
-;;		sino
-;;			devolver acumulador.
+;;    pseudocode:
+;;    Utilizando una función auxiliar de la forma:
+;;    aux_fun (nodo acumulador)
+;;        si (nodo no es nulo)
+;;            añadir el nodo al acumulador
+;;            aux_fun(padre(nodo) acumulador)
+;;        sino
+;;            devolver acumulador.
 ;;
 
 (defun get-states (node acc)
-	(if (null node)
-		(print acc)
-		(get-states (node-parent node) (append (print acc) (list (node-state node))))))
+    (if (null node)
+        acc
+        (get-states (node-parent node) (append acc (list (node-state node))))))
 
 (defun tree-path (node)
-	(get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+    (get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
 ;; Examples 
 
@@ -593,31 +616,32 @@
 
 ;; end
 
+
+
 ;;;;
 ;; Obtención de la secuencia de acciones de un camino, desde un nodo origen hasta un nodo meta
-;; 	(definido por *galaxy-M35*, según la estrategia *A-star*)
+;;     (definido por *galaxy-M35*, según la estrategia *A-star*)
 ;; 
-;; IN: 
-;;		node: nodo origen desde el que empezar la búsqueda.
-;; OUT:
-;;		una lista de acciones que llevan desde el nodo origen hasta el destino.
+;; IN:  node: nodo origen desde el que empezar la búsqueda.
+;;
+;; OUT: una lista de acciones que llevan desde el nodo origen hasta el destino.
 ;;
 ;; pseudocode:
 ;; Utilizando una función auxiliar de la forma:
 ;; aux_fun (nodo acumulador)
-;;		si (nodo no es nulo)
-;;			añadir acción(nodo) al acumulador
-;;			aux_fun(padre(nodo) acumulador)
-;;		sino
-;;			devolver acumulador
+;;        si (nodo no es nulo)
+;;            añadir acción(nodo) al acumulador
+;;            aux_fun(padre(nodo) acumulador)
+;;        sino
+;;            devolver acumulador
 
 (defun  _aux_action-sequence (node acc)
-	(if (null (node-action node))
-		acc
-		(_aux_action-sequence (node-parent node) (append acc (list (node-action node))))))
+    (if (null (node-action node))
+        acc
+        (_aux_action-sequence (node-parent node) (append acc (list (node-action node))))))
 
 (defun  action-sequence (node)
-	(_aux_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+    (_aux_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
 ;; Examples
 
@@ -629,3 +653,29 @@
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
 
 ;; end
+
+
+;;; Ignore ;;%%
+
+(setf *depth-first*
+    (make-strategy
+        :name 'depth-first
+        :node-compare-p 'depth-first-node-compare-p))
+
+(defun depth-first-node-compare-p (node-1 node-2)
+    (>= (node-depth node-1) (node-depth node-2)))
+
+(tree-path (tree-search *galaxy-M35* *depth-first*))
+
+
+(setf *breadth-first*
+    (make-strategy
+        :name 'breadth-first
+        :node-compare-p 'breadth-first-node-compare-p))
+
+(defun breadth-first-node-compare-p (node-1 node-2)
+    (<= (node-depth node-1) (node-depth node-2)))
+
+(tree-path (tree-search *galaxy-M35* *breadth-first*))
+
+;;%%

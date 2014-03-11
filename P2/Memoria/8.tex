@@ -1,49 +1,43 @@
 \begin{aibox}{\function}
 \begin{alltt}
-tree-path (node)
+tree-search (problem strategy)
 
 
-IN: problem 	estructura con la información del problema.
-	strategy 	estrategia a seguir para la búsqueda.
-OUT: Evalúa a un único nodo meta o nil si no hay solución.
+   IN: problem     estructura con la información del problema.
+       strategy     estrategia a seguir para la búsqueda.
+   OUT: Evalúa a un único nodo meta o nil si no hay solución.
 
 \end{alltt}
 \end{aibox}
 
 \begin{aibox}{\examples}
 \begin{alltt}
-;; Examples
+Examples
 (TREE-SEARCH *galaxy-M35* *A-STAR*)
 
-;;\#S(NODE :STATE SIRTIS
-;;   :PARENT
-;;   \#S(NODE :STATE DAVION
-;;      :PARENT
-;;      \#S(NODE :STATE KATRIL
-;;         :PARENT
-;;         \#S(NODE :STATE KENTARES
-;;            :PARENT
-;;            \#S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H NIL
-;;               :F 0)
-;;            :ACTION
-;;            \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES
-;;               :COST 4)
-;;            :DEPTH 1 :G 4 :H 4 :F 8)
-;;         :ACTION
-;;         \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL
-;;            :COST 2)
-;;         :DEPTH 2 :G 6 :H 3 :F 9)
-;;      :ACTION
-;;      \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-;;      :DEPTH 3 :G 7 :H 1 :F 8)
-;;   :ACTION
-;;   \#S(ACTION :NAME NAVIGATE-W
-
-;; Examples 
-
-(TREE-PATH *node-01*)
-
-;;(SIRTIS DAVION KATRIL KENTARES AVALON)
+S(NODE :STATE SIRTIS
+  :PARENT
+  \#S(NODE :STATE DAVION
+     :PARENT
+     \#S(NODE :STATE KATRIL
+        :PARENT
+        \#S(NODE :STATE KENTARES
+           :PARENT
+           \#S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H NIL
+              :F 0)
+           :ACTION
+           \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES
+              :COST 4)
+           :DEPTH 1 :G 4 :H 4 :F 8)
+        :ACTION
+        \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL
+           :COST 2)
+        :DEPTH 2 :G 6 :H 3 :F 9)
+     :ACTION
+     \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+     :DEPTH 3 :G 7 :H 1 :F 8)
+  :ACTION
+  \#S(ACTION :NAME NAVIGATE-W
 
 
 \end{alltt}
@@ -54,17 +48,19 @@ Realiza la búsqueda en un problema según una estrategia
 
 \end{aibox}
 
+\newpage
 \begin{aibox}{\pseudocode}
 \begin{alltt}
-Utilizamos una auxiliar recursiva con la lista de nodos.
-aux\_fun(problema estrategia lista\_nodos)
-	si lista\_nodos no está vacía
-		si ( es\_solución first lista\_nodos)
-			first lista\_nodos
-		sino
-			nueva\_lista\_nodos = insertar(lista\_nodos (expandir\_nodo first lista\_nodos) estrategia)
-			aux\_fun (problema estrategia nueva\_lista\_nodos)
-
+   Utilizamos una auxiliar recursiva con la lista de nodos.
+   aux\_fun(problema estrategia lista\_nodos)
+       si lista\_nodos no está vacía
+           si ( es\_solución first lista\_nodos)
+               first lista\_nodos
+           sino
+               nueva\_lista\_nodos = insertar
+                         (lista\_nodos (expandir\_nodo first lista\_nodos) estrategia)
+               aux\_fun (problema estrategia nueva\_lista\_nodos)
+   
 
 \end{alltt}
 \end{aibox}
@@ -77,25 +73,20 @@ aux\_fun(problema estrategia lista\_nodos)
             nil
             (if  (fncall (problem-fn-goal-test problem) (node-state n))
               n
-              (tree-search-aux problem strategy  (insert-nodes (cdr open-nodes)  (expand-node n problem) strategy))))))
+              (tree-search-aux problem strategy  
+                    (insert-nodes 
+                        (cdr open-nodes)
+                        (expand-node n problem)
+                        strategy))))))
 
 (defun tree-search (problem strategy)
   (tree-search-aux problem strategy (list (make-node
-  										:state (problem-initial-state problem)
-  										:depth 0
-  										:g 0
-  										:f 0))))
+                                          :state (problem-initial-state problem)
+                                          :depth 0
+                                          :g 0
+                                          :f 0))))
 
 
-
-
-(defun get-states (node acc)
-	(if (null node)
-		(print acc)
-		(get-states (node-parent node) (append (print acc) (list (node-state node))))))
-
-(defun tree-path (node)
-	(get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
 
 

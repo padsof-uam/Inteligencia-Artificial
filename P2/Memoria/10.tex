@@ -1,0 +1,61 @@
+\begin{aibox}{\function}
+\begin{alltt}
+ action-sequence (node)
+
+
+IN:  node: nodo origen desde el que empezar la búsqueda.
+OUT: una lista de acciones que llevan desde el nodo origen hasta el destino.
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\examples}
+\begin{alltt}
+Examples
+
+(ACTION-SEQUENCE *node-01*)
+
+(\#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
+ \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
+ \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
+ \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
+
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\comments}
+Obtención de la secuencia de acciones de un camino, desde un nodo origen hasta un nodo meta
+    (definido por *galaxy-M35*, según la estrategia *A-star*)
+
+
+\end{aibox}
+
+\begin{aibox}{\pseudocode}
+\begin{alltt}
+Utilizando una función auxiliar de la forma:
+aux\_fun (nodo acumulador)
+       si (nodo no es nulo)
+           añadir acción(nodo) al acumulador
+           aux\_fun(padre(nodo) acumulador)
+       sino
+           devolver acumulador
+
+\end{alltt}
+\end{aibox}
+
+\begin{aibox}{\code}
+\begin{alltt}
+(defun  \_aux\_action-sequence (node acc)
+    (if (null (node-action node))
+        acc
+        (\_aux\_action-sequence (node-parent node) (append acc (list (node-action node))))))
+
+(defun  action-sequence (node)
+    (\_aux\_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+
+
+
+
+\end{alltt}
+\end{aibox}
