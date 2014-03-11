@@ -1,6 +1,6 @@
 \begin{aibox}{\function}
 \begin{alltt}
-insert-nodes (nodes lst-nodes strategy)
+insert-nodes-strategy (nodes lst-nodes strategy)
 
 
 IN:     nodes: lista de nodos para insertar.
@@ -14,12 +14,9 @@ OUT:    una lista de nodos ordenados de acuerdo a la estrategia.
 \begin{aibox}{\examples}
 \begin{alltt}
 Examples
-(insert-nodes 
-    (list *node-00* *node-01* *node-02*) 
-    (insert-nodes 
-        (list *node-00* *node-01* *node-02*) 
-        *lst-nodes-0*
-        *uniform-cost*)
+(insert-nodes-strategy 
+    (list *node-00* *node-01* *node-02*)
+    (sort (copy-seq *lst-nodes-0*) (strategy-node-compare-p *uniform-cost*))
     *uniform-cost*)
 
 \#S(NODE :STATE PROSERPINA 
@@ -72,19 +69,21 @@ Inserta una lista de nodos en otra (ya ordenada) de acuerdo con una estrategia.
 
 \begin{aibox}{\pseudocode}
 \begin{alltt}
-   insert-nodes(nodes lst strategy)
+   insert-nodes-strategy(nodes lst strategy)
        iterar at1 en nodes
            iterar at2 en lst
                si ato1 < at2
                    insertar ato1 y desplazar el resto
-Opción b (que encontramos mejor,
-porque modificar una lista sobre la que estamos iterando es peligroso):
-   insert-nodes(nodes lst strategy acc)
+
+    Opción b (que encontramos mejor,
+    porque modificar una lista sobre la que estamos iterando es peligroso):
+
+    insert-nodes-strategy(nodes lst strategy acc)
        iterar at1 en nodes
            iterar at2 en lst
                si ato1 < at2
                    insertar ato1 en acc
-                   insert-nodes 
+                   insert-nodes-strategy 
                          (rest(nodes) lst-nodes strategy acc)
                sino
                    insertar ato2 en acc
@@ -95,26 +94,29 @@ porque modificar una lista sobre la que estamos iterando es peligroso):
 
 \begin{aibox}{\code}
 \begin{alltt}
-(defun \_aux-insert-nodes (nodes lst-nodes acc strategy)
+(defun \_aux-insert-nodes-strategy (nodes lst-nodes acc strategy)
     (if (null nodes)
         (append acc lst-nodes)
         (if (null lst-nodes)
             (append acc nodes)
             (if  (funcall (strategy-node-compare-p strategy) (car nodes) (car lst-nodes))
-
-                (\_aux-insert-nodes 
+                (\_aux-insert-nodes-strategy 
                     (cdr nodes)
                     lst-nodes
                     (append acc (list (car nodes)))
                     strategy)
-                (\_aux-insert-nodes
+                (\_aux-insert-nodes-strategy
                     nodes
                     (cdr lst-nodes)
                     (append acc (list (car lst-nodes)))
                     strategy)))))
 
-(defun insert-nodes (nodes lst-nodes strategy)
-    (\_aux-insert-nodes nodes lst-nodes '() strategy))
+(defun insert-nodes-strategy (nodes lst-nodes strategy)
+    (\_aux-insert-nodes-strategy 
+        (sort (copy-seq nodes) (strategy-node-compare-p strategy))
+        lst-nodes 
+        '() 
+        strategy))
 
 
 

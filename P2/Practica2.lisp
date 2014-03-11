@@ -22,6 +22,8 @@
 
 (setf *planets-destination* '(Sirtis))
 
+(setf *planet-origin* 'Kentares)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Problem definition
@@ -105,6 +107,8 @@
 ;; 
 ;; pseudocode
 ;; comprobar si state está en planets-destination
+;;
+
 (defun f-goal-test-galaxy (state planets-destination) 
   (not (null (member state planets-destination))))
 
@@ -126,6 +130,12 @@
 ;; OUT: valor de la heurística en el planeta actual
 ;;
 ;; pseudocode
+;; fun ( estado sensores)
+;;  si estado= first(sensores)
+;;      return heurística first(sensores)
+;;  else 
+;;      return fun(estado resto(sensores))
+;;
 
 (defun f-h-galaxy (state sensors)
   (if (null sensors)
@@ -230,7 +240,7 @@
 ;;
 ;; IN:     node-1 y node-2 a comparar.
 ;;     
-;; OUT: 
+;; OUT:    la comparación del valor de f de cada nodo
 ;; 
 ;; pseudocode
 ;;     Comparamos los valores de la f de cada nodo
@@ -440,7 +450,11 @@
                     strategy)))))
 
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-    (_aux-insert-nodes-strategy (sort (copy-seq nodes) (strategy-node-compare-p strategy)) lst-nodes '() strategy))
+    (_aux-insert-nodes-strategy 
+        (sort (copy-seq nodes) (strategy-node-compare-p strategy))
+        lst-nodes 
+        '() 
+        strategy))
 
 ;; Examples
 (insert-nodes-strategy 
@@ -571,14 +585,20 @@
 ;;    :DEPTH 3
 ;;    :G 4
 ;;    :H 0
+;;    :F 4)
 
 ;; end
 
 
-; Realiza la búsqueda A* para el problema dado
-; Evalúa:
-;    Si no hay solución: NIL
-; Si hay solución: el nodo correspondiente al estado-objetivo ;
+;;;;
+;; Realiza la búsqueda A* para el problema dado
+;;
+;; IN: El problema al que aplicar A*
+;; OUT: Si no hay solución: NIL
+;; Si hay solución: el nodo correspondiente al estado-objetivo ;
+;;
+;; pseudocode:
+;; buscar en arbol con problem *A-STAR*
 
 (defun a-star-search (problem)
     (tree-search problem *A-star*))

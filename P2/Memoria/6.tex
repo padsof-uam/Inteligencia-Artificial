@@ -51,10 +51,14 @@ Examples
 \end{aibox}
 
 \begin{aibox}{\comments}
-Expande el nodo dado. Para ello buscaremos en las estructuras de problem 
-la información sobre a qué planetas podemos viajar (qué nodos son los sucesores) 
+Expande el nodo dado.
+
+Para ello buscaremos en las estructuras de problem 
+la información sobre a qué planetas podemos viajar (qué nodos son los sucesores)
+
 y crearemos una estructura nodo para cada sucesor con toda la información necesaria.  No comprobamos si el nodo es solución (que es lo primero antes de expandir nodo).
-Dejamos esa comprrobación para la tarea superior.
+
+Dejamos esa comprobación para la tarea superior.
 
 \end{aibox}
 
@@ -68,20 +72,22 @@ Iterar atomo en planetas\_destino
 
 \begin{aibox}{\code}
 \begin{alltt}
+(mapcan \#'(lambda(x)  
+        (fncall x (node-state *node-00*))) 
+        (problem-operators *galaxy-M35*))
+
 (defun expand-node (nodeArg problem)
     (let ((lst
             (mapcan
                 \#'(lambda(x)  
-                    (funcall 
-                        (fn-name x) (node-state nodeArg) (fn-lst-args x))) 
+                    (fncall x (node-state nodeArg))) 
                 (problem-operators problem))))
             (mapcar \#'(lambda(x) 
                 (let (
                     (g (+ (action-cost x) (node-g nodeArg)))
-                    (h (funcall 
-                            (fn-name (problem-fn-h problem)) 
-                            (action-final x) 
-                            ( fn-lst-args (problem-fn-h problem)))))
+                    (h (fncall 
+                            (problem-fn-h problem)
+                            (action-final x))))
                         (make-node
                             :state (action-final x)
                             :parent nodeArg
@@ -90,6 +96,7 @@ Iterar atomo en planetas\_destino
                             :g g
                             :h h
                             :f (+ g h)))) lst)))
+
 
 
 

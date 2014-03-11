@@ -1,46 +1,36 @@
 \begin{aibox}{\function}
-\begin{alltt}
-\end{alltt}
+No hemos implementado ninguna función para este ejercicio.
 \end{aibox}
 
 \begin{aibox}{\examples}
-\begin{alltt}
-
-\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\comments}
-Definimos un problema llamado *galaxy-M35*. Hemos utilizado 
-
+Creamos una estructura con los campos y con toda información necesaria, tal y como se nos pedía.
 \end{aibox}
 
 \begin{aibox}{\pseudocode}
-\begin{alltt}
-Examples
-
-\end{alltt}
 \end{aibox}
 
 \begin{aibox}{\code}
 \begin{alltt}
-
 (setf *galaxy-M35*
     (make-problem
         :states *planets*
-        :initial-state 'PROSERPINA
+        :initial-state 'Kentares
         :fn-goal-test (make-fn
-                          :name 'fn-f-goal-test-galaxy
-                        :lst-args *planets-destination*)
+                :name 'f-goal-test-galaxy
+                :lst-args (list *planets-destination*))
         :fn-h (make-fn
-                  :name 'f-h-galaxy
-                :lst-args *sensors*)
+                :name 'f-h-galaxy
+                :lst-args (list *sensors*))
         :operators (list
                     (make-fn
                         :name 'navigate-worm-hole 
-                        :lst-args *worm-holes*)
+                        :lst-args (list *worm-holes*))
                     (make-fn
                         :name 'navigate-white-hole
-                        :lst-args *white-holes*))))
+                        :lst-args (list *white-holes*)))))
 
 \end{alltt}
 \end{aibox}

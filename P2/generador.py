@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import sys
-source_name = 'Practica2.lisp'
+	source_name = 'Practica2.lisp'
 lines=[]
 fin = open(source_name, 'r')
 f_general = open('Memoria/Memoria.tex', 'w')
@@ -102,10 +102,12 @@ for i in xrange(1,num_fichero+1):
 					ejemplos += todo[j]
 				j+=1
 		elif todo[j].find(';;') == -1:
+			if codigo=='':
+				name = todo[j][todo[j].find('defun ')+len('defun '):]
 			codigo += todo[j]
 			if todo[j].find('defun')!=-1:
 				name = todo[j][todo[j].find('defun ')+len('defun '):]
-			#print todo[j],todo[j].find('defun')
+			print todo[j],todo[j].find('defun')
 		j += 1
 #			a=2
 	#Generacion del tex

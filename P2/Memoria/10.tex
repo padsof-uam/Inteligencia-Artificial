@@ -1,6 +1,6 @@
 \begin{aibox}{\function}
 \begin{alltt}
- action-sequence (node)
+action-sequence (node)
 
 
 IN:  node: nodo origen desde el que empezar la búsqueda.
@@ -13,13 +13,11 @@ OUT: una lista de acciones que llevan desde el nodo origen hasta el destino.
 \begin{alltt}
 Examples
 
-(ACTION-SEQUENCE *node-01*)
+(action-sequence *node-end*)
 
-(\#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
+(\#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
  \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
- \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
- \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
-
+ \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 1))
 
 \end{alltt}
 \end{aibox}
@@ -49,9 +47,9 @@ aux\_fun (nodo acumulador)
 (defun  \_aux\_action-sequence (node acc)
     (if (null (node-action node))
         acc
-        (\_aux\_action-sequence (node-parent node) (append acc (list (node-action node))))))
+        (\_aux\_action-sequence (node-parent node) (append (list (node-action node)) acc))))
 
-(defun  action-sequence (node)
+(defun action-sequence (node)
     (\_aux\_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
 

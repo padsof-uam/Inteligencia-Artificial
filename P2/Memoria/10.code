@@ -17,20 +17,18 @@
 (defun  _aux_action-sequence (node acc)
     (if (null (node-action node))
         acc
-        (_aux_action-sequence (node-parent node) (append acc (list (node-action node))))))
+        (_aux_action-sequence (node-parent node) (append (list (node-action node)) acc))))
 
-(defun  action-sequence (node)
+(defun action-sequence (node)
     (_aux_action-sequence (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
 
 ;; Examples
 
-(ACTION-SEQUENCE *node-01*)
+(action-sequence *node-end*)
 
-;; (#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 8)
+;; (#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
 ;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL :COST 2)
-;;  #S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES :COST 4))
-
+;;  #S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN DAVION :FINAL SIRTIS :COST 1))
 ;; end
 
 

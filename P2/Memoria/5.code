@@ -5,20 +5,20 @@
 (setf *galaxy-M35*
     (make-problem
         :states *planets*
-        :initial-state 'PROSERPINA
+        :initial-state 'Kentares
         :fn-goal-test (make-fn
-                :name 'fn-f-goal-test-galaxy
-                :lst-args *planets-destination*)
+                :name 'f-goal-test-galaxy
+                :lst-args (list *planets-destination*))
         :fn-h (make-fn
                 :name 'f-h-galaxy
-                :lst-args *sensors*)
+                :lst-args (list *sensors*))
         :operators (list
                     (make-fn
                         :name 'navigate-worm-hole 
-                        :lst-args *worm-holes*)
+                        :lst-args (list *worm-holes*))
                     (make-fn
                         :name 'navigate-white-hole
-                        :lst-args *white-holes*))))
+                        :lst-args (list *white-holes*)))))
 
 ;; Examples
 

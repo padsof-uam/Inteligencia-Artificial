@@ -2,7 +2,6 @@
 \begin{alltt}
 tree-search (problem strategy)
 
-
    IN: problem     estructura con la información del problema.
        strategy     estrategia a seguir para la búsqueda.
    OUT: Evalúa a un único nodo meta o nil si no hay solución.
@@ -13,31 +12,48 @@ tree-search (problem strategy)
 \begin{aibox}{\examples}
 \begin{alltt}
 Examples
-(TREE-SEARCH *galaxy-M35* *A-STAR*)
-
-S(NODE :STATE SIRTIS
-  :PARENT
-  \#S(NODE :STATE DAVION
-     :PARENT
-     \#S(NODE :STATE KATRIL
-        :PARENT
-        \#S(NODE :STATE KENTARES
-           :PARENT
-           \#S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H NIL
-              :F 0)
-           :ACTION
-           \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN AVALON :FINAL KENTARES
-              :COST 4)
-           :DEPTH 1 :G 4 :H 4 :F 8)
-        :ACTION
-        \#S(ACTION :NAME NAVIGATE-WHITE-HOLE :ORIGIN KENTARES :FINAL KATRIL
-           :COST 2)
-        :DEPTH 2 :G 6 :H 3 :F 9)
-     :ACTION
-     \#S(ACTION :NAME NAVIGATE-WORM-HOLE :ORIGIN KATRIL :FINAL DAVION :COST 1)
-     :DEPTH 3 :G 7 :H 1 :F 8)
-  :ACTION
-  \#S(ACTION :NAME NAVIGATE-W
+(tree-search *galaxy-M35* *A-STAR*)
+\#S(NODE
+   :STATE SIRTIS
+   :PARENT \#S(NODE
+              :STATE DAVION
+              :PARENT \#S(NODE
+                         :STATE KATRIL
+                         :PARENT \#S(NODE
+                                    :STATE KENTARES
+                                    :PARENT NIL
+                                    :ACTION NIL
+                                    :DEPTH 0
+                                    :G 0
+                                    :H NIL
+                                    :F 0)
+                         :ACTION \#S(ACTION
+                                    :NAME NAVIGATE-WHITE-HOLE
+                                    :ORIGIN KENTARES
+                                    :FINAL KATRIL
+                                    :COST 2)
+                         :DEPTH 1
+                         :G 2
+                         :H 3
+                         :F 5)
+              :ACTION \#S(ACTION
+                         :NAME NAVIGATE-WORM-HOLE
+                         :ORIGIN KATRIL
+                         :FINAL DAVION
+                         :COST 1)
+              :DEPTH 2
+              :G 3
+              :H 1
+              :F 4)
+   :ACTION \#S(ACTION
+              :NAME NAVIGATE-WHITE-HOLE
+              :ORIGIN DAVION
+              :FINAL SIRTIS
+              :COST 1)
+   :DEPTH 3
+   :G 4
+   :H 0
+   :F 4)
 
 
 \end{alltt}
@@ -48,7 +64,6 @@ Realiza la búsqueda en un problema según una estrategia
 
 \end{aibox}
 
-\newpage
 \begin{aibox}{\pseudocode}
 \begin{alltt}
    Utilizamos una auxiliar recursiva con la lista de nodos.
@@ -68,15 +83,14 @@ Realiza la búsqueda en un problema según una estrategia
 \begin{aibox}{\code}
 \begin{alltt}
 (defun tree-search-aux (problem strategy open-nodes)
-    (let ((n (first open-nodes)))
-        (if ( or (null open-nodes) (null n))
-            nil
-            (if  (fncall (problem-fn-goal-test problem) (node-state n))
+    (when open-nodes
+        (let ((n (first open-nodes)))
+            (if (fncall (problem-fn-goal-test problem) (node-state n))
               n
               (tree-search-aux problem strategy  
-                    (insert-nodes 
-                        (cdr open-nodes)
+                    (insert-nodes-strategy 
                         (expand-node n problem)
+                        (rest open-nodes)
                         strategy))))))
 
 (defun tree-search (problem strategy)
@@ -85,10 +99,6 @@ Realiza la búsqueda en un problema según una estrategia
                                           :depth 0
                                           :g 0
                                           :f 0))))
-
-
-
-
 
 \end{alltt}
 \end{aibox}

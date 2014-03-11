@@ -13,9 +13,10 @@ tree-path (node)
 \begin{alltt}
 Examples 
 
-(TREE-PATH *node-01*)
+(setf *node-end* (a-star-search *galaxy-M35*))
+(tree-path *node-end*)
 
-SIRTIS DAVION KATRIL KENTARES AVALON)
+(SIRTIS DAVION KATRIL KENTARES AVALON)
 
 
 \end{alltt}
@@ -49,7 +50,7 @@ SIRTIS DAVION KATRIL KENTARES AVALON)
         (get-states (node-parent node) (append acc (list (node-state node))))))
 
 (defun tree-path (node)
-    (get-states (tree-search-aux *galaxy-M35* *A-star* (list node)) ()))
+    (get-states node '()))
 
 
 
