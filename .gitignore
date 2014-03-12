@@ -5,4 +5,4 @@
 *.log
 *.fdb_latexmk
 *.gz
-*.sublime-workspace
+*.sublime*
