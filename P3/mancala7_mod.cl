@@ -1121,7 +1121,7 @@ arguments."
     ;(list
       ;(partida 0 1 (list *jdr-Avara* *jdr-mmx-bueno*))
       ;(partida 1 1 (list *jdr-Avara* *jdr-mmx-bueno*)))))
-;(partida 0 1 (list *jdr-humano*      *jdr-1st-opt*))
+(partida 0 1 (list *jdr-humano*      *jdr-1st-opt*))
 ;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
 
 
