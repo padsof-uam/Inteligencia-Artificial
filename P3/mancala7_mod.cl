@@ -983,14 +983,20 @@ arguments."
 
 
 (setf *heuristics* (list
-  #'(lambda (estado) (suma-fila 
-                  (estado-tablero estado) 
-                  (estado-lado-sgte-jugador estado)))
-  #'(lambda (estado) (suma-fila 
-                  (estado-tablero estado) 
-                  (lado-contrario (estado-lado-sgte-jugador estado))))
-  #'(lambda (estado) (max-list (list-lado estado 
-      (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ; #'(lambda (estado) (suma-fila 
+  ;                 (estado-tablero estado) 
+  ;                 (estado-lado-sgte-jugador estado)))
+  ; #'(lambda (estado) (suma-fila 
+  ;                 (estado-tablero estado) 
+  ;                 (lado-contrario (estado-lado-sgte-jugador estado))))
+  #'(lambda (estado) (- (suma-fila 
+                     (estado-tablero estado) 
+                     (estado-lado-sgte-jugador estado))
+                   (suma-fila 
+                     (estado-tablero estado) 
+                     (lado-contrario (estado-lado-sgte-jugador estado)))))
+   #'(lambda (estado) (max-list (list-lado estado 
+       (lado-contrario (estado-lado-sgte-jugador estado)))))
   ))
 
 (defun f-eval-Avara-SA (estado valores)

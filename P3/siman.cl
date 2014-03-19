@@ -17,9 +17,15 @@
 (range-step 0 10 2)
 (range-step 1 0 0.1)
 
+; Variables para la función de generación
+(setf *w* 40)
+(setf *r* 0.04)
+(setf *p* 2)
+(setf *d* 2)
+
 (defun generate-temp-steps (step-num)
 	(append
-		(mapcar #'(lambda (x) (/ 20 (+ (expt (* x 0.1) 2) 1))) (range-step 0 (- step-num 1) 0.2))
+		(mapcar #'(lambda (x) (/ *w* (+ (expt (* x *r*) *p*) *d*))) (range-step 0 (- step-num 1) 0.2))
 		'(0)))
 
 (generate-temp-steps 100)
