@@ -57,7 +57,7 @@
 ;;; *2-sentidos*       nil      nil        T        nil
 ;;; ------------------------------------------------------------------------------------------
 
-(in-package "COMMON-GRAPHICS-USER")
+;(in-package "COMMON-GRAPHICS-USER")
 (defvar *vers*           "7.0" ) ; Software version "x.y" = mancala X, rel. Y
 (defvar *long-fila*        8   ) ; longitud de la fila de cada jugador, incl. el Kalaha en su caso
 (defvar *fichas-inicio*    3   ) ; numero de fichas que hay inicialmente en cada hueco
@@ -77,6 +77,10 @@
 (defvar *tournament*       nil ) ; T=juego llamado desde torneo, nil=juego individual
 (defvar *marcador*  (make-array '(2 2) :initial-element 0))
 (defvar *tablero-aux*      nil ) ; Tablero auxiliar para uso discrecional del alumno (solo mediante funciones especificas)
+
+(setf *tournament* T)
+(setf *verb*      nil)
+(setf *verjugada* nil)
 
 (setf (symbol-function 'r) #'1+) ; Definicion del operador R (siembra a derechas)
 (setf (symbol-function 'l) #'1-) ; Definicion del operador L (siembra a izquierdas)
@@ -307,12 +311,29 @@
           (sentidos (if *2-sentidos* '(r l) '(r))))
           (combina-lst-lst sentidos l-acciones))))
 
+(defun copy-array (array &key
+                   (element-type (array-element-type array))
+                   (fill-pointer (and (array-has-fill-pointer-p array)
+                                      (fill-pointer array)))
+                   (adjustable (adjustable-array-p array)))
+  "Returns an undisplaced copy of ARRAY, with same fill-pointer and
+adjustability (if any) as the original, unless overridden by the keyword
+arguments."
+  (let* ((dimensions (array-dimensions array))
+         (new-array (make-array dimensions
+                                :element-type element-type
+                                :adjustable adjustable
+                                :fill-pointer fill-pointer)))
+    (dotimes (i (array-total-size array))
+      (setf (row-major-aref new-array i)
+            (row-major-aref array i)))
+    new-array))
 
 ;;; Hace una copia del estado
 ;;; TBD: revisar necesidad. copy-estado no crea copia del array.
 (defun copia-estado (estado &optional accion)
   (make-estado
-   :tablero                (cg.base:copy-array  (estado-tablero estado))
+   :tablero                (copy-array  (estado-tablero estado))
    :lado-sgte-jugador (estado-lado-sgte-jugador estado)
    :accion                 (if accion accion (estado-accion estado))))
 
@@ -522,33 +543,7 @@
         (format t "~%Boaster ~A registers in majordomo, port ~A " bname *mport*)
         (setf (get '*bname* :plyr) bname)
         (subscr-bst bname "new")
-        (with-open-stream (bstr-skt (socket:make-socket :connect :passive :local-port *bport*))
-          (socket:set-socket-options bstr-skt :reuse-address t :nodelay t)
-          (loop for i from 1 to *bgames* do
-                (delayed-refresh)
-                (reset-contadores (* 2 *long-fila*))
-                (let ((chall-rslt (boast-p2p-loop estado lado-01 profundidad-max lst-jug bstr-skt)))
-
-                  ;; Reject game                       : (cha    msg      vers)
-                  ;; Normal game result                : (cha    0|1|2    vers)
-                  ;; Error  game result                : (cha (0|1|2 msg) vers)
-                  ;; wich are completed & sent to mj as: (n boa cha msg vers mv# gm#)  or
-                  ;;  (n boa cha 0|1|2 vers mv# gm#) or  (n boa cha (0|1|2 msg) vers mv# gm# vers)
-
-                  (format t "~%  Game ~a:  ~s after ~a moves~%" i chall-rslt *njugada*)
-                  (cond
-                   ((or (null chall-rslt) (not (listp chall-rslt)))
-                    (format t "~%FATAL: chall-rslt not a list. Ignored (~s)." chall-rslt)
-                    (submit-error (list bname "n/a" (list 0 "BST ERROR") *vers* *njugada* (- *bgames* i))))
-                   ((stringp (second chall-rslt))
-                    (format t "~%  Reject: ~s" chall-rslt)
-                    (submit-reject (cons bname (append chall-rslt (list *njugada* *bgames*)))))
-                   ((listp (second chall-rslt))
-                    (format t "~%Error in player: ~s~%" chall-rslt)
-                    (submit-error (cons bname (append chall-rslt (list *njugada* (- *bgames* i)))   )))
-                   ((numberp (second chall-rslt))
-                    (submit-result (cons bname (append chall-rslt (list *njugada* (- *bgames* i))))))
-                   (t (format t "~%FATAL: invalid chall-rslt. Ignored (~s)." chall-rslt))))))))
+        ))
      (t (local-loop estado lado-01 profundidad-max lst-jug)))))
 
 
@@ -584,11 +579,10 @@
                 (when (= (mod *njugada* 10) 0)
                   (to-logfile (format nil " ~d" *njugada*) 4 T))))
             (setf estado
-              (mp:with-timeout ((get-timeout curr-plyr) (to-logfile " T-Out " 2 T) 'timeout)
-                (ignore-errors (funcall (jugador-f-juego curr-plyr)
+              (funcall (jugador-f-juego curr-plyr)
                                         estado
                                         profundidad-max
-                                        (jugador-f-eval curr-plyr)))))))
+                                        (jugador-f-eval curr-plyr)))))
           (when (null estado)                                  ; => abandono, error o return nil|-infinito
             (return (values (winner (nth lado-01 lst-jug) lst-jug) "Error en func. o abandono")))
           (when (eql estado 'timeout)                          ; timeout de jugada
@@ -853,6 +847,219 @@
                         :f-eval   #'f-eval-Regular))
 
 
+
+;;; Los nuestros:
+
+;;; ------------------------------------------------------------------------------------------
+(defun f-eval-Avara (estado)
+   (+
+      (- 
+            (suma-fila 
+               (estado-tablero estado) 
+               (estado-lado-sgte-jugador estado))
+            (suma-fila 
+               (estado-tablero estado) 
+               (lado-contrario (estado-lado-sgte-jugador estado))))
+      ; Evitamos tener muchas fichas en un mismo hoyo.
+      (* 0.3 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
+
+(setf *jdr-Avara* (make-jugador
+                        :nombre   '|Ju-Mmx-Avara|
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'f-eval-Avara))
+
+(defun max-list-chained (milado estado))
+
+;(partida 0 2 (list *jdr-Avara* *jdr-mmx-Regular*))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun minimax-1-SA(estado profundidad devolver-movimiento profundidad-max f-eval valores)
+  (cond ((>= profundidad profundidad-max)
+         (unless devolver-movimiento  (funcall f-eval estado valores)))
+        (t
+         (let* ((sucesores (generar-sucesores estado))
+               (mejor-valor -99999)
+                (mejor-sucesor nil))
+           (cond ((null sucesores)
+                  (unless devolver-movimiento  (funcall f-eval estado valores)))
+                 (t
+                  (loop for sucesor in sucesores do
+                    (let* ((resultado-sucesor (minimax-1-SA sucesor (1+ profundidad)
+                                        nil profundidad-max f-eval valores))
+                           (valor-nuevo (- resultado-sucesor)))
+                      ;(format t "~% Mmx-1 Prof:~A valor-nuevo ~4A de sucesor  ~A" profundidad valor-nuevo (estado-tablero sucesor))
+                      (when (> valor-nuevo mejor-valor)
+                        (setq mejor-valor valor-nuevo)
+                        (setq mejor-sucesor  sucesor ))))
+                  (if  devolver-movimiento mejor-sucesor mejor-valor)))))))
+
+
+(defun minimax-SA (estado profundidad-max f-eval valores )
+  (let* ((oldverb *verb*)  (*verb* nil)
+         (estado2 (minimax-1-SA estado 0 t profundidad-max f-eval valores))
+         (*verb* oldverb))
+    estado2))
+
+(defun SA-local-loop (estado lado-01 profundidad-max lst-jug valores)
+  "bucle de movimientos alternos hasta conclusion de la partida"
+  (when *verb* (format t "~%Local game ~A-~A depth=~A " (jugador-nombre (first lst-jug)) (jugador-nombre (second lst-jug)) profundidad-max))
+  (loop
+    (act-marcador (estado-tablero estado) :return-pts T)
+    (when (and *verb* (estado-accion estado))
+      (format t "~%[J ~A] ~A juega ~A "
+        *njugada* (jugador-nombre (nth (mod (+ 1 lado-01) 2) lst-jug)) (estado-accion estado)))
+    (let ((curr-plyr (nth lado-01 lst-jug)))
+        (cond
+         ((or (juego-terminado-p)                              ; si juego terminado o tablas
+              (tablas-p (* 2 *long-fila*) (get-pts 0) (get-pts 1)))
+          (when *verjugada* (muestra-tablero estado T))
+          (return (informa-final-de-juego estado lst-jug)))
+         (T                                                    ; llamada al jugador que tiene el turno
+          (cond
+           ((estado-debe-pasar-turno estado)                   ; TBD No registra accion!
+            (setf estado (cambia-lado-sgte-jugador (copia-estado estado) nil)))
+           (T
+            (if *verjugada*
+                (progn
+                  (muestra-tablero estado)
+                  (format t "~%[J ~A] El turno es de ~A~%" *njugada* (jugador-nombre curr-plyr)))
+              (if *vermarcador*
+                  (format t "~%~3d ~a-~a" *njugada* (get-pts 0) (get-pts 1))
+                (when (= (mod *njugada* 10) 0)
+                  (to-logfile (format nil " ~d" *njugada*) 4 T))))
+            (setf estado
+              (funcall (jugador-f-juego curr-plyr)
+                                        estado
+                                        profundidad-max
+                                        (jugador-f-eval curr-plyr)
+                                        valores))))
+          (when (null estado)                                  ; => abandono, error o return nil|-infinito
+            (return (values (winner (nth lado-01 lst-jug) lst-jug) "Error en func. o abandono")))
+          (when (eql estado 'timeout)                          ; timeout de jugada
+            (return (values (winner (nth lado-01 lst-jug) lst-jug) "Timeout jugada")))
+          (setf lado-01 (mod (1+ lado-01) 2))                  ; inversion: pasa al otro jugador / convierte 1-2 0-1
+          )))))
+
+(defun SA-partida (lado profundidad-max lst-jug valores &optional filas)
+  (let* ((lado-01 (mod lado 2))
+         (estado (crea-estado-inicial lado-01 filas))
+         (boast (/= (jugador-port (second lst-jug)) 0))
+         (chall (/= (jugador-port (first lst-jug)) 0)) )
+    (reset-contadores (* 2 *long-fila*))
+    (if (or *tournament* (and (< *debug-level* 2) (not boast) (not chall)))
+        (setq *verjugada* nil *vermarcador* nil)
+      (if *verjugada* (format t "~%  Juego: (1) ~a vs ~a (2) "
+                        (jugador-nombre (first lst-jug)) (jugador-nombre (second lst-jug)))))
+
+    (cond
+     ((and chall boast)
+      (@stop "Ambos jugadores son remotos. Uno de ellos debe ser local"))
+
+     (chall                                                       ; Challenger Role
+      (setf (jugador-host *boaster-remoto*) *bhost*)              ; recarga por si ha cambiado
+      (chall-p2p-loop estado lado-01 profundidad-max lst-jug))    ; TBD take role out
+
+     (boast                                                       ; Boaster Role
+      (let ((bname (fullname (jugador-nombre (first lst-jug)))))
+        (format t "~%Boaster ~A registers in majordomo, port ~A " bname *mport*)
+        (setf (get '*bname* :plyr) bname)
+        (subscr-bst bname "new")
+        ))
+     (t (SA-local-loop estado lado-01 profundidad-max lst-jug valores)))))
+
+
+
+
+(defun f-eval-Avara-SA (estado valores)
+   (let ((h1 (-
+               (suma-fila 
+                  (estado-tablero estado) 
+                  (estado-lado-sgte-jugador estado))
+               (suma-fila 
+                  (estado-tablero estado) 
+                  (lado-contrario (estado-lado-sgte-jugador estado)))))
+         (h2  (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+   (reduce #'+ 
+      (mapcar
+         '*
+         (list h1 h2)
+         valores))))
+
+
+
+
+
+(defun f-j-mmx-SA (estado profundidad-max f-eval valores)
+;;; (minimax-a-b estado profundidad-max f-eval))
+   (minimax-SA estado profundidad-max f-eval valores))
+
+(setf *jdr-Avara-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Avara-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Avara-SA))
+
+;;; Jugador Bueno (pero tramposo: juega con un nivel mas de evaluacion)
+;;; ------------------------------------------------------------------------------------------
+(defun f-eval-Bueno-SA (estado valores)
+  (if (juego-terminado-p estado)
+      -50                              ;; Condicion especial de juego terminado
+    ;; Devuelve el maximo del numero de fichas del lado enemigo menos el numero de propias
+    (max-list (mapcar #'(lambda(x)
+                          (- (suma-fila (estado-tablero x) (lado-contrario (estado-lado-sgte-jugador x)))
+                                    (suma-fila (estado-tablero x) (estado-lado-sgte-jugador x))))
+                (generar-sucesores estado)))))
+
+
+
+(defun f-eval-Regular-SA (estado valores)
+  (- (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado))
+    (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado)))))
+
+
+(setf *jdr-mmx-Bueno-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Bueno|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Bueno-SA))
+
+(setf *jdr-mmx-Regular-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Regular-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Regular-SA))
+
+
+
+;(SA-partida 0 1 (list *jdr-Avara-SA*      *jdr-mmx-Regular-SA*) '(1 2 3))
+(setf weights '(1 0.3 0 0 1))
+(cons 
+  (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+  (cons 
+    (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+    (list
+      (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+      (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; ------------------------------------------------------------------------------------------
 ;;; EJEMPLOS DE PARTIDAS DE PRUEBA
 ;;; ------------------------------------------------------------------------------------------
@@ -874,14 +1081,19 @@
 
 ;;; Activa comentarios para seguir la evolucion de la partida
 ;(setq *verb* t)
-;;; Fuerza posicion para jugar a partir de ella (ejemplo pag.4 del enunciado)
-(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 
-(setq mi-posicion (list '(1 0 1 3 2 4 0 3) (reverse '(4 0 3 5 2 1 0 1))))
-(setq estado (crea-estado-inicial 0 mi-posicion))
+
+
+;;; Fuerza posicion para jugar a partir de ella (ejemplo pag.4 del enunciado)
+;(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
+
+;(setq mi-posicion (list '(1 0 1 3 2 4 0 3) (reverse '(4 0 3 5 2 1 0 1))))
+;(setq estado (crea-estado-inicial 0 mi-posicion))
+
+
 
 ;;; Juega a partir de posicion dada (ejemplo pag.4 del enunciado)
-(partida 0 2 (list *jdr-humano*      *jdr-human2*) mi-posicion)
+;(partida 0 2 (list *jdr-humano*      *jdr-human2*) mi-posicion)
 
 ;;; Fuerza posicion: casi mate en 1 si juega 0
 ;(setq mi-posicion (list '(3 2 2 2 6 2 2 2) (reverse '(1 0 4 0 0 0 2 2)) ))
@@ -898,10 +1110,17 @@
 ;(partida 0 8 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
 
 ;;; Ejemplos de partidas para pruebas
-;(partida 0 2 (list *jdr-mmx-Regular* *jdr-erroneo*))
-;(partida 0 1 (list *jdr-mmx-Regular* *jdr-mmx-bueno*))
-;(partida 0 1 (list *jdr-humano*      *jdr-mmx-Regular*))
-;(partida 0 1 (list *jdr-humano*      *jdr-mmx-Bueno*))
+
+
+
+;(print '(Contra el malo))
+;(cons 
+  ;(partida 0 1 (list *jdr-Avara*      *jdr-mmx-Regular-SA*))
+  ;(cons 
+    ;(partida 1 1 (list *jdr-Avara*      *jdr-mmx-Regular-SA*))
+    ;(list
+      ;(partida 0 1 (list *jdr-Avara* *jdr-mmx-bueno*))
+      ;(partida 1 1 (list *jdr-Avara* *jdr-mmx-bueno*)))))
 ;(partida 0 1 (list *jdr-humano*      *jdr-1st-opt*))
 ;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
 
@@ -913,5 +1132,8 @@
 
 ;(partida 2 2 (list *jdr-mmx-Bueno* *challenger-remoto*))
 ;(partida 2 2 (list *boaster-remoto* *jdr-humano*))
+
+
+
 
 
