@@ -493,9 +493,9 @@ arguments."
   (let ((ganador (cond
                   (*tablas* 0)
                   (msg winner)
-                  ((< (get-pts 0) (get-pts 1)) 2)
-                  (t 1))))
-    (when (> *debug-level* 4)
+                  ((< (get-pts 0) (get-pts 1)) 1)
+                  (t -1))))
+    (when nil
       (format t "~2%  FIN DEL JUEGO por ~A en ~A Jugadas~%  Marcador:  ~A ~A - ~A ~A~%~%"
         (if (= ganador 0) "TABLAS" "VICTORIA")
         *njugada*
@@ -503,7 +503,7 @@ arguments."
         (+ (get-pts 0) (if *kalaha* (aref (estado-tablero estado) 0 *long-fila*) 0))
         (+ (get-pts 1) (if *kalaha* (aref (estado-tablero estado) 1 *long-fila*) 0))
         (jugador-nombre (second lst-jug))))
-    (values ganador nil)))
+    (+ ganador (/ *njugada* 100.0))))
 
 
 ;;; ------------------------------------------------------------------------------------------
@@ -982,26 +982,23 @@ arguments."
      (t (SA-local-loop estado lado-01 profundidad-max lst-jug valores)))))
 
 
-
+(setf *heuristics* (list
+  #'(lambda (estado) (suma-fila 
+                  (estado-tablero estado) 
+                  (estado-lado-sgte-jugador estado)))
+  #'(lambda (estado) (suma-fila 
+                  (estado-tablero estado) 
+                  (lado-contrario (estado-lado-sgte-jugador estado))))
+  #'(lambda (estado) (max-list (list-lado estado 
+      (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ))
 
 (defun f-eval-Avara-SA (estado valores)
-   (let ((h1 (-
-               (suma-fila 
-                  (estado-tablero estado) 
-                  (estado-lado-sgte-jugador estado))
-               (suma-fila 
-                  (estado-tablero estado) 
-                  (lado-contrario (estado-lado-sgte-jugador estado)))))
-         (h2  (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
    (reduce #'+ 
       (mapcar
          '*
-         (list h1 h2)
-         valores))))
-
-
-
-
+         (mapcar #'(lambda (x) (funcall x estado)) *heuristics*)
+         valores)))
 
 (defun f-j-mmx-SA (estado profundidad-max f-eval valores)
 ;;; (minimax-a-b estado profundidad-max f-eval))
@@ -1121,7 +1118,7 @@ arguments."
     ;(list
       ;(partida 0 1 (list *jdr-Avara* *jdr-mmx-bueno*))
       ;(partida 1 1 (list *jdr-Avara* *jdr-mmx-bueno*)))))
-(partida 0 1 (list *jdr-humano*      *jdr-1st-opt*))
+;(partida 0 1 (list *jdr-humano*      *jdr-1st-opt*))
 ;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
 
 

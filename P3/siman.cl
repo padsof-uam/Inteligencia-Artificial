@@ -19,13 +19,14 @@
 
 (defun generate-temp-steps (step-num)
 	(append
-		(mapcar #'(lambda (x) (/ 20 (+ (expt (* x 0.2) 2) 1))) (range-step 0 (- step-num 1) 0.2))
+		(mapcar #'(lambda (x) (/ 20 (+ (expt (* x 0.1) 2) 1))) (range-step 0 (- step-num 1) 0.2))
 		'(0)))
 
 (generate-temp-steps 100)
 
 (defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold)
-	(if (or (null remaining-temp) (< state-val value-threshold))
+	(print (list state state-val))
+	(if (or (null remaining-temp) (<= state-val value-threshold))
 		(list state state-val)
 		(let ((next (funcall f-state-generate-from state)))
 			(let ((next-val (funcall f-state-value next)))
@@ -37,6 +38,12 @@
 					(simulated-annealing-aux (rest remaining-temp) state state-val 
 						f-state-generate-from f-state-value f-prob-for-change value-threshold))))))
 
+;; Magnífica función de simulated annealing.
+;; Recibe
+;; 	initial-state: Estado incial
+;; 	f-mierdas: funciones de generación de estados, cálculo del valor de un estado y la de probabilidad de salto.
+;;	value-threshold: Si llegamos a este valor o inferior, paramos.
+;;  steps: Cuantos "pasos" de temperatura hacemos. Lo pongo entre comillas porque si le pones p.ej. 100 hace bastantes más. 
 (defun simulated-annealing (initial-state f-state-generate-from f-state-value f-prob-for-change value-threshold steps)
 	(simulated-annealing-aux 
 		(generate-temp-steps steps)
@@ -47,6 +54,14 @@
 (defun parab-gen-from (state)
 	(mapcar #'(lambda (x) (- (+ x (random 2.0)) (random 2.0))) state))
 
+(defun siman-prob (state next temp)
+	(if (< next state)
+		1
+		(if (> temp 0)
+			(exp (/ (- state next) temp))
+			0)))
+
+
 (parab-gen-from '(3 1))
 
 (defun parab-value (state)
@@ -54,11 +69,4 @@
 
 (parab-value '(3 1))
 
-(defun parab-prob (state next temp)
-	(if (< next state)
-		1
-		(if (> temp 0)
-			(exp (/ (- state next) temp))
-			0)))
-
-(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'parab-prob 0.01 100)
+(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.01 200)
