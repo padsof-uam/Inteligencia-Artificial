@@ -1,0 +1,64 @@
+(defun range(n m)
+	(if (< m n)
+		(reverse (range m n))
+		(loop for i from n to m
+			collect i)))
+
+(range 1 3)
+(range 0 10)
+(range 10 10)
+(range 10 0)
+
+(defun range-step (n m step)
+	(let ((range-len (/ (- m n) step)))
+		(mapcar #'(lambda (x) (+ n (* step x))) (range 0 range-len))))
+
+(range-step 0 4 0.5)
+(range-step 0 10 2)
+(range-step 1 0 0.1)
+
+(defun generate-temp-steps (step-num)
+	(append
+		(mapcar #'(lambda (x) (/ 20 (+ (expt (* x 0.2) 2) 1))) (range-step 0 (- step-num 1) 0.2))
+		'(0)))
+
+(generate-temp-steps 100)
+
+(defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold)
+	(if (or (null remaining-temp) (< state-val value-threshold))
+		(list state state-val)
+		(let ((next (funcall f-state-generate-from state)))
+			(let ((next-val (funcall f-state-value next)))
+				(if (> 
+						(funcall f-prob-for-change state-val next-val (first remaining-temp))
+						(random 1.0))
+					(simulated-annealing-aux (rest remaining-temp) next next-val 
+						f-state-generate-from f-state-value f-prob-for-change value-threshold)
+					(simulated-annealing-aux (rest remaining-temp) state state-val 
+						f-state-generate-from f-state-value f-prob-for-change value-threshold))))))
+
+(defun simulated-annealing (initial-state f-state-generate-from f-state-value f-prob-for-change value-threshold steps)
+	(simulated-annealing-aux 
+		(generate-temp-steps steps)
+		initial-state
+		(funcall f-state-value initial-state)
+		f-state-generate-from f-state-value f-prob-for-change value-threshold))
+
+(defun parab-gen-from (state)
+	(mapcar #'(lambda (x) (- (+ x (random 2.0)) (random 2.0))) state))
+
+(parab-gen-from '(3 1))
+
+(defun parab-value (state)
+	(apply '+ (mapcar #'(lambda (x) (* x x)) state)))
+
+(parab-value '(3 1))
+
+(defun parab-prob (state next temp)
+	(if (< next state)
+		1
+		(if (> temp 0)
+			(exp (/ (- state next) temp))
+			0)))
+
+(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'parab-prob 0.01 100)
