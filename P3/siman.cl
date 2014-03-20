@@ -25,10 +25,10 @@
 
 (defun generate-temp-steps (step-num)
 	(append
-		(mapcar #'(lambda (x) (/ *w* (+ (expt (* x *r*) *p*) *d*))) (range-step 0 (- step-num 1) 0.2))
+		(mapcar #'(lambda (x) (/ *w* (+ (expt (* x *r*) *p*) *d*))) (range-step 0 199 (/ 200 step-num)))
 		'(0)))
 
-(generate-temp-steps 100)
+(generate-temp-steps 500)
 
 (defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold)
 	(print (list state state-val))
@@ -75,4 +75,4 @@
 
 (parab-value '(3 1))
 
-(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.01 200)
+(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.001 5000)
