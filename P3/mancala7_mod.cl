@@ -77,10 +77,17 @@
 (defvar *tournament*       nil ) ; T=juego llamado desde torneo, nil=juego individual
 (defvar *marcador*  (make-array '(2 2) :initial-element 0))
 (defvar *tablero-aux*      nil ) ; Tablero auxiliar para uso discrecional del alumno (solo mediante funciones especificas)
+(defvar *random*           T)
 
 (setf *tournament* T)
 (setf *verb*      nil)
 (setf *verjugada* nil)
+
+(defun range(n m)
+  (if (< m n)
+    (reverse (range m n))
+    (loop for i from n to m
+      collect i)))
 
 (setf (symbol-function 'r) #'1+) ; Definicion del operador R (siembra a derechas)
 (setf (symbol-function 'l) #'1-) ; Definicion del operador L (siembra a izquierdas)
@@ -179,7 +186,8 @@
 (defun construye-fila-tablero (long fichas)
   (cond
    ((= 0 long) (if *kalaha* '(0) nil))
-   ( T (if (>= fichas *fichas-inicio*)
+   (*random* (mapcar #'(lambda (x) (random 4)) (range 0 (- long 1))))
+   (T (if (>= fichas *fichas-inicio*)
            (cons *fichas-inicio* (construye-fila-tablero (- long 1) (- fichas *fichas-inicio*)))
            (cons fichas (construye-fila-tablero (- long 1) fichas))))))
 
@@ -428,7 +436,7 @@ arguments."
 
 ;;; Genera los posibles sucesores de un estado
 (defun generar-sucesores (estado)
-  (when *verb* (format t "~% ---- Gen.Sucesores de ~a" (estado-tablero estado)))
+  (when *verb* (format t "~% ---- Gen.Suucesores de ~a" (estado-tablero estado)))
   (if (juego-terminado-p estado)
       nil
      (mapcar #'(lambda(x) (ejecuta-accion estado x)) (acciones-posibles estado))))
@@ -503,7 +511,9 @@ arguments."
         (+ (get-pts 0) (if *kalaha* (aref (estado-tablero estado) 0 *long-fila*) 0))
         (+ (get-pts 1) (if *kalaha* (aref (estado-tablero estado) 1 *long-fila*) 0))
         (jugador-nombre (second lst-jug))))
-    (+ ganador (/ *njugada* 100.0))))
+    (if (>= ganador 0)
+      (- ganador (/ *njugada* 100.0))
+      (+ ganador (/ *njugada* 100.0)))))
 
 
 ;;; ------------------------------------------------------------------------------------------
