@@ -878,8 +878,6 @@ arguments."
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Avara))
 
-(defun max-list-chained (milado estado))
-
 ;(partida 0 2 (list *jdr-Avara* *jdr-mmx-Regular*))
 
 
@@ -895,18 +893,6 @@ arguments."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun max-list-chained (milado estado cont)
-   (if (= cont 7)
-      ()
-      (cons 
-         (max-list-chained milado estado (+ cont 1)) 
-         (chain-ate milado (estado-tablero estado) cont 0))))
-
-(defun chain-ate (milado tablero pos total)
-   (let ((fichas (get-fichas tablero milado pos)))
-      (if (<> fichas 0)
-         (chain-ate milado tablero (+ pos fichas) (+ total fichas))
-         (+ total fichas))))
 
 
 (defun minimax-1-SA(estado profundidad devolver-movimiento profundidad-max f-eval valores)
@@ -1004,6 +990,21 @@ arguments."
      (t (SA-local-loop estado lado-01 profundidad-max lst-jug valores)))))
 
 
+(defun max-list-chained (milado estado cont)
+   (if (= cont 7)
+      ()
+      (append 
+         (max-list-chained milado estado (+ cont 1)) 
+         (chain-ate milado (estado-tablero estado) cont 0))
+      ))
+
+(defun chain-ate (milado tablero pos total)
+   (let ((fichas (get-fichas tablero milado pos)))
+      (if (= fichas 0)
+         (+ total fichas)
+         (chain-ate milado tablero (mod (+ pos fichas) 8) (+ total fichas)))))
+
+
 (setf *heuristics* (list
   ; #'(lambda (estado) (suma-fila 
   ;                 (estado-tablero estado) 
@@ -1019,6 +1020,8 @@ arguments."
                      (lado-contrario (estado-lado-sgte-jugador estado)))))
    #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
+
+   #'(lambda (estado) (print (max-list-chained 0 estado  0)))
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1077,8 +1080,9 @@ arguments."
              (list
                (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
                (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))))))
+(setf weights '(0.7 0.3 6 0 1))
 
-(partida-SA-all-games '(0.7 0.3 0 0 1))
+(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
