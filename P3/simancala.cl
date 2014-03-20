@@ -51,7 +51,7 @@
 		reps)))
 
 (setf *evaluators* 
-	(generate-evaluators (list *jdr-mmx-Regular-SA*) 2 1))
+	(generate-evaluators (list *jdr-mmx-Regular-SA*) 2 3))
 
 ; Dar valor a un estado: ejecutamos la partida con cada uno de los jugadores,
 ;	que reciben el estado como vector de pesos.
@@ -66,4 +66,4 @@
 (mancala-value '(1 0.3))
 
 ; Ejecutamos el algoritmo con un estado inicial y un valor mínimo que sea ganar todas las partidas que jugamos.
-(simulated-annealing '(0.2 0.2) 'mancala-gen-from 'mancala-value 'siman-prob (- 0 (length *evaluators*)) 1000)
+(simulated -annealing '(0.2 0.2) 'mancala-gen-from 'mancala-value 'siman-prob (- 0 (length *evaluators*)) 1000)
