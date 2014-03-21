@@ -992,19 +992,31 @@ arguments."
      (t (SA-local-loop estado lado-01 profundidad-max lst-jug valores)))))
 
 
+
+(defun flatten (structure)
+   (cond ((null structure) nil)
+   ((atom structure) (list structure))
+   (t (mapcan #'flatten structure))))
+
+
 (defun max-list-chained (milado estado cont)
-   (if (= cont 7)
-      ()
-      (cons 
-         (max-list-chained milado estado (+ cont 1)) 
-         (chain-ate milado (estado-tablero estado) cont 0))
-      ))
+  (if (> cont 7)
+    0
+    (let ((L2 (chain-ate milado (estado-tablero estado) cont 0))
+         (L1 (max-list-chained milado estado (+ cont 1))))
+        (if (and (consp L1) (consp L2))
+          (append L1 L2)
+          (if (consp L1)
+          (append L1 (list L2))
+          (list L1 L2)
+          )))))
+
 
 (defun chain-ate (milado tablero pos total)
-   (let ((fichas (get-fichas tablero milado pos)))
-      (if (= fichas 0)
-         (+ total fichas)
-         (chain-ate milado tablero (mod (+ pos fichas) 8) (+ total fichas)))))
+   (let ((mis-fichas (get-fichas tablero milado pos)) (sus-fichas (get-fichas tablero (mod (+ milado 1) 2) pos)))
+      (if (or (= mis-fichas 0) (>= sus-fichas 1))
+         (+ total mis-fichas)
+         (chain-ate milado tablero (mod (+ pos mis-fichas) 8) (+ total mis-fichas)))))
 
 
 (setf *heuristics* (list
@@ -1020,10 +1032,11 @@ arguments."
                    (suma-fila 
                      (estado-tablero estado) 
                      (lado-contrario (estado-lado-sgte-jugador estado)))))
+   
    #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
 
-   #'(lambda (estado) (max-list-chained 0 estado  0))
+   #'(lambda (estado) (max-list  (max-list-chained 0 estado  0)))
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1072,18 +1085,19 @@ arguments."
 
 
 (defun partida-SA-all-games (weights)
-    (reduce #'+
-         (cons 
-           (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-           (cons 
-             (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-             (list
-               (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-               (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights))))))
+   (list
+     (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+     (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+     (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+     (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
-(setf weights '(1 0.3 0 0 1))
+(setf weights '(1 0.3 0.5 0 1))
 
-(partida-SA-all-games weights)
+;(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1151,7 +1165,7 @@ arguments."
     ;(list
       ;(partida 0 1 (list *jdr-Avara* *jdr-mmx-bueno*))
       ;(partida 1 1 (list *jdr-Avara* *jdr-mmx-bueno*)))))
-;(partida 0 1 (list *jdr-humano*      *jdr-1st-opt*))
+(partida 0 1 (list *jdr-humano*      *jdr-mmx-Regular*))
 ;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
 
 
