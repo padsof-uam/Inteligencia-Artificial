@@ -30,18 +30,21 @@
 
 (generate-temp-steps 500)
 
-(defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold)
-	(if (or (null remaining-temp) (<= state-val value-threshold))
-		(list state state-val)
-		(let ((next (funcall f-state-generate-from state)))
-			(let ((next-val (funcall f-state-value next)))
-				(if (> 
-						(funcall f-prob-for-change state-val next-val (first remaining-temp))
-						(random 1.0))
-					(simulated-annealing-aux (rest remaining-temp) next next-val 
-						f-state-generate-from f-state-value f-prob-for-change value-threshold)
-					(simulated-annealing-aux (rest remaining-temp) state state-val 
-						f-state-generate-from f-state-value f-prob-for-change value-threshold))))))
+(defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold best)
+	(let ((best (if (<= state-val (cadr best))
+					(list state state-val)
+					best)))
+		(if (or (null remaining-temp) (<= state-val value-threshold))
+			best
+			(let ((next (funcall f-state-generate-from state)))
+				(let ((next-val (funcall f-state-value next)))
+					(if (> 
+							(funcall f-prob-for-change state-val next-val (first remaining-temp))
+							(random 1.0))
+						(simulated-annealing-aux (rest remaining-temp) next next-val 
+							f-state-generate-from f-state-value f-prob-for-change value-threshold best)
+						(simulated-annealing-aux (rest remaining-temp) state state-val 
+							f-state-generate-from f-state-value f-prob-for-change value-threshold best)))))))
 
 ;; Magnífica función de simulated annealing.
 ;; Recibe
@@ -54,7 +57,8 @@
 		(generate-temp-steps steps)
 		initial-state
 		(funcall f-state-value initial-state)
-		f-state-generate-from f-state-value f-prob-for-change value-threshold))
+		f-state-generate-from f-state-value f-prob-for-change value-threshold
+		(list initial-state '0))
 
 (defun parab-gen-from (state)
 	(mapcar #'(lambda (x) (- (+ x (random 2.0)) (random 2.0))) state))
@@ -74,4 +78,4 @@
 
 (parab-value '(3 1))
 
-(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.001 5000)
+(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.001 10)
