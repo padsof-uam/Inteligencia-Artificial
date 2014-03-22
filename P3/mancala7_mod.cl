@@ -18,7 +18,7 @@
 ;;;
 ;;; NUEVO EN LA VERSION 6.30
 ;;; - Incluye funciones de manejo de un tablero auxiliar
-;;; - Evita que quien devuelva un n∫ negativo muy grande (que puede pasar por nil) obtenga
+;;; - Evita que quien devuelva un n¬∫ negativo muy grande (que puede pasar por nil) obtenga
 ;;;   tablas. Del mismo modo, si el humano abandona no obtiene tablas sino que pierde.
 ;;;
 ;;; COMENTARIOS
@@ -624,8 +624,8 @@ arguments."
 ;;; Funcion que inicia la busqueda y devuelve el siguiente estado elegido por el jugador que
 ;;; tiene el turno, segun algoritmo minimax
 ;;; RECIBE:   estado,
-;;;           profundidad-max    : lÌmite de profundidad
-;;;           f-eval             : funciÛn de evaluaciÛn
+;;;           profundidad-max    : l√≠mite de profundidad
+;;;           f-eval             : funci√≥n de evaluaci√≥n
 ;;; DEVUELVE: estado siguiente del juego
 ;;; ------------------------------------------------------------------------------------------
 
@@ -657,11 +657,11 @@ arguments."
 
 
 ;;; ------------------------------------------------------------------------------------------
-;;; ImplementaciÛn del algoritmo minimax con poda alfa-beta
+;;; Implementaci√≥n del algoritmo minimax con poda alfa-beta
 ;;; RECIBE:   estado, profundidad actual, beta, alfa,
-;;;           devolver-movimiento: flag que indica si devolver un estado (llamada raiz) o un valor numÈrico (resto de llamadas)
-;;;           profundidad-max    : lÌmite de profundidad
-;;;           f-eval             : funciÛn de evaluaciÛn
+;;;           devolver-movimiento: flag que indica si devolver un estado (llamada raiz) o un valor num√©rico (resto de llamadas)
+;;;           profundidad-max    : l√≠mite de profundidad
+;;;           f-eval             : funci√≥n de evaluaci√≥n
 ;;; DEVUELVE: valor minimax en todos los niveles de profundidad, excepto en el nivel 0 que devuelve el estado del juego tras el
 ;;;           movimiento que escoge realizar
 ;;; ------------------------------------------------------------------------------------------
@@ -804,7 +804,7 @@ arguments."
   (when estado t)       ; dummy para evitar warnings de compilador
   (random 100) )
 
-;;; f-juego que utiliza b˙squeda minimax pero evalua aleatoriamente
+;;; f-juego que utiliza b√∫squeda minimax pero evalua aleatoriamente
 ;;; ------------------------------------------------------------------------------------------
 (setf *jdr-mmx-eval-aleatoria* (make-jugador
                         :nombre   '|Ju-Mmx-Eval-Aleatoria|
@@ -835,7 +835,7 @@ arguments."
                 (generar-sucesores estado)))))
 
 
-;;; Devuelve el m·ximo de una lista de nos. y su posiciÛn
+;;; Devuelve el m√°ximo de una lista de nos. y su posici√≥n
 ;;; ------------------------------------------------------------------------------------------
 (defun max-list (l &key (test #'>))
   (let ((result -999999) (pos -1))
@@ -1020,6 +1020,7 @@ arguments."
          (chain-ate milado tablero (mod (+ pos mis-fichas) 8) (+ total mis-fichas)))))
 
 
+; Cada heur√≠stica cuanto m√°s negativa sea es que m√°s mejor es.
 (setf *heuristics* (list
   #'(lambda (estado)( - (suma-fila 
                            (estado-tablero estado) 
@@ -1027,26 +1028,39 @@ arguments."
                         (suma-fila 
                            (estado-tablero estado) 
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ; El m√°ximo que se pueden llevar.
   #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ; Cu·ntos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
+  ; Cu√°ntos hoyos tiene el otro con alguna semilla.
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; Cu·ntos hoyos tiene el otro con alguna semilla.
+  ; Cu√°ntos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  ; En cu·ntos hoyos no puedo robar semillas.
+  ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
+  #'(lambda (estado) 
+    ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
+              (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+        (length (remove-if-not #'(lambda (x) (not (= x 1))) 
+              (list-lado estado (estado-lado-sgte-jugador estado))))))
+
+  ; En cu√°ntos hoyos no puede el otro robar semillas. Informaci√≥n sin m√°s.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4))) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; En cu·ntos hoyos no puede el otro robar semillas.
+  ; En cu√°ntos hoyos no puedo robar semillas. Informaci√≥n sin m√°s.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4)))
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  ; En cu·ntos hoyos sÌ puedo robar semillas.
+
+  ; En cu√°ntos hoyos s√≠ puede el otro robar semillas. Cuanto menor sea mejor. REVISAR este 4. Lo mismo es < 4.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4))) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; En cu·ntos hoyos sÌ puedo robar semillas.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4)))
-        (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+
+  ; En cu√°ntos hoyos s√≠ puedo robar semillas.
+  #'(lambda (estado)
+    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4)))
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+        (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4))) 
+          (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ))
 
@@ -1094,7 +1108,7 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
-(setf weights '(1 0.3 0.5 0 1))
+(setf weights '(1 1 1 1 1 1 1 1 1))
 
 (defun partida-SA-all-games (weights)
    (list
@@ -1109,7 +1123,7 @@ arguments."
 
 
 
-;(partida-SA-all-games weights)
+(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1155,7 +1169,7 @@ arguments."
 ;(setq mi-posicion (list '(3 2 2 2 6 2 2 2) (reverse '(1 0 4 0 0 0 2 2)) ))
 
 
-;;; Ejemplo de experimentaciÛn a varias profundidades
+;;; Ejemplo de experimentaci√≥n a varias profundidades
 ;;;(setq *debug-level* 2)
 ;;;(setq *verjugada*   nil)
 ;;;(setq *vermarcador* nil)
