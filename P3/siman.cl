@@ -31,7 +31,7 @@
 (generate-temp-steps 500)
 
 (defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold best)
-	(let ((best (if (<= state-val (cadr best))
+	(let ((best (if (<=  state-val (cadr best))
 					(list state state-val)
 					best)))
 		(if (or (null remaining-temp) (<= state-val value-threshold))
@@ -41,9 +41,9 @@
 					(if (> 
 							(funcall f-prob-for-change state-val next-val (first remaining-temp))
 							(random 1.0))
-						(simulated-annealing-aux (rest remaining-temp) next next-val 
+						(simulated-annealing-aux (rest remaining-temp) (print next) (print next-val) 
 							f-state-generate-from f-state-value f-prob-for-change value-threshold best)
-						(simulated-annealing-aux (rest remaining-temp) state state-val 
+						(simulated-annealing-aux (rest remaining-temp) (print state) (print state-val) 
 							f-state-generate-from f-state-value f-prob-for-change value-threshold best)))))))
 
 ;; Magnífica función de simulated annealing.

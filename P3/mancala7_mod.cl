@@ -1181,7 +1181,7 @@ arguments."
 ;;;(dolist (n '(1 2 3 4 5)) (print (partida 2 n (list *jdr-mmx-regular* *jdr-mmx-bueno*))))
 
 ;;; Timeout jugada: a nivel 8 el aleatorio pierde por tiempo
-(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
+;(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
 ;(partida 0 8 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
 
 ;;; Ejemplos de partidas para pruebas
