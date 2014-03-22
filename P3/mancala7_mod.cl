@@ -1029,18 +1029,25 @@ arguments."
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ; Cuántos hoyos tiene el otro con alguna semilla.
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  ; En cuántos hoyos no puedo robar semillas.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4))) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ; En cuántos hoyos no puede el otro robar semillas.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4)))
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  ; En cuántos hoyos sí puedo robar semillas.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4))) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ; En cuántos hoyos sí puedo robar semillas.
   #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4)))
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1087,9 +1094,9 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
+(setf weights '(1 0.3 0.5 0 1))
 
 (defun partida-SA-all-games (weights)
-<<<<<<< HEAD
    (list
      (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
      (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
@@ -1100,29 +1107,7 @@ arguments."
      (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
      (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
-(setf weights '(1 0.3 0.5 0 1))
-=======
-    (reduce #'+
-         (cons 
-           (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-           (cons 
-             (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-             (list
-               (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-               (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights))))))
 
-;(setf weights '(1 0.3 0 0 1))
-;(SA-partida 0 1 (list *jdr-Avara-SA*      *jdr-mmx-Regular-SA*) '(1 2 3))
-; (setf weights '(1 0.3 0 0 1))
-; (cons 
-;   (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-;   (cons 
-;     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-;     (list
-;       (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-;       (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights))))
-
->>>>>>> 86793416aae71c520b10231cf8746bc1074d06f5
 
 ;(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1192,7 +1177,7 @@ arguments."
     ;(list
       ;(partida 0 1 (list *jdr-Avara* *jdr-mmx-bueno*))
       ;(partida 1 1 (list *jdr-Avara* *jdr-mmx-bueno*)))))
-(partida 0 1 (list *jdr-humano*      *jdr-mmx-Regular*))
+;(partida 0 1 (list *jdr-humano*      *jdr-mmx-Regular*))
 ;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
 
 
