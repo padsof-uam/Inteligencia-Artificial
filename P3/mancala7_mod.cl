@@ -1023,10 +1023,10 @@ arguments."
 (setf *heuristics* (list
   #'(lambda (estado)( - (suma-fila 
                            (estado-tablero estado) 
-                           (estado-lado-sgte-jugador estado))) 
+                           (estado-lado-sgte-jugador estado)) 
                         (suma-fila 
                            (estado-tablero estado) 
-                           (lado-contrario (estado-lado-sgte-jugador estado))))
+                           (lado-contrario (estado-lado-sgte-jugador estado)))))
   #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
