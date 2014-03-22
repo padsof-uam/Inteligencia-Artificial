@@ -1028,15 +1028,20 @@ arguments."
                         (suma-fila 
                            (estado-tablero estado) 
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ; El máximo que se pueden llevar.
+  
+  ; El máximo que me puedo llevar.
   #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ; El máximo que se puede llevar el otro
+  #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+
   ; Cuántos hoyos tiene el otro con alguna semilla.
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  
   ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
   #'(lambda (estado) 
     ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
@@ -1051,15 +1056,15 @@ arguments."
   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4)))
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
 
-  ; En cuántos hoyos sí puede el otro robar semillas. Cuanto menor sea mejor. REVISAR este 4. Lo mismo es < 4.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4))) 
+  ; En cuántos hoyos sí puede el otro robar semillas. Cuanto menor sea mejor. 
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
 
   ; En cuántos hoyos sí puedo robar semillas.
   #'(lambda (estado)
-    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4)))
+    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
           (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-        (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4))) 
+        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
           (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ))
@@ -1123,7 +1128,7 @@ arguments."
 
 
 (setf *random* nil)
-(partida-SA-all-games weights)
+;(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1176,7 +1181,7 @@ arguments."
 ;;;(dolist (n '(1 2 3 4 5)) (print (partida 2 n (list *jdr-mmx-regular* *jdr-mmx-bueno*))))
 
 ;;; Timeout jugada: a nivel 8 el aleatorio pierde por tiempo
-;(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
+(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
 ;(partida 0 8 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
 
 ;;; Ejemplos de partidas para pruebas
