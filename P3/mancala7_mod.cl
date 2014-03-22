@@ -1037,8 +1037,8 @@ arguments."
                            (estado-tablero estado) 
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
-  ; Máximas fichas que puedo comer. Cuantas más podamos comer mejor y cuanto más negativa mejor.
-  #'(lambda (estado) (- 0 (max-list-chained 0 estado)))
+  ; Máximas fichas que puedo comer. El algoritmo le pondrá el signo negativo apropiado.
+  #'(lambda (estado) (max-list-chained 0 estado))
   ; Máximas fichas que me pueden comer.
   #'(lambda (estado) (max-list-chained 1 estado))  
 
@@ -1125,7 +1125,7 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
-(setf weights '(0.7119942 -0.72701263 -0.13390136 0.43411708 -0.4516902 -0.5112896 0.19340944 -0.8332827 -0.8752656 0.5392759 0.30509472 -0.056417227))
+(setf weights '(0.36080503 0.23074722 -0.22696567 0.30660963 -0.5381019 -0.3032012 0.964375 0.23046398 0.16267824 -0.32217693 -0.6611998 -0.0944922))
 
 (defun partida-SA-all-games (weights)
    (list
