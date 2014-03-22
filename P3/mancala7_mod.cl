@@ -1050,10 +1050,10 @@ arguments."
               (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4))) 
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
         (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; En cuántos hoyos no puedo robar semillas. Información sin más.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4)))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos sí puede el otro robar semillas. Cuanto menor sea mejor. 
