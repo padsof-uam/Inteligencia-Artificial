@@ -58,7 +58,7 @@
 		initial-state
 		(funcall f-state-value initial-state)
 		f-state-generate-from f-state-value f-prob-for-change value-threshold
-		(list initial-state '0))
+		(list initial-state '100)))
 
 (defun parab-gen-from (state)
 	(mapcar #'(lambda (x) (- (+ x (random 2.0)) (random 2.0))) state))
