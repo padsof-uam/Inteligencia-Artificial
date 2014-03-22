@@ -1,3 +1,4 @@
+*.fasl
 *.pdf
 *.aux
 *.toc

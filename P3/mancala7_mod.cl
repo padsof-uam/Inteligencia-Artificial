@@ -78,6 +78,7 @@
 (defvar *marcador*  (make-array '(2 2) :initial-element 0))
 (defvar *tablero-aux*      nil ) ; Tablero auxiliar para uso discrecional del alumno (solo mediante funciones especificas)
 (defvar *random*           T)
+(defvar *jugfactor*        1)
 
 (setf *tournament* T)
 (setf *verb*      nil)
@@ -514,8 +515,8 @@ arguments."
     (if (= ganador 0)
       ganador
       (if (> ganador 0)
-      (- ganador (/ *njugada* 100.0))
-      (+ ganador (/ *njugada* 100.0))))))
+      (- ganador (* *jugfactor* (/ *njugada* 100.0)))
+      (+ ganador (* *jugfactor* (/ *njugada* 100.0)))))))
 
 
 ;;; ------------------------------------------------------------------------------------------
@@ -1020,23 +1021,26 @@ arguments."
 
 
 (setf *heuristics* (list
-  ; #'(lambda (estado) (suma-fila 
-  ;                 (estado-tablero estado) 
-  ;                 (estado-lado-sgte-jugador estado)))
-  ; #'(lambda (estado) (suma-fila 
-  ;                 (estado-tablero estado) 
-  ;                 (lado-contrario (estado-lado-sgte-jugador estado))))
-  #'(lambda (estado) (- (suma-fila 
-                     (estado-tablero estado) 
-                     (estado-lado-sgte-jugador estado))
-                   (suma-fila 
-                     (estado-tablero estado) 
-                     (lado-contrario (estado-lado-sgte-jugador estado)))))
-   
-   #'(lambda (estado) (max-list (list-lado estado 
+  #'(lambda (estado)( - (suma-fila 
+                           (estado-tablero estado) 
+                           (estado-lado-sgte-jugador estado))) 
+                        (suma-fila 
+                           (estado-tablero estado) 
+                           (lado-contrario (estado-lado-sgte-jugador estado))))
+  #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
-
-   #'(lambda (estado) (max-list  (max-list-chained 0 estado  0)))
+  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+        (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+        (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4))) 
+        (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (> x 4)))
+        (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4))) 
+        (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (<= x 4)))
+        (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1085,6 +1089,7 @@ arguments."
 
 
 (defun partida-SA-all-games (weights)
+<<<<<<< HEAD
    (list
      (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
      (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
@@ -1096,6 +1101,28 @@ arguments."
      (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
 (setf weights '(1 0.3 0.5 0 1))
+=======
+    (reduce #'+
+         (cons 
+           (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+           (cons 
+             (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+             (list
+               (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+               (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights))))))
+
+;(setf weights '(1 0.3 0 0 1))
+;(SA-partida 0 1 (list *jdr-Avara-SA*      *jdr-mmx-Regular-SA*) '(1 2 3))
+; (setf weights '(1 0.3 0 0 1))
+; (cons 
+;   (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+;   (cons 
+;     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+;     (list
+;       (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+;       (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights))))
+
+>>>>>>> 86793416aae71c520b10231cf8746bc1074d06f5
 
 ;(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
