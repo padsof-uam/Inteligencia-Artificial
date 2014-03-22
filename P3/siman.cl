@@ -31,7 +31,6 @@
 (generate-temp-steps 500)
 
 (defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold)
-	(print (list state state-val))
 	(if (or (null remaining-temp) (<= state-val value-threshold))
 		(list state state-val)
 		(let ((next (funcall f-state-generate-from state)))

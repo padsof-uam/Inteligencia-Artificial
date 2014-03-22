@@ -1,5 +1,5 @@
-;(load "mancala7_mod.cl")
-;(load "siman.cl")
+(load "mancala7_mod.cl")
+(load "siman.cl")
 
 (defun rand-between (a b)
 	(let ((interval (- b a)))
@@ -71,12 +71,12 @@
 ; Ejecutamos el algoritmo con un estado inicial y un valor mínimo que sea ganar todas las partidas que jugamos.
 (defun simancala (steps)
 	(let ((hnum (length *heuristics*)))
-		(simulated-annealing 
+		(print (simulated-annealing 
 			(make-list hnum :initial-element (/ 1 hnum))
 			'mancala-gen-from 
 			'mancala-value 
 			'siman-prob 
 			(- 0 (length *evaluators*)) 
-			steps)))
+			steps))))
 
 (simancala 3000)
