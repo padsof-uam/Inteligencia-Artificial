@@ -1037,6 +1037,11 @@ arguments."
                            (estado-tablero estado) 
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
+  ; Máximas fichas que puedo comer. Cuantas más podamos comer mejor y cuanto más negativa mejor.
+  #'(lambda (estado) (- 0 (max-list-chained 0 estado)))
+  ; Máximas fichas que me pueden comer.
+  #'(lambda (estado) (max-list-chained 1 estado))  
+
   ; El máximo que me puedo llevar.
   #'(lambda (estado) (max-list (list-lado estado 
        (lado-contrario (estado-lado-sgte-jugador estado)))))
@@ -1074,10 +1079,6 @@ arguments."
           (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
         (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
           (list-lado estado (estado-lado-sgte-jugador estado))))))
-  ; Máximas fichas que puedo comer. Cuantas más podamos comer mejor y cuanto más negativa mejor.
-  #'(lambda (estado) (- 0 (max-list-chained 0 estado)))
-  ; Máximas fichas que me pueden comer.
-  #'(lambda (estado) (max-list-chained 1 estado))  
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1124,7 +1125,6 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
-(setf weights '(0.850826 -0.2578113 0.24683642 0.16001654 0.36500502 -0.15920186 0.4420216 -0.7057643 0.6616514 0.8 0.6))
 
 (defun partida-SA-all-games (weights)
    (list
@@ -1138,9 +1138,10 @@ arguments."
      (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
 
-(setf *random* T)
+(setf *random* nil)
 (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
 
+(setf weights '(0.7119942 -0.72701263 -0.13390136 0.43411708 -0.4516902 -0.5112896 0.19340944 -0.8332827 -0.8752656 0.5392759 0.30509472 -0.056417227))
 (partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
