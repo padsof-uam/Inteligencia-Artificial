@@ -896,6 +896,34 @@ arguments."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun max-list-chained (lado estado)
+  (max-list (cdr (max-list-chained-aux lado estado 0))))
+
+(defun max-list-chained-aux (milado estado cont)
+  (if (> cont 7)
+    0
+    (let ((L2 (chain-ate milado (estado-tablero estado) cont 0 0))
+         (L1 (max-list-chained-aux milado estado (+ cont 1))))
+        (if (and (consp  L1) (consp  L2))
+          (append L1 L2)
+          (if (consp L1)
+          (append L1 (list L2))
+          (list L1 L2)
+          )))))
+
+; El máximo que robo desde la posición en la que estoy.
+(defun chain-ate (milado tablero pos total cont)
+  (if (> cont 7)
+    total
+   (let ((mis-fichas (get-fichas tablero milado pos)) 
+         (sus-fichas (get-fichas tablero (mod (+ milado 1) 2) pos)))
+      (if (or (= mis-fichas 0) (>= sus-fichas 4))
+         (+ total sus-fichas)
+         (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
+
+;(setq mi-posicion (list '(1 1 1 1 1 1 1 1) (reverse '(1 2 0 3 1 1 4 1))))
+;(setq estado (crea-estado-inicial 0 mi-posicion))
+;(max-list-chained 1 estado)
 
 
 (defun minimax-1-SA(estado profundidad devolver-movimiento profundidad-max f-eval valores)
@@ -1000,26 +1028,6 @@ arguments."
    (t (mapcan #'flatten structure))))
 
 
-(defun max-list-chained (milado estado cont)
-  (if (> cont 7)
-    0
-    (let ((L2 (chain-ate milado (estado-tablero estado) cont 0))
-         (L1 (max-list-chained milado estado (+ cont 1))))
-        (if (and (consp L1) (consp L2))
-          (append L1 L2)
-          (if (consp L1)
-          (append L1 (list L2))
-          (list L1 L2)
-          )))))
-
-
-(defun chain-ate (milado tablero pos total)
-   (let ((mis-fichas (get-fichas tablero milado pos)) (sus-fichas (get-fichas tablero (mod (+ milado 1) 2) pos)))
-      (if (or (= mis-fichas 0) (>= sus-fichas 1))
-         (+ total mis-fichas)
-         (chain-ate milado tablero (mod (+ pos mis-fichas) 8) (+ total mis-fichas)))))
-
-
 ; Cada heurística cuanto más negativa sea es que más mejor es.
 (setf *heuristics* (list
   #'(lambda (estado)( - (suma-fila 
@@ -1066,7 +1074,10 @@ arguments."
           (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
         (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
           (list-lado estado (estado-lado-sgte-jugador estado))))))
-
+  ; Máximas fichas que puedo comer. Cuantas más podamos comer mejor y cuanto más negativa mejor.
+  #'(lambda (estado) (- 0 (max-list-chained 0 estado)))
+  ; Máximas fichas que me pueden comer.
+  #'(lambda (estado) (max-list-chained 1 estado))  
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1113,7 +1124,7 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
-(setf weights '(0.850826 -0.2578113 0.24683642 0.16001654 0.36500502 -0.15920186 0.4420216 -0.7057643 0.6616514))
+(setf weights '(0.850826 -0.2578113 0.24683642 0.16001654 0.36500502 -0.15920186 0.4420216 -0.7057643 0.6616514 0.8 0.6))
 
 (defun partida-SA-all-games (weights)
    (list
@@ -1127,8 +1138,10 @@ arguments."
      (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
 
-(setf *random* nil)
-;(partida-SA-all-games weights)
+(setf *random* T)
+(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
+
+(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1147,7 +1160,7 @@ arguments."
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto
 ;(setq *vermarcador* t)   ; valor por defecto
-;(partida 0 1 (list *jdr-aleatorio*   *jdr-mmx-Bueno*))
+;(partida 0 1 (list *jdr-humano*   *jdr-mmx-Regular*))
 
 ;;; Juego automatico con salida mimima por eficiencia, profundidad=2
 ;(setq *verjugada* nil)
@@ -1162,10 +1175,6 @@ arguments."
 ;;; Fuerza posicion para jugar a partir de ella (ejemplo pag.4 del enunciado)
 ;(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 
-;(setq mi-posicion (list '(1 0 1 3 2 4 0 3) (reverse '(4 0 3 5 2 1 0 1))))
-;(setq estado (crea-estado-inicial 0 mi-posicion))
-
-
 
 ;;; Juega a partir de posicion dada (ejemplo pag.4 del enunciado)
 ;(partida 0 2 (list *jdr-humano*      *jdr-human2*) mi-posicion)
@@ -1178,7 +1187,7 @@ arguments."
 ;;;(setq *debug-level* 2)
 ;;;(setq *verjugada*   nil)
 ;;;(setq *vermarcador* nil)
-;;;(dolist (n '(1 2 3 4 5)) (print (partida 2 n (list *jdr-mmx-regular* *jdr-mmx-bueno*))))
+;;;(dolist (n '(1 2 3 4 5))  (partida 2 n (list *jdr-mmx-regular* *jdr-mmx-bueno*)))
 
 ;;; Timeout jugada: a nivel 8 el aleatorio pierde por tiempo
 ;(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
