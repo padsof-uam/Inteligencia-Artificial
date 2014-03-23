@@ -51,7 +51,7 @@
 		reps)))
 
 (setf *evaluators* 
-	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA*) 2 3))
+	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA* *Simon*) 4 20))
 
 (length *evaluators*)
 
@@ -65,7 +65,7 @@
 		state))
 	*evaluators*)))
 
-(mancala-value (make-list 7 :initial-element 0.1))
+(mancala-value (make-list (length *heuristics*) :initial-element 0.1))
 
 
 ; Ejecutamos el algoritmo con un estado inicial y un valor mínimo que sea ganar todas las partidas que jugamos.

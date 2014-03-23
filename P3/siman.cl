@@ -4,18 +4,18 @@
 		(loop for i from n to m
 			collect i)))
 
-(range 1 3)
-(range 0 10)
-(range 10 10)
-(range 10 0)
+;(range 1 3)
+;(range 0 10)
+;(range 10 10)
+;(range 10 0)
 
 (defun range-step (n m step)
 	(let ((range-len (/ (- m n) step)))
 		(mapcar #'(lambda (x) (+ n (* step x))) (range 0 range-len))))
 
-(range-step 0 4 0.5)
-(range-step 0 10 2)
-(range-step 1 0 0.1)
+;(range-step 0 4 0.5)
+;(range-step 0 10 2)
+;(range-step 1 0 0.1)
 
 ; Variables para la función de generación
 (setf *w* 40)
@@ -28,7 +28,7 @@
 		(mapcar #'(lambda (x) (/ *w* (+ (expt (* x *r*) *p*) *d*))) (range-step 0 199 (/ 200 step-num)))
 		'(0)))
 
-(generate-temp-steps 500)
+; (generate-temp-steps 500)
 
 (defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold best)
 	(let ((best (if (<=  state-val (cadr best))
@@ -71,11 +71,11 @@
 			0)))
 
 
-(parab-gen-from '(3 1))
+; (parab-gen-from '(3 1))
 
 (defun parab-value (state)
 	(apply '+ (mapcar #'(lambda (x) (* x x)) state)))
 
-(parab-value '(3 1))
+; (parab-value '(3 1))
 
-(simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.001 10)
+; (simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.00001 1000)
