@@ -1215,12 +1215,11 @@ arguments."
       (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
             (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
           (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-            (list-lado estado (estado-lado-sgte-jugador estado))))))
-  ))
+            (list-lado estado (estado-lado-sgte-jugador estado))))))))
 
 (setf *Simon* (make-jugador
                         :nombre   '|Simon|
-                        :f-juego  #'f-j-mmx
+                        :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Simon))
 
 
@@ -1238,7 +1237,7 @@ arguments."
 
 ;(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
 ;(setf *random* nil)
-;(partida-SA-all-games weights)
+(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
