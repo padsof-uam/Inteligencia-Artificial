@@ -619,6 +619,47 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 
 ;;; ------------------------------------------------------------------------------------------
+;;; ALGORITMO Poda minimax-a-b
+;;; ------------------------------------------------------------------------------------------
+;;; Funcion que inicia la busqueda y devuelve el siguiente estado elegido por el jugador que
+;;; tiene el turno, segun algoritmo minimax mejorado con poda minimax-a-b
+;;; RECIBE:   estado,
+;;;           profundidad-max    : límite de profundidad
+;;;           f-eval             : función de evaluación
+;;; DEVUELVE: estado siguiente del juego
+;;; ------------------------------------------------------------------------------------------
+(defun minimax-a-b (estado profundidad-max f-eval)
+  (let* ((oldverb *verb*)  (*verb* nil)
+         (estado2 (minimax-auxab estado t profundidad-max -999999 999999 (estado-lado-sgte-jugador estado) f-eval))
+         (*verb* oldverb))
+    estado2))
+
+(defun minimax-auxab (estado ret-mov depth alpha betha maximazingTurn f-eval)
+  (cond 
+    ((= depth 0) 
+        (unless ret-mov (funcall f-eval estado)))
+    (t 
+      (let* ((sucesores (generar-sucesores estado)) (mejor-valor -999999) (mejor-sucesor nil))
+        (cond 
+          ((null sucesores) 
+            (unless ret-mov (funcall f-eval estado)))
+          ((= maximazingTurn 1)
+            (mapcar #'(lambda (child) 
+              (let ((alpha (max-list (list alpha (minimax-auxab child nil (- depth 1) alpha betha 0 f-eval))))))
+                (when (<  alpha  betha)
+                  (setq mejor-sucesor child)
+                  (setq mejor-valor alpha))) (generar-sucesores estado))
+            (if  ret-mov mejor-sucesor mejor-valor))
+          ((= maximazingTurn 0)
+            (mapcar #'(lambda (child)
+              (let ((betha (min-list (list betha (minimax-auxab child nil (- depth 1) alpha betha 1 f-eval))))))
+                (when (< alpha betha)
+                  (setq mejor-sucesor child)
+                  (setq mejor-valor betha))) (generar-sucesores estado))
+            (if  ret-mov mejor-sucesor mejor-valor)))))))
+
+
+;;; ------------------------------------------------------------------------------------------
 ;;; ALGORITMO MINIMAX
 ;;; ------------------------------------------------------------------------------------------
 ;;; Funcion que inicia la busqueda y devuelve el siguiente estado elegido por el jugador que
@@ -719,6 +760,12 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 ;;; FUNCIONES DE DEFINICION DE JUGADORES Y PARTIDAS DE PRUEBA
 ;;; ------------------------------------------------------------------------------------------
+
+(defun f-j-mmx-ab (estado profundidad-max f-eval)
+;;; (minimax-a-b estado profundidad-max f-eval))
+   (minimax-a-b estado profundidad-max f-eval))
+
+
 
 ;;; f-juego que utiliza busqueda minimax (con o sin poda)
 ;;; ------------------------------------------------------------------------------------------
@@ -837,7 +884,14 @@ arguments."
 
 ;;; Devuelve el máximo de una lista de nos. y su posición
 ;;; ------------------------------------------------------------------------------------------
-(defun max-list (l &key (test #'>))
+(defun max-list (l &key (test #'>=))
+  (let ((result -999999) (pos -1))
+    (dolist (i l (values result pos))
+      (when (funcall test i result)
+        (setq result i)
+        (incf pos)))))
+
+(defun min-list (l &key (test #'<=))
   (let ((result -999999) (pos -1))
     (dolist (i l (values result pos))
       (when (funcall test i result)
@@ -1038,9 +1092,9 @@ arguments."
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
   ; Máximas fichas que puedo comer. El algoritmo le pondrá el signo negativo apropiado.
-  #'(lambda (estado) (max-list-chained 0 estado))
+  ;#'(lambda (estado) (max-list-chained 0 estado))
   ; Máximas fichas que me pueden comer.
-  #'(lambda (estado) (max-list-chained 1 estado))  
+  ;#'(lambda (estado) (max-list-chained 1 estado))  
 
   ; El máximo que me puedo llevar.
   #'(lambda (estado) (max-list (list-lado estado 
@@ -1134,6 +1188,11 @@ arguments."
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Simon))
 
+(setf *Simon-ab* (make-jugador
+                        :nombre   '|Simon|
+                        :f-juego  #'f-j-mmx-ab
+                        :f-eval   #'f-eval-Simon))
+
 (defun f-eval-Simon (estado)
   (+ 
     (* 0.19824123 ( - (suma-fila 
@@ -1184,7 +1243,7 @@ arguments."
 
 ;(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
 (setf *random* nil)
-(partida-SA-all-games weights)
+;(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1195,7 +1254,8 @@ arguments."
 ;;; EJEMPLOS DE PARTIDAS DE PRUEBA
 ;;; ------------------------------------------------------------------------------------------
 ;;; Juego manual contra jugador automatico, saca el humano
-(partida 0 1 (list *Simon*      *jdr-mmx-Bueno* ))
+(partida 1 2 (list *jdr-humano* *Simon-ab* ))
+(partida 1 2 (list *Simon-ab*      *jdr-mmx-Bueno* ))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
 ;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))

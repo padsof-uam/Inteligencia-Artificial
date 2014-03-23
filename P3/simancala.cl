@@ -79,4 +79,4 @@
 			(- 0 (length *evaluators*)) 
 			steps))))
 
-(simancala 10000)
+(simancala 5000)
