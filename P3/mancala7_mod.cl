@@ -1183,7 +1183,7 @@ arguments."
 
 
 
-(defun f-eval-Simon (estado)
+(defun f-eval-Simon (estado wt)
   (+ 
     (* 0.19824123 ( - (suma-fila 
                         (estado-tablero estado) 
@@ -1233,8 +1233,7 @@ arguments."
      (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
      (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
      (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-))
+     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
 
 ;(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
