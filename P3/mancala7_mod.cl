@@ -1127,6 +1127,49 @@ arguments."
 
 (setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
 
+
+
+(setf *Simon* (make-jugador
+                        :nombre   '|Simon|
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'f-eval-Simon))
+
+(defun f-eval-Simon (estado)
+  (+ 
+    (* 0.19824123 ( - (suma-fila 
+                        (estado-tablero estado) 
+                        (estado-lado-sgte-jugador estado)) 
+                      (suma-fila 
+                        (estado-tablero estado) 
+                        (lado-contrario (estado-lado-sgte-jugador estado)))))
+    (*  -0.74062204 (max-list-chained 0 estado))
+    (*  0.4447801 (max-list-chained 1 estado))  
+    (* 0.16666222 (max-list (list-lado estado 
+         (lado-contrario (estado-lado-sgte-jugador estado)))))
+    (* 0.925256 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+    (* -0.89839506 (length (remove-if-not #'(lambda (x) (= x 0)) 
+          (list-lado estado (estado-lado-sgte-jugador estado)))))
+    (* -0.6152954 (length (remove-if-not #'(lambda (x) (= x 0)) 
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+    (* -0.030327797
+      ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
+                (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+          (length (remove-if-not #'(lambda (x) (not (= x 1))) 
+                (list-lado estado (estado-lado-sgte-jugador estado))))))
+    (* 0.5465987 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+          (list-lado estado (estado-lado-sgte-jugador estado)))))
+    (* 0.15208268  (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+    (* -0.040797234 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+          (list-lado estado (estado-lado-sgte-jugador estado)))))
+    (* 0.6847365
+      (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+          (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+            (list-lado estado (estado-lado-sgte-jugador estado))))))
+  ))
+
+
 (defun partida-SA-all-games (weights)
    (list
      (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
@@ -1139,8 +1182,8 @@ arguments."
      (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
 
-(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
-
+;(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
+(setf *random* nil)
 (partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1152,7 +1195,7 @@ arguments."
 ;;; EJEMPLOS DE PARTIDAS DE PRUEBA
 ;;; ------------------------------------------------------------------------------------------
 ;;; Juego manual contra jugador automatico, saca el humano
-;(partida 0 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
+(partida 0 1 (list *Simon*      *jdr-mmx-Bueno* ))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
 ;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
