@@ -1182,7 +1182,6 @@ arguments."
 (setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
 
 
-
 (setf *Simon* (make-jugador
                         :nombre   '|Simon|
                         :f-juego  #'f-j-mmx
@@ -1228,6 +1227,10 @@ arguments."
             (list-lado estado (estado-lado-sgte-jugador estado))))))
   ))
 
+(setf *Simon* (make-jugador
+                        :nombre   '|Simon|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Simon))
 
 (defun partida-SA-all-games (weights)
    (list
@@ -1257,6 +1260,7 @@ arguments."
 ;;; Juego manual contra jugador automatico, saca el humano
 ;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
 ;(partida 1 2 (list *Simon-ab*      *jdr-mmx-Bueno* ))
+;(partida 0 1 (list *Simon*      *jdr-mmx-Bueno* ))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
 ;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
