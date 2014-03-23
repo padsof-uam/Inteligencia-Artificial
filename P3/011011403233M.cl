@@ -1,38 +1,5 @@
-(defun minimax-1 (estado profundidad devolver-movimiento profundidad-max f-eval)
-  (cond ((>= profundidad profundidad-max)
-         (unless devolver-movimiento  (funcall f-eval estado)))
-        (t
-         (let* ((sucesores (generar-sucesores estado))
-               (mejor-valor -99999)
-                (mejor-sucesor nil))
-           (cond ((null sucesores)
-                  (unless devolver-movimiento  (funcall f-eval estado)))
-                 (t
-                  (loop for sucesor in sucesores do
-                    (let* ((resultado-sucesor (minimax-1 sucesor (1+ profundidad)
-                                        nil profundidad-max f-eval))
-                           (valor-nuevo (- resultado-sucesor)))
-                      ;(format t "~% Mmx-1 Prof:~A valor-nuevo ~4A de sucesor  ~A" profundidad valor-nuevo (estado-tablero sucesor))
-                      (when (> valor-nuevo mejor-valor)
-                        (setq mejor-valor valor-nuevo)
-                        (setq mejor-sucesor  sucesor ))))
-                  (if  devolver-movimiento mejor-sucesor mejor-valor)))))))
-
-(defun minimax (estado profundidad-max f-eval)
-  (let* ((oldverb *verb*)  (*verb* nil)
-         (estado2 (minimax-1 estado 0 t profundidad-max f-eval))
-         (*verb* oldverb))
-    estado2))
-
-
-(defun f-j-mmx (estado profundidad-max f-eval)
-   (minimax estado profundidad-max f-eval))
-
-
-(setf *Simon* (make-jugador
-                        :nombre   '|Simon|
-                        :f-juego  #'f-j-mmx
-                        :f-eval   #'mi-f-ev))
+; 3MV1SL28IC
+; Simon
 
 (defun mi-f-ev (estado)
   (+ 
