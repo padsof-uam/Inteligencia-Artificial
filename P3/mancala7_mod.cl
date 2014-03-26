@@ -77,7 +77,7 @@
 (defvar *tournament*       nil ) ; T=juego llamado desde torneo, nil=juego individual
 (defvar *marcador*  (make-array '(2 2) :initial-element 0))
 (defvar *tablero-aux*      nil ) ; Tablero auxiliar para uso discrecional del alumno (solo mediante funciones especificas)
-(defvar *random*           T)
+(defvar *random*           nil)
 (defvar *jugfactor*        1)
 
 (setf *tournament* T)
@@ -1127,11 +1127,11 @@ arguments."
   #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
 
   ; Cuántos hoyos tiene el otro con alguna semilla.
-  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-        (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
-  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-        (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+  ;       (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ; ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
+  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+  ;       (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
   
   ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
   #'(lambda (estado) 
@@ -1141,18 +1141,18 @@ arguments."
               (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-  #'(lambda (estado) (- (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-                            (list-lado estado (estado-lado-sgte-jugador estado))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+                            (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; En cuántos hoyos no puedo robar semillas. Información sin más.
-                        (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos sí puedo robar semillas.
-  #'(lambda (estado)
-    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
-          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-          (list-lado estado (estado-lado-sgte-jugador estado))))))
+  ; #'(lambda (estado)
+  ;   (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+  ;         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ;       (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+  ;         (list-lado estado (estado-lado-sgte-jugador estado))))))
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1189,6 +1189,17 @@ arguments."
     (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado)))))
 
 
+(setf *jdr-mmx-Bueno-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Bueno|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Bueno-SA))
+
+(setf *jdr-mmx-Regular-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Regular-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Regular-SA))
+
+(setf weights '(0.5718088 0.087263346 -0.9487088 -0.19075418 0.16493344 0.025273085 0.2732327 -0.0068848133))
 
 (defun f-eval-Simon (estado)
   (+ 

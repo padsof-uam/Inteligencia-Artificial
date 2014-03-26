@@ -51,7 +51,7 @@
 		reps)))
 
 (setf *evaluators* 
-	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA*) 4 10))
+	(generate-evaluators (list *jdr-mmx-Bueno-SA*) 2 1))
 
 ; (length *evaluators*)
 
@@ -78,6 +78,13 @@
 			'mancala-value 
 			'siman-prob 
 			(- 0 (length *evaluators*)) 
-			steps))))
+			steps
+			0.2
+			20))))
 
-(simancala 5000)
+(setf result (simancala 200))
+(setf wths (first result))
+(print wths)
+(print "results: ")
+(print (partida-SA-all-games wths))
+(print 'end)

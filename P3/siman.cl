@@ -30,21 +30,31 @@
 
 ; (generate-temp-steps 500)
 
-(defun simulated-annealing-aux (remaining-temp state state-val f-state-generate-from f-state-value f-prob-for-change value-threshold best)
+(defstruct sa-data
+	f-state-generate-from
+	f-state-value 
+	f-prob-for-change 
+	value-threshold
+	change-threshold)
+
+(defun simulated-annealing-aux (data remaining-temp state state-val best change-history )
+	(print state-val)
 	(let ((best (if (<=  state-val (cadr best))
 					(list state state-val)
 					best)))
-		(if (or (null remaining-temp) (<= state-val value-threshold))
+		(if (or (null remaining-temp) 
+				(<= state-val (sa-data-value-threshold data)) 
+				(<= (apply '+ change-history) (sa-data-change-threshold data)))
 			best
-			(let ((next (funcall f-state-generate-from state)))
-				(let ((next-val (funcall f-state-value next)))
+			(let ((next (funcall (sa-data-f-state-generate-from data) state)))
+				(let ((next-val (funcall (sa-data-f-state-value data) next)))
 					(if (> 
-							(funcall f-prob-for-change state-val next-val (first remaining-temp))
+							(funcall (sa-data-f-prob-for-change data) state-val next-val (first remaining-temp))
 							(random 1.0))
-						(simulated-annealing-aux (rest remaining-temp)  next  next-val
-							f-state-generate-from f-state-value f-prob-for-change value-threshold best)
-						(simulated-annealing-aux (rest remaining-temp)  state  state-val
-							f-state-generate-from f-state-value f-prob-for-change value-threshold best)))))))
+						(simulated-annealing-aux data (rest remaining-temp) next next-val best 
+							(append (rest change-history) (list (abs (- next-val state-val)))))
+						(simulated-annealing-aux data (rest remaining-temp) state state-val best 
+							(append (rest change-history) (list 0)))))))))
 
 ;; Magnífica función de simulated annealing.
 ;; Recibe
@@ -52,13 +62,22 @@
 ;; 	f-mierdas: funciones de generación de estados, cálculo del valor de un estado y la de probabilidad de salto.
 ;;	value-threshold: Si llegamos a este valor o inferior, paramos.
 ;;  steps: Cuantos "pasos" de temperatura hacemos. Lo pongo entre comillas porque si le pones p.ej. 100 hace bastantes más. 
-(defun simulated-annealing (initial-state f-state-generate-from f-state-value f-prob-for-change value-threshold steps)
-	(simulated-annealing-aux 
-		(generate-temp-steps steps)
-		initial-state
-		(funcall f-state-value initial-state)
-		f-state-generate-from f-state-value f-prob-for-change value-threshold
-		(list initial-state '100)))
+(defun simulated-annealing (initial-state f-state-generate-from f-state-value 
+	f-prob-for-change value-threshold steps change-threshold history-items)
+	(let ((data (make-sa-data
+					:f-state-generate-from 	f-state-generate-from
+					:f-state-value  		f-state-value 
+					:f-prob-for-change  	f-prob-for-change 
+					:value-threshold 		value-threshold
+					:change-threshold 		change-threshold
+					)))
+		(simulated-annealing-aux 
+			data
+			(generate-temp-steps steps)
+			initial-state
+			(funcall f-state-value initial-state)
+			(list initial-state '100)
+			(make-list history-items :initial-element 99))))
 
 (defun parab-gen-from (state)
 	(mapcar #'(lambda (x) (- (+ x (random 2.0)) (random 2.0))) state))
@@ -78,4 +97,12 @@
 
 ; (parab-value '(3 1))
 
-; (simulated-annealing '(3 5) 'parab-gen-from 'parab-value 'siman-prob 0.00001 1000)
+; (simulated-annealing 
+; 	'(3 5) 
+; 	'parab-gen-from 
+; 	'parab-value 
+; 	'siman-prob 
+; 	0.00001
+; 	2000 
+; 	20
+; 	10)
