@@ -77,7 +77,7 @@
 (defvar *tournament*       nil ) ; T=juego llamado desde torneo, nil=juego individual
 (defvar *marcador*  (make-array '(2 2) :initial-element 0))
 (defvar *tablero-aux*      nil ) ; Tablero auxiliar para uso discrecional del alumno (solo mediante funciones especificas)
-(defvar *random*           T)
+(defvar *random*           nil)
 (defvar *jugfactor*        1)
 
 (setf *tournament* T)
@@ -1175,8 +1175,7 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
-(setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
-
+(setf weights '(0.5718088 0.087263346 -0.9487088 -0.19075418 0.16493344 0.025273085 0.2732327 -0.0068848133))
 
 
 (defun f-eval-Simon (estado wt)
