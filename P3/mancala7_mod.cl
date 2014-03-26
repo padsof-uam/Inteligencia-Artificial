@@ -1277,6 +1277,18 @@ arguments."
    (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
+(defun partida-SA-all-games-player (player weights)
+  (list
+   (SA-partida 0 1 (list player *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 1 1 (list player *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 0 2 (list player *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 1 2 (list player *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 0 1 (list player *jdr-mmx-bueno-SA*) weights)
+   (SA-partida 1 1 (list player *jdr-mmx-bueno-SA*) weights)
+   (SA-partida 0 2 (list player *jdr-mmx-bueno-SA*) weights)
+   (SA-partida 1 2 (list player *jdr-mmx-bueno-SA*) weights)))
+  )
+
 ; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 ; (setq estado (crea-estado-inicial 0 mi-posicion))
 ; (dotimes (i 20)
@@ -1301,22 +1313,22 @@ arguments."
 ;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
 (setf *random* nil)
 
-(list   
-  (list   
-    (partida 0 1 (list *Simon-ab* *jdr-mmx-Regular*))   
-    (partida 0 1 (list *jdr-mmx-Untitled* *jdr-mmx-Regular*)))  
-  (list   
-    (partida 1 1 (list *Simon-ab* *jdr-mmx-Regular*) )   
-    (partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-Regular*)))  
-  (list   
-    (partida 0 1 (list *Simon-ab* *jdr-mmx-bueno*))   
-    (partida 0 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*)))  
-  (list   
-    (partida 1 1 (list *Simon-ab* *jdr-mmx-bueno*))   
-    (partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*))))
+;(list   
+  ;(list   
+    ;(partida 0 1 (list *Simon-ab* *jdr-mmx-Regular*))   
+    ;(partida 0 1 (list *jdr-mmx-Untitled* *jdr-mmx-Regular*)))  
+  ;(list   
+    ;(partida 1 1 (list *Simon-ab* *jdr-mmx-Regular*) )   
+    ;(partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-Regular*)))  
+  ;(list   
+    ;(partida 0 1 (list *Simon-ab* *jdr-mmx-bueno*))   
+    ;(partida 0 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*)))  
+  ;(list   
+    ;(partida 1 1 (list *Simon-ab* *jdr-mmx-bueno*))   
+    ;(partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*))))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
-;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
+; (partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
 
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto

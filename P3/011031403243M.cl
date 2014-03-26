@@ -43,3 +43,14 @@
           (append L1 (list L2))
           (list L1 L2)
           )))))
+
+
+(defun chain-ate (milado tablero pos total cont)
+  (if (> cont 7)
+    total
+   (let ((mis-fichas (get-fichas tablero milado pos)) 
+         (sus-fichas (get-fichas tablero (mod (+ milado 1) 2) pos)))
+      (if (or (= mis-fichas 0) (>= sus-fichas 4))
+         (+ total sus-fichas)
+         (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
+
