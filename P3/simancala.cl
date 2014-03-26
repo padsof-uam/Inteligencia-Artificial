@@ -87,4 +87,4 @@
 (print wths)
 (print "results: ")
 (print (partida-SA-all-games wths))
-(print 'end)
+;(print 'end)

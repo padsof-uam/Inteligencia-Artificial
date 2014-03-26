@@ -956,7 +956,7 @@ arguments."
 
 (setf *jdr-Avara* (make-jugador
                         :nombre   '|Ju-Mmx-Avara|
-                        :f-juego  #'f-j-mmx
+                        :f-juego  #'f-j-mmx-ab
                         :f-eval   #'f-eval-Avara))
 
 ;(partida 0 2 (list *jdr-Avara* *jdr-mmx-Regular*))
@@ -1001,7 +1001,7 @@ arguments."
 
 ;(setq mi-posicion (list '(1 1 1 1 1 1 1 1) (reverse '(1 2 0 3 1 1 4 1))))
 ;(setq estado (crea-estado-inicial 0 mi-posicion))
-;(max-list-chained 1 estado)
+;(max-list-chained 1 esAvaratado)
 
 
 (defun minimax-1-SA(estado profundidad devolver-movimiento profundidad-max f-eval valores)
@@ -1116,22 +1116,21 @@ arguments."
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
   ; Máximas fichas que puedo comer. El algoritmo le pondrá el signo negativo apropiado.
-  ;#'(lambda (estado) (max-list-chained 0 estado))
+  #'(lambda (estado) (max-list-chained 0 estado))
   ; Máximas fichas que me pueden comer.
   #'(lambda (estado) (max-list-chained 1 estado))  
 
   ; El máximo que me puedo llevar.
-  #'(lambda (estado) (max-list (list-lado estado 
-       (lado-contrario (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
   ; El máximo que se puede llevar el otro
   #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
 
   ; Cuántos hoyos tiene el otro con alguna semilla.
-  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-  ;       (list-lado estado (estado-lado-sgte-jugador estado)))))
+   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+         (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
-  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-  ;       (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
   
   ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
   #'(lambda (estado) 
@@ -1141,18 +1140,18 @@ arguments."
               (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-                            (list-lado estado (estado-lado-sgte-jugador estado)))))
+   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+                             (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; En cuántos hoyos no puedo robar semillas. Información sin más.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+                             (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos sí puedo robar semillas.
-  ; #'(lambda (estado)
-  ;   (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
-  ;         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ;       (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-  ;         (list-lado estado (estado-lado-sgte-jugador estado))))))
+  #'(lambda (estado)
+    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+          (list-lado estado (estado-lado-sgte-jugador estado))))))
   ))
 
 (defun f-eval-Avara-SA (estado valores)
@@ -1199,7 +1198,7 @@ arguments."
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
-(setf weights '(0.5718088 0.087263346 -0.9487088 -0.19075418 0.16493344 0.025273085 0.2732327 -0.0068848133))
+(setf weights '(0.27685022 0.35966134 0.118098974 -0.99456143 -0.80726767 0.26139617 0.85861015 -0.798074 0.23994088 0.4549408))
 
 (defun f-eval-Simon (estado)
   (+ 
@@ -1236,7 +1235,6 @@ arguments."
             (list-lado estado (estado-lado-sgte-jugador estado))))))))
 
 (setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
-
 ;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
 (setf *jdr-mmx-Bueno-SA* (make-jugador
                         :nombre   '|Ju-Mmx-Bueno|
@@ -1267,16 +1265,17 @@ arguments."
 
 (setq *timeout* 0)
 (setf *random* nil)
-; (defun partida-SA-all-games (weights)
-;    (list
-     ;(SA-partida 0 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
-     ;(SA-partida 1 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
-     ;(SA-partida 0 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
-     ;(SA-partida 1 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
-     ;(SA-partida 0 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)
-     ;(SA-partida 1 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)
-     ;(SA-partida 0 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)
-     ;(SA-partida 1 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)))
+
+(defun partida-SA-all-games (weights)
+  (list
+   (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+   (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+   (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
+   (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
 
 ; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 ; (setq estado (crea-estado-inicial 0 mi-posicion))
