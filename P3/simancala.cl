@@ -51,19 +51,20 @@
 		reps)))
 
 (setf *evaluators* 
-	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA* *Simon*) 2 3))
+	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA*) 4 10))
 
-;(length *evaluators*)
+; (length *evaluators*)
 
 ; Dar valor a un estado: ejecutamos la partida con cada uno de los jugadores,
 ;	que reciben el estado como vector de pesos.
 (defun mancala-value (state)
-	(apply '+ (mapcar #'(lambda (x) (SA-partida 
-		(mc-evaluator-starter x)
-		(mc-evaluator-depth x)
-		(list *jdr-Avara-SA* (mc-evaluator-enemy x))
-		state))
-	*evaluators*)))
+	(/ (apply '+ (mapcar #'(lambda (x) (SA-partida 
+			(mc-evaluator-starter x)
+			(mc-evaluator-depth x)
+			(list *jdr-Avara-SA* (mc-evaluator-enemy x))
+			state))
+		*evaluators*))
+	(length *evaluators*)))
 
 ;(mancala-value (make-list (length *heuristics*) :initial-element 0.1))
 
