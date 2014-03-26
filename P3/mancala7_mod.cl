@@ -630,35 +630,59 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 (defun minimax-a-b (estado profundidad-max f-eval)
   (let* ((oldverb *verb*)  (*verb* nil)
-         (estado2 (minimax-auxab estado t profundidad-max -999999 999999 (estado-lado-sgte-jugador estado) f-eval))
+         (estado2 (minimax-auxab estado t profundidad-max profundidad-max 1 -999999 999999 f-eval))
          (*verb* oldverb))
     estado2))
 
-(defun minimax-auxab (estado ret-mov depth alpha betha maximazingTurn f-eval)
+(defun minimax-auxab (estado ret-mov depth-max depth maximizing alpha beta f-eval)
   (cond 
     ((= depth 0) 
-        (unless ret-mov (funcall f-eval estado)))
+        (if ( = (mod depth-max 2) 0)
+          (unless ret-mov  (funcall f-eval estado))
+          (unless ret-mov  (- (funcall f-eval estado)))))
     (t 
-      (let* ((sucesores (generar-sucesores estado)) (mejor-valor -999999) (mejor-sucesor nil))
+      (let* (
+          (sucesores (generar-sucesores estado))
+          (mejor-sucesor nil))
         (cond 
           ((null sucesores) 
-            (unless ret-mov (funcall f-eval estado)))
-          ((= maximazingTurn 1)
-            (mapcar #'(lambda (child) 
-              (let ((alpha (max-list (list alpha (minimax-auxab child nil (- depth 1) alpha betha 0 f-eval))))))
-                (when (<  alpha  betha)
-                  (setq mejor-sucesor child)
-                  (setq mejor-valor alpha))) (generar-sucesores estado))
-            (if  ret-mov mejor-sucesor mejor-valor))
-          ((= maximazingTurn 0)
-            (mapcar #'(lambda (child)
-              (let ((betha (min-list (list betha (minimax-auxab child nil (- depth 1) alpha betha 1 f-eval))))))
-                (when (< alpha betha)
-                  (setq mejor-sucesor child)
-                  (setq mejor-valor betha))) (generar-sucesores estado))
-            (if  ret-mov mejor-sucesor mejor-valor)))))))
+            (if ( = (mod depth-max 2) 0)
+              (unless ret-mov  (funcall f-eval estado))
+              (unless ret-mov  (- (funcall f-eval estado)))))
+          ((= maximizing 1)
+              (loop for sucesor in sucesores do
+                (let* (
+                  (result (minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
+                  (cond 
+                    ((> result alpha)
+                      (setq alpha result)
+                      (setq mejor-sucesor sucesor))
+                    ((>=  alpha  beta)
+                      (if  ret-mov mejor-sucesor alpha)))))
+              (if  ret-mov mejor-sucesor alpha))
+          ((= maximizing 0)
+            (loop for sucesor in sucesores do
+                (let* (
+                  (result (minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
+                  (cond 
+                    ((< result beta)
+                      (setq beta result)
+                      (setq mejor-sucesor sucesor))
+                  ((>=  alpha  beta)                    
+                    (if  ret-mov mejor-sucesor beta)))))
+              (if  ret-mov mejor-sucesor beta)))))))
 
 
+;;;  Intento de poda 
+;;; (mapcar #'(lambda (child) 
+;;;           (let* (
+;;;                   (val (- (minimax-auxab child nil (- depth 1) (- (print betha)) (- (print alpha)) f-eval (- color))))
+;;;                   (mejor-valor (max-list (list val mejor-valor)))
+;;;                   (alpha (max-list (list alpha val))))
+;;;             (when (and (> alpha betha) (eql break nil))
+;;;               (setq (print mejor-valor) (print alpha))
+;;;               (setq (print mejor-sucesor) (print child))
+;;;               (setq break t)))) sucesores)
 ;;; ------------------------------------------------------------------------------------------
 ;;; ALGORITMO MINIMAX
 ;;; ------------------------------------------------------------------------------------------
@@ -1094,7 +1118,7 @@ arguments."
   ; Máximas fichas que puedo comer. El algoritmo le pondrá el signo negativo apropiado.
   ;#'(lambda (estado) (max-list-chained 0 estado))
   ; Máximas fichas que me pueden comer.
-  ;#'(lambda (estado) (max-list-chained 1 estado))  
+  #'(lambda (estado) (max-list-chained 1 estado))  
 
   ; El máximo que me puedo llevar.
   #'(lambda (estado) (max-list (list-lado estado 
@@ -1169,21 +1193,8 @@ arguments."
     (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado)))))
 
 
-(setf *jdr-mmx-Bueno-SA* (make-jugador
-                        :nombre   '|Ju-Mmx-Bueno|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-Bueno-SA))
 
-(setf *jdr-mmx-Regular-SA* (make-jugador
-                        :nombre   '|Ju-Mmx-Regular-SA|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-Regular-SA))
-
-(setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
-
-
-
-(defun f-eval-Simon (estado wt)
+(defun f-eval-Simon (estado)
   (+ 
     (* 0.19824123 ( - (suma-fila 
                         (estado-tablero estado) 
@@ -1217,27 +1228,60 @@ arguments."
           (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
             (list-lado estado (estado-lado-sgte-jugador estado))))))))
 
+(setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
+
+;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
+(setf *jdr-mmx-Bueno-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Bueno|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Bueno-SA))
+
+(setf *jdr-mmx-Regular-SA* (make-jugador
+                        :nombre   '|Ju-Mmx-Regular-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-Regular-SA))
+
+
+(setf *jdr-mmx-Untitled* (make-jugador
+                        :nombre   '|Ju-Mmx-Untitled-SA|
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'f-eval-Simon))
+
 (setf *Simon* (make-jugador
                         :nombre   '|Simon|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Simon))
 
+(setf *Simon-ab* (make-jugador
+                        :nombre   '|Simon|
+                        :f-juego  #'f-j-mmx-ab
+                        :f-eval   #'f-eval-Simon))
 
-(defun partida-SA-all-games (weights)
-   (list
-     (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
+
+(setq *timeout* 0)
+(setf *random* nil)
+; (defun partida-SA-all-games (weights)
+;    (list
+     ;(SA-partida 0 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
+     ;(SA-partida 1 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
+     ;(SA-partida 0 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
+     ;(SA-partida 1 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-Regular-SA*) weights)
+     ;(SA-partida 0 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)
+     ;(SA-partida 1 1 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)
+     ;(SA-partida 0 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)
+     ;(SA-partida 1 2 (list *jdr-mmx-Untitled-SA* *jdr-mmx-bueno-SA*) weights)))
+
+; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
+; (setq estado (crea-estado-inicial 0 mi-posicion))
+; (dotimes (i 20)
+;   (setq *timeout* (* 0.5 (+ 10 i)))
+;   (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
+;   (partida 1 4 (list *jdr-humano* *jdr-mmx-Bueno*)))
 
 
 ;(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
 ;(setf *random* nil)
-(partida-SA-all-games weights)
+;(partida-SA-all-games weights)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1249,11 +1293,28 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 ;;; Juego manual contra jugador automatico, saca el humano
 ;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
-;(partida 1 2 (list *Simon-ab*      *jdr-mmx-Bueno* ))
-;(partida 0 1 (list *Simon*      *jdr-mmx-Bueno* ))
+(setf *random* nil)
+
+(partida 0 1 (list *Simon-ab*      *jdr-mmx-Regular* ))
+(partida 0 1 (list *jdr-mmx-Untitled*      *jdr-mmx-Regular* ))
+
+(list   
+  (list   
+    (partida 0 1 (list *Simon-ab* *jdr-mmx-Regular*))   
+    (partida 0 1 (list *jdr-mmx-Untitled* *jdr-mmx-Regular*)))  
+  (list   
+    (partida 1 1 (list *Simon-ab* *jdr-mmx-Regular*) )   
+    (partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-Regular*)))  
+  (list   
+    (partida 0 1 (list *Simon-ab* *jdr-mmx-bueno*))   
+    (partida 0 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*)))  
+  (list   
+    (partida 1 1 (list *Simon-ab* *jdr-mmx-bueno*))   
+    (partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*))))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
-;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
+;(partida 1 2 
+  (list *jdr-humano*      *jdr-mmx-Bueno* ))
 
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto
