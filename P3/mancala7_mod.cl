@@ -1291,9 +1291,6 @@ arguments."
 ;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
 (setf *random* nil)
 
-(partida 0 1 (list *Simon-ab*      *jdr-mmx-Regular* ))
-(partida 0 1 (list *jdr-mmx-Untitled*      *jdr-mmx-Regular* ))
-
 (list   
   (list   
     (partida 0 1 (list *Simon-ab* *jdr-mmx-Regular*))   
@@ -1309,8 +1306,7 @@ arguments."
     (partida 1 1 (list *jdr-mmx-Untitled* *jdr-mmx-bueno*))))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
-;(partida 1 2 
-  (list *jdr-humano*      *jdr-mmx-Bueno* ))
+;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
 
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto
