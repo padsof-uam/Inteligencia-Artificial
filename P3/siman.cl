@@ -38,7 +38,7 @@
 	change-threshold)
 
 (defun simulated-annealing-aux (data remaining-temp state state-val best change-history )
-	(print (list state state-val))
+	(print state-val)
 	(let ((best (if (<=  state-val (cadr best))
 					(list state state-val)
 					best)))
@@ -97,12 +97,12 @@
 
 ; (parab-value '(3 1))
 
-(simulated-annealing 
-	'(3 5) 
-	'parab-gen-from 
-	'parab-value 
-	'siman-prob 
-	0.00001
-	2000 
-	20
-	10)
+; (simulated-annealing 
+; 	'(3 5) 
+; 	'parab-gen-from 
+; 	'parab-value 
+; 	'siman-prob 
+; 	0.00001
+; 	2000 
+; 	20
+; 	10)

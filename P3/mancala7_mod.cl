@@ -1103,11 +1103,11 @@ arguments."
   #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
 
   ; Cuántos hoyos tiene el otro con alguna semilla.
-  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-        (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
-  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-        (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+  ;       (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ; ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
+  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+  ;       (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
   
   ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
   #'(lambda (estado) 
@@ -1117,18 +1117,18 @@ arguments."
               (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-  #'(lambda (estado) (- (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-                            (list-lado estado (estado-lado-sgte-jugador estado))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+                            (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; En cuántos hoyos no puedo robar semillas. Información sin más.
-                        (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos sí puedo robar semillas.
-  #'(lambda (estado)
-    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
-          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-          (list-lado estado (estado-lado-sgte-jugador estado))))))
+  ; #'(lambda (estado)
+  ;   (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+  ;         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  ;       (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+  ;         (list-lado estado (estado-lado-sgte-jugador estado))))))
   ))
 
 (defun f-eval-Avara-SA (estado valores)
