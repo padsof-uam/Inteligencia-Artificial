@@ -1,5 +1,5 @@
 ; 3MV1SL28IC
-; Simon
+; SimonDice
 
 (defun mi-f-ev (estado)
   (+ 
