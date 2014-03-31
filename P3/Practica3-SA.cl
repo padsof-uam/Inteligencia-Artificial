@@ -140,10 +140,10 @@
                            (estado-tablero estado) 
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
-  ; Máximas semillas que puedo robar. El algoritmo le pondrá el signo negativo apropiado.
-  #'(lambda (estado) (max-list-chained 0 estado))
-  ; Máximas semillas que me pueden robar.
-  #'(lambda (estado) (max-list-chained 1 estado))  
+  ; Máximas semillas que me pueden robar. Si vamos ganando, buscamos que no nos roben muchas y si vamos perdiendo buscamos robar muchas.
+  #'(lambda (estado) (if (> (get-pts 1) (get-pts 0))
+           (max-list-chained 0 estado)
+           (max-list-chained 1 estado)))  
 
   ; El máximo que me puedo llevar.
   #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
