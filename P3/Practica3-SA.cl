@@ -237,6 +237,50 @@
     (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado)))))
 
 
+(defun mi-f-eval (estado whgs )
+  (+ 
+    ( * 0.7534673 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+    ( * 0.67191815  (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+    ( * 0.86767983  (- (suma-fila 
+               (estado-tablero estado) 
+               (estado-lado-sgte-jugador estado)) 
+            (suma-fila 
+               (estado-tablero estado) 
+               (lado-contrario (estado-lado-sgte-jugador estado)))))
+  
+    ( * 0.0853672  (if (> (get-pts 1) (get-pts 0))
+           (max-list-chained 0 estado)
+           (max-list-chained 1 estado)))  
+
+    ( * -0.20095587  (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+    ( * -0.7599144  (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+
+    ( * 0.2564392  (length (remove-if-not #'(lambda (x) (= x 0)) 
+      (list-lado estado (estado-lado-sgte-jugador estado)))))
+    ( *  -0.93289447  (length (remove-if-not #'(lambda (x) (= x 0)) 
+      (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+    ( * 0.45880747  
+      ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
+                (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+          (length (remove-if-not #'(lambda (x) (not (= x 1))) 
+                (list-lado estado (estado-lado-sgte-jugador estado))))))
+    ( * 0.9019537 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+                              (list-lado estado (estado-lado-sgte-jugador estado)))))
+    ( * -0.44900846 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+                              (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+
+    ( * -0.81448364 (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+          (list-lado estado (estado-lado-sgte-jugador estado))))))
+
+  ))
+
+(setf *Top60* (make-jugador
+                        :nombre   '|Top60|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'mi-f-eval))
+
 ;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
 
 (setq *timeout* 0)
@@ -260,6 +304,10 @@
    (SA-partida 1 1 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)
    (SA-partida 0 2 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)
    (SA-partida 1 2 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 0 1 (list *jdr-pruebas* *Top60*) weights)
+   (SA-partida 1 1 (list *jdr-pruebas* *Top60*) weights)
+   (SA-partida 0 2 (list *jdr-pruebas* *Top60*) weights)
+   (SA-partida 1 2 (list *jdr-pruebas* *Top60*) weights)
    (SA-partida 0 1 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 1 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 0 2 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
@@ -271,6 +319,10 @@
    (SA-partida 1 1 (list player *jdr-mmx-Regular-SA*) weights)
    (SA-partida 0 2 (list player *jdr-mmx-Regular-SA*) weights)
    (SA-partida 1 2 (list player *jdr-mmx-Regular-SA*) weights)
+   (SA-partida 0 1 (list player *Top60*) weights)
+   (SA-partida 1 1 (list player *Top60*) weights)
+   (SA-partida 0 2 (list player *Top60*) weights)
+   (SA-partida 1 2 (list player *Top60*) weights)
    (SA-partida 0 1 (list player *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 1 (list player *jdr-mmx-bueno-SA*) weights)
    (SA-partida 0 2 (list player *jdr-mmx-bueno-SA*) weights)

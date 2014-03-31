@@ -939,6 +939,7 @@ arguments."
                         :f-eval   #'f-eval-Regular))
 
 
+
 ; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 ; (setq estado (crea-estado-inicial 0 mi-posicion))
 ; (dotimes (i 20)

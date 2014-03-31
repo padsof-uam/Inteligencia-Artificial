@@ -3,8 +3,8 @@
 
 (defun mi-f-ev (estado)
   (+ 
-    ( * 0.7534673 max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-    ( * 0.67191815  max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+    ( * 0.7534673 max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))
+    ( * 0.67191815  max-list (list-lado estado (estado-lado-sgte-jugador estado)))
     ( * 0.86767983  (- (suma-fila 
                (estado-tablero estado) 
                (estado-lado-sgte-jugador estado)) 
@@ -37,7 +37,6 @@
           (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
         (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
           (list-lado estado (estado-lado-sgte-jugador estado))))))
-  ))
 
   ))
 

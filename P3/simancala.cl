@@ -52,7 +52,7 @@
 		reps)))
 
 (setf *evaluators* 
-	(generate-evaluators (list *jdr-mmx-Bueno-SA*) 2 1))
+	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA* *Top60*) 3 1))
 
 ; (length *evaluators*)
 
@@ -83,7 +83,7 @@
 			0.2
 			20))))
 
-(setf result (simancala 600))
+(setf result (simancala 500))
 (setf wths (first result))
 (print wths)
 (print "results: ")
