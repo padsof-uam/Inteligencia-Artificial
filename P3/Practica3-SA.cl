@@ -141,7 +141,7 @@
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
   ; Máximas semillas que me pueden robar. Si vamos ganando, buscamos que no nos roben muchas y si vamos perdiendo buscamos robar muchas.
-  #'(lambda (estado) (if (> (get-tot 1) (get-tot 0))
+  #'(lambda (estado) (if (< (get-tot 1) (get-tot 0))
            (max-list-chained 0 estado)
            (max-list-chained 1 estado)))  
 
