@@ -141,9 +141,9 @@
                            (lado-contrario (estado-lado-sgte-jugador estado)))))
   
   ; Máximas semillas que me pueden robar. Si vamos ganando, buscamos que no nos roben muchas y si vamos perdiendo buscamos robar muchas.
-  #'(lambda (estado) (if (< (get-tot 1) (get-tot 0))
-           (max-list-chained 0 estado)
-           (max-list-chained 1 estado)))  
+  ;#'(lambda (estado) (if (< (get-tot 1) (get-tot 0))
+  ;         (max-list-chained 0 estado)
+  ;         (max-list-chained 1 estado)))  
 
   ; El máximo que me puedo llevar.
   #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
@@ -165,11 +165,11 @@
               (list-lado estado (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-                             (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ; #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+   ;                          (list-lado estado (estado-lado-sgte-jugador estado)))))
   ; En cuántos hoyos no puedo robar semillas. Información sin más.
-   #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-                             (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+   ;#'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+   ;                          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
 
   ; En cuántos hoyos sí puedo robar semillas.
   #'(lambda (estado)
