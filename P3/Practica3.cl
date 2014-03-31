@@ -989,7 +989,7 @@ arguments."
 
 ;;; Timeout jugada: a nivel 8 el aleatorio pierde por tiempo
 ;(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
-;(partida 0 8 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
+(partida 0 8 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
 
 ;;; Ejemplos de partidas para pruebas
 
@@ -1005,7 +1005,11 @@ arguments."
 ;(partida 2 2 (list *jdr-mmx-Bueno* *challenger-remoto*))
 ;(partida 2 2 (list *boaster-remoto* *jdr-humano*))
 
+;(setf *timeout* 1)
+;(partida 1 8 (list *jdr-humano* *jdr-mmx-bueno*))
 
-
-
+;(dotimes (i 200)
+;  (setq *timeout* (* 0.5 (+ 20 i)))
+ ; (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
+ ; (partida 1 3 (list *jdr-humano* *jdr-mmx-bueno*)))
 
