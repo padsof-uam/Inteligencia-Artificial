@@ -1,4 +1,5 @@
-(load "mancala7_mod.cl")
+(load "Practica3.cl")
+(load "Practica3-SA.cl")
 (load "siman.cl")
 
 (defun rand-between (a b)
@@ -61,7 +62,7 @@
 	(/ (apply '+ (mapcar #'(lambda (x) (SA-partida 
 			(mc-evaluator-starter x)
 			(mc-evaluator-depth x)
-			(list *jdr-Avara-SA* (mc-evaluator-enemy x))
+			(list *jdr-pruebas* (mc-evaluator-enemy x))
 			state))
 		*evaluators*))
 	(length *evaluators*)))
@@ -82,7 +83,7 @@
 			0.2
 			20))))
 
-(setf result (simancala 200))
+(setf result (simancala 600))
 (setf wths (first result))
 (print wths)
 (print "results: ")

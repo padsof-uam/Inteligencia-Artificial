@@ -1,0 +1,53 @@
+\documentclass[nochap]{apuntes}
+
+\author{Guillermo Julián y Víctor de Juan}
+\date{28-Marzo}
+\title{Inteligencia Artificial - Practica 3}
+
+\begin{document}
+
+\section*{Parte B}
+
+\subsection*{1 - Función de evaluación}
+Todas nuestras funciones de evaluación seguían el mismo formato. Varios factores dependientes del tablero que podían ser influyentes, ponderados según su importancia.
+
+\subsubsection*{Fundamentos, razonamiento y pruebas}
+Tras jugar varias partidas descubrimos factores importantes
+
+\begin{itemize}
+\item El número de hoyos ocupados.
+\item El máximo de semillas en un hoyo.
+\item Cuantos hoyos hay libres.
+\item El máximo de semillas que puedo robar (encadenadamente. Contando con que al robar hay que seguir sembrando y se pueden volver a robar)
+\item El número de hoyos en los que no nos pueden robar semillas (por tener más de 4 semillas o por no tener ninguna)
+\item El número de hoyos en los que si se pueden robar semillas.
+\item El número de hoyos con 1 semilla (si tenemos todos los hoyos con una única semilla es muy fácil perder, porque en cuanto nos roben una, siembran y nos roban la siguiente (si el oponente tiene semillas en sus hoyos claro)
+\end{itemize}
+
+Estos factores son son computables para ambos jugadores de la partida.
+
+El problema que nos encontramos fue cómo ponderar los dicersos factores. Lo que hemos hecho para resolver este sistema ha sido utilizar un algoritmo de optimización llamado \textit{Simulated-annealing}. El empleo de este algoritmo nos posibilitó encontrar la mejor combinación de ponderaciones para los factores.
+
+\paragraph{Simulated Annealing}
+La implementación de este algoritmo se encuentra repartida entre los ficheros \textit{siman.cl} (que contiene el algoritmo general de simmulated annealing) y \tesxit{simancala.cl} (que es la concreción del algoritmo para partidas de mancala).
+
+El resultado de la ejecución de \textit{simancala.cl} es una lista de números entre -1 y 1. -0.83 significa partida ganada en 17 turnos, y de manera similar, 0.36 significa partida perdida en 0.64. De esta forma cuanto más negativos consigamos mejor. 
+
+No siempre hemos hecho simulaciones con todos los factores (que en el fondo son heurísticas) ya que si obteníamos un peso de 0.000573 en una heurística significa que no es muy importante. 
+
+\paragraph{Pruebas}
+
+Implementamos pequeñas modificaciones en el código recibido para poder tener una función (partida-SA-all-games) que dada una lista de ponderaciones jugara contra los jugadores de referencia \textit{Bueno} y \textit{Regular} a profundidades 1 y 2 (por no emplear demasiado tiempo en la simulación). Para ello fue necesario crear una función de evaluación de cada jugador que también recibiera una lista de ponderaciones aunque luego no la usara y una función de minimax que recibiera como argumento las ponderaciones. Todas estas funciones están agrupadas en el fichero Practica3-SA.cl. 
+
+
+\subsubsection*{Pruebas de tiempo}
+
+\subsection*{Explicación el código entregado:}
+\paragraph{Utilice ejemplos de evaluaciones que ilustren para qué sirve cada función.}
+\paragraph{Comente línea a línea las funciones implicadas en la implementación del algoritmo minimax}
+
+\paragraph{Compare y comente la ejecución del código cuando la profundidad es par o impar.}
+
+
+
+\end{document}
