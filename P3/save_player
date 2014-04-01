@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "=====================================" >> jugadores.res
+echo >> jugadores.res
+echo "With heuristics" >> jugadores.res
+cat heuristics.cl | grep -v ";" >> jugadores.res
+echo >> jugadores.res
+echo "Results" >> jugadores.res
+cat results.dat >> jugadores.res
+echo >> jugadores.res
+cat >> jugadores.res

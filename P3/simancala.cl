@@ -52,9 +52,7 @@
 		reps)))
 
 (setf *evaluators* 
-	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA* *Top60*) 3 1))
-
-; (length *evaluators*)
+	(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA*) 2 1))
 
 ; Dar valor a un estado: ejecutamos la partida con cada uno de los jugadores,
 ;	que reciben el estado como vector de pesos.
@@ -83,9 +81,22 @@
 			0.2
 			20))))
 
-(setf result (simancala 500))
+(setf result (simancala 2))
 (setf wths (first result))
-(print wths)
-(print "results: ")
-(print (partida-SA-all-games wths))
+(format T "~&>>>RBG ~%")
+(format T "Average: ~a ~%" (second result))
+(format T "Results: ~%")
+(format T "Enemy ~1,10T ~2,10TDepth ~3,10TStarts ~4,10TResult ~5,10T ~%")
+(mapcar #'(lambda (x)
+	(format T "~a ~1,10T ~a ~2,10T ~a ~3,10T ~a ~4,10T ~%"
+		(jugador-nombre (mc-evaluator-enemy x))
+		(mc-evaluator-depth x)
+		(= (mc-evaluator-starter x) 0)
+		(SA-partida 
+			(mc-evaluator-starter x)
+			(mc-evaluator-depth x)
+			(list *jdr-pruebas* (mc-evaluator-enemy x))
+			wths)))
+		*evaluators*)
+(format T "Weights: ~a" wths)
 ;(print 'end)

@@ -124,60 +124,7 @@
          (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
 
 
-
-
-(setf *heuristics* (list
-;;; Jugador Bueno (pero t
-  ; El máximo de semillas en un único hoyo (de los nuestros).
-  #'(lambda (estado)(max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ; El máximo de semillas en un único hoyo (del oponente).s
-  #'(lambda (estado)(max-list (list-lado estado (estado-lado-sgte-jugador estado))))
-  ; Diferencia de semillas. (Heurística del jugador regular)
-  #'(lambda (estado)( - (suma-fila 
-                           (estado-tablero estado) 
-                           (estado-lado-sgte-jugador estado)) 
-                        (suma-fila 
-                           (estado-tablero estado) 
-                           (lado-contrario (estado-lado-sgte-jugador estado)))))
-  
-  ; Máximas semillas que me pueden robar. Si vamos ganando, buscamos que no nos roben muchas y si vamos perdiendo buscamos robar muchas.
-  ;#'(lambda (estado) (if (< (get-tot 1) (get-tot 0))
-  ;         (max-list-chained 0 estado)
-  ;         (max-list-chained 1 estado)))  
-
-  ; El máximo que me puedo llevar.
-  #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ; El máximo que se puede llevar el otro
-  #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
-
-  ; Cuántos hoyos tiene el otro con alguna semilla.
-   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-         (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
-   #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  
-  ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
-  #'(lambda (estado) 
-    ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
-              (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-        (length (remove-if-not #'(lambda (x) (not (= x 1))) 
-              (list-lado estado (estado-lado-sgte-jugador estado))))))
-
-  ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-  ; #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-   ;                          (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; En cuántos hoyos no puedo robar semillas. Información sin más.
-   ;#'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-   ;                          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-
-  ; En cuántos hoyos sí puedo robar semillas.
-  #'(lambda (estado)
-    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
-          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-          (list-lado estado (estado-lado-sgte-jugador estado))))))
-  ))
+(load "heuristics.cl")
 
 ;;; Funciones de evaluación de los jugadores.
 
@@ -289,7 +236,7 @@
 (setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
 
 (setf *jdr-mmx-Bueno-SA* (make-jugador
-                        :nombre   '|Ju-Mmx-Bueno|
+                        :nombre   '|Ju-Mmx-Bueno-SA|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Bueno-SA))
 
@@ -304,10 +251,6 @@
    (SA-partida 1 1 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)
    (SA-partida 0 2 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)
    (SA-partida 1 2 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)
-   (SA-partida 0 1 (list *jdr-pruebas* *Top60*) weights)
-   (SA-partida 1 1 (list *jdr-pruebas* *Top60*) weights)
-   (SA-partida 0 2 (list *jdr-pruebas* *Top60*) weights)
-   (SA-partida 1 2 (list *jdr-pruebas* *Top60*) weights)
    (SA-partida 0 1 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 1 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 0 2 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
