@@ -183,7 +183,8 @@
 ;;; FUNCIONES DE INICIALIZACION DE TABLERO Y ESTADO
 ;;; ------------------------------------------------------------------------------------------
 
-;;; Crea la lista para el initial-contents de la parte de tablero de un jugador
+;;; Crea la lista para el initial-contents de la parte de tablero de un jugador.
+;;; Hemos añadido la posibilidad de generar un tablero aleatorio con la variable random.
 (defun construye-fila-tablero (long fichas)
   (cond
    ((= 0 long) (if *kalaha* '(0) nil))
@@ -630,35 +631,59 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 (defun minimax-a-b (estado profundidad-max f-eval)
   (let* ((oldverb *verb*)  (*verb* nil)
-         (estado2 (minimax-auxab estado t profundidad-max -999999 999999 (estado-lado-sgte-jugador estado) f-eval))
+         (estado2 (minimax-auxab estado t profundidad-max profundidad-max 1 -999999 999999 f-eval))
          (*verb* oldverb))
     estado2))
 
-(defun minimax-auxab (estado ret-mov depth alpha betha maximazingTurn f-eval)
+(defun minimax-auxab (estado ret-mov depth-max depth maximizing alpha beta f-eval)
   (cond 
     ((= depth 0) 
-        (unless ret-mov (funcall f-eval estado)))
+        (if ( = (mod depth-max 2) 0)
+          (unless ret-mov  (funcall f-eval estado))
+          (unless ret-mov  (- (funcall f-eval estado)))))
     (t 
-      (let* ((sucesores (generar-sucesores estado)) (mejor-valor -999999) (mejor-sucesor nil))
+      (let* (
+          (sucesores (generar-sucesores estado))
+          (mejor-sucesor nil))
         (cond 
           ((null sucesores) 
-            (unless ret-mov (funcall f-eval estado)))
-          ((= maximazingTurn 1)
-            (mapcar #'(lambda (child) 
-              (let ((alpha (max-list (list alpha (minimax-auxab child nil (- depth 1) alpha betha 0 f-eval))))))
-                (when (<  alpha  betha)
-                  (setq mejor-sucesor child)
-                  (setq mejor-valor alpha))) (generar-sucesores estado))
-            (if  ret-mov mejor-sucesor mejor-valor))
-          ((= maximazingTurn 0)
-            (mapcar #'(lambda (child)
-              (let ((betha (min-list (list betha (minimax-auxab child nil (- depth 1) alpha betha 1 f-eval))))))
-                (when (< alpha betha)
-                  (setq mejor-sucesor child)
-                  (setq mejor-valor betha))) (generar-sucesores estado))
-            (if  ret-mov mejor-sucesor mejor-valor)))))))
+            (if ( = (mod depth-max 2) 0)
+              (unless ret-mov  (funcall f-eval estado))
+              (unless ret-mov  (- (funcall f-eval estado)))))
+          ((= maximizing 1)
+              (loop for sucesor in sucesores do
+                (let* (
+                  (result (minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
+                  (cond 
+                    ((> result alpha)
+                      (setq alpha result)
+                      (setq mejor-sucesor sucesor))
+                    ((>=  alpha  beta)
+                      (if  ret-mov mejor-sucesor alpha)))))
+              (if  ret-mov mejor-sucesor alpha))
+          ((= maximizing 0)
+            (loop for sucesor in sucesores do
+                (let* (
+                  (result (minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
+                  (cond 
+                    ((< result beta)
+                      (setq beta result)
+                      (setq mejor-sucesor sucesor))
+                  ((>=  alpha  beta)                    
+                    (if  ret-mov mejor-sucesor beta)))))
+              (if  ret-mov mejor-sucesor beta)))))))
 
 
+;;;  Intento de poda 
+;;; (mapcar #'(lambda (child) 
+;;;           (let* (
+;;;                   (val (- (minimax-auxab child nil (- depth 1) (- (print betha)) (- (print alpha)) f-eval (- color))))
+;;;                   (mejor-valor (max-list (list val mejor-valor)))
+;;;                   (alpha (max-list (list alpha val))))
+;;;             (when (and (> alpha betha) (eql break nil))
+;;;               (setq (print mejor-valor) (print alpha))
+;;;               (setq (print mejor-sucesor) (print child))
+;;;               (setq break t)))) sucesores)
 ;;; ------------------------------------------------------------------------------------------
 ;;; ALGORITMO MINIMAX
 ;;; ------------------------------------------------------------------------------------------
@@ -915,340 +940,21 @@ arguments."
 
 
 
-;;; Los nuestros:
-
-;;; ------------------------------------------------------------------------------------------
-(defun f-eval-Avara (estado)
-   (+
-      (- 
-            (suma-fila 
-               (estado-tablero estado) 
-               (estado-lado-sgte-jugador estado))
-            (suma-fila 
-               (estado-tablero estado) 
-               (lado-contrario (estado-lado-sgte-jugador estado))))
-      ; Evitamos tener muchas fichas en un mismo hoyo.
-      (* 0.3 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
-
-(setf *jdr-Avara* (make-jugador
-                        :nombre   '|Ju-Mmx-Avara|
-                        :f-juego  #'f-j-mmx
-                        :f-eval   #'f-eval-Avara))
-
-;(partida 0 2 (list *jdr-Avara* *jdr-mmx-Regular*))
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun max-list-chained (lado estado)
-  (max-list (cdr (max-list-chained-aux lado estado 0))))
-
-(defun max-list-chained-aux (milado estado cont)
-  (if (> cont 7)
-    0
-    (let ((L2 (chain-ate milado (estado-tablero estado) cont 0 0))
-         (L1 (max-list-chained-aux milado estado (+ cont 1))))
-        (if (and (consp  L1) (consp  L2))
-          (append L1 L2)
-          (if (consp L1)
-          (append L1 (list L2))
-          (list L1 L2)
-          )))))
-
-; El máximo que robo desde la posición en la que estoy.
-(defun chain-ate (milado tablero pos total cont)
-  (if (> cont 7)
-    total
-   (let ((mis-fichas (get-fichas tablero milado pos)) 
-         (sus-fichas (get-fichas tablero (mod (+ milado 1) 2) pos)))
-      (if (or (= mis-fichas 0) (>= sus-fichas 4))
-         (+ total sus-fichas)
-         (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
-
-;(setq mi-posicion (list '(1 1 1 1 1 1 1 1) (reverse '(1 2 0 3 1 1 4 1))))
-;(setq estado (crea-estado-inicial 0 mi-posicion))
-;(max-list-chained 1 estado)
-
-
-(defun minimax-1-SA(estado profundidad devolver-movimiento profundidad-max f-eval valores)
-  (cond ((>= profundidad profundidad-max)
-         (unless devolver-movimiento  (funcall f-eval estado valores)))
-        (t
-         (let* ((sucesores (generar-sucesores estado))
-               (mejor-valor -99999)
-                (mejor-sucesor nil))
-           (cond ((null sucesores)
-                  (unless devolver-movimiento  (funcall f-eval estado valores)))
-                 (t
-                  (loop for sucesor in sucesores do
-                    (let* ((resultado-sucesor (minimax-1-SA sucesor (1+ profundidad)
-                                        nil profundidad-max f-eval valores))
-                           (valor-nuevo (- resultado-sucesor)))
-                      ;(format t "~% Mmx-1 Prof:~A valor-nuevo ~4A de sucesor  ~A" profundidad valor-nuevo (estado-tablero sucesor))
-                      (when (> valor-nuevo mejor-valor)
-                        (setq mejor-valor valor-nuevo)
-                        (setq mejor-sucesor  sucesor ))))
-                  (if  devolver-movimiento mejor-sucesor mejor-valor)))))))
-
-
-(defun minimax-SA (estado profundidad-max f-eval valores )
-  (let* ((oldverb *verb*)  (*verb* nil)
-         (estado2 (minimax-1-SA estado 0 t profundidad-max f-eval valores))
-         (*verb* oldverb))
-    estado2))
-
-(defun SA-local-loop (estado lado-01 profundidad-max lst-jug valores)
-  "bucle de movimientos alternos hasta conclusion de la partida"
-  (when *verb* (format t "~%Local game ~A-~A depth=~A " (jugador-nombre (first lst-jug)) (jugador-nombre (second lst-jug)) profundidad-max))
-  (loop
-    (act-marcador (estado-tablero estado) :return-pts T)
-    (when (and *verb* (estado-accion estado))
-      (format t "~%[J ~A] ~A juega ~A "
-        *njugada* (jugador-nombre (nth (mod (+ 1 lado-01) 2) lst-jug)) (estado-accion estado)))
-    (let ((curr-plyr (nth lado-01 lst-jug)))
-        (cond
-         ((or (juego-terminado-p)                              ; si juego terminado o tablas
-              (tablas-p (* 2 *long-fila*) (get-pts 0) (get-pts 1)))
-          (when *verjugada* (muestra-tablero estado T))
-          (return (informa-final-de-juego estado lst-jug)))
-         (T                                                    ; llamada al jugador que tiene el turno
-          (cond
-           ((estado-debe-pasar-turno estado)                   ; TBD No registra accion!
-            (setf estado (cambia-lado-sgte-jugador (copia-estado estado) nil)))
-           (T
-            (if *verjugada*
-                (progn
-                  (muestra-tablero estado)
-                  (format t "~%[J ~A] El turno es de ~A~%" *njugada* (jugador-nombre curr-plyr)))
-              (if *vermarcador*
-                  (format t "~%~3d ~a-~a" *njugada* (get-pts 0) (get-pts 1))
-                (when (= (mod *njugada* 10) 0)
-                  (to-logfile (format nil " ~d" *njugada*) 4 T))))
-            (setf estado
-              (funcall (jugador-f-juego curr-plyr)
-                                        estado
-                                        profundidad-max
-                                        (jugador-f-eval curr-plyr)
-                                        valores))))
-          (when (null estado)                                  ; => abandono, error o return nil|-infinito
-            (return (values (winner (nth lado-01 lst-jug) lst-jug) "Error en func. o abandono")))
-          (when (eql estado 'timeout)                          ; timeout de jugada
-            (return (values (winner (nth lado-01 lst-jug) lst-jug) "Timeout jugada")))
-          (setf lado-01 (mod (1+ lado-01) 2))                  ; inversion: pasa al otro jugador / convierte 1-2 0-1
-          )))))
-
-(defun SA-partida (lado profundidad-max lst-jug valores &optional filas)
-  (let* ((lado-01 (mod lado 2))
-         (estado (crea-estado-inicial lado-01 filas))
-         (boast (/= (jugador-port (second lst-jug)) 0))
-         (chall (/= (jugador-port (first lst-jug)) 0)) )
-    (reset-contadores (* 2 *long-fila*))
-    (if (or *tournament* (and (< *debug-level* 2) (not boast) (not chall)))
-        (setq *verjugada* nil *vermarcador* nil)
-      (if *verjugada* (format t "~%  Juego: (1) ~a vs ~a (2) "
-                        (jugador-nombre (first lst-jug)) (jugador-nombre (second lst-jug)))))
-
-    (cond
-     ((and chall boast)
-      (@stop "Ambos jugadores son remotos. Uno de ellos debe ser local"))
-
-     (chall                                                       ; Challenger Role
-      (setf (jugador-host *boaster-remoto*) *bhost*)              ; recarga por si ha cambiado
-      (chall-p2p-loop estado lado-01 profundidad-max lst-jug))    ; TBD take role out
-
-     (boast                                                       ; Boaster Role
-      (let ((bname (fullname (jugador-nombre (first lst-jug)))))
-        (format t "~%Boaster ~A registers in majordomo, port ~A " bname *mport*)
-        (setf (get '*bname* :plyr) bname)
-        (subscr-bst bname "new")
-        ))
-     (t (SA-local-loop estado lado-01 profundidad-max lst-jug valores)))))
-
-
-
-(defun flatten (structure)
-   (cond ((null structure) nil)
-   ((atom structure) (list structure))
-   (t (mapcan #'flatten structure))))
-
-
-; Cada heurística cuanto más negativa sea es que más mejor es.
-(setf *heuristics* (list
-  #'(lambda (estado)( - (suma-fila 
-                           (estado-tablero estado) 
-                           (estado-lado-sgte-jugador estado)) 
-                        (suma-fila 
-                           (estado-tablero estado) 
-                           (lado-contrario (estado-lado-sgte-jugador estado)))))
-  
-  ; Máximas fichas que puedo comer. El algoritmo le pondrá el signo negativo apropiado.
-  ;#'(lambda (estado) (max-list-chained 0 estado))
-  ; Máximas fichas que me pueden comer.
-  ;#'(lambda (estado) (max-list-chained 1 estado))  
-
-  ; El máximo que me puedo llevar.
-  #'(lambda (estado) (max-list (list-lado estado 
-       (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ; El máximo que se puede llevar el otro
-  #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
-
-  ; Cuántos hoyos tiene el otro con alguna semilla.
-  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-  ;       (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; ; Cuántos hoyos tengo con 0 semillas. Interesa que tenga pocos hoyos el otro y muchos nosotros.
-  ; #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
-  ;       (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  
-  ; Tener hoyos a 1 es peor. Las que tengo yo menos las que tiene el otro.
-  #'(lambda (estado) 
-    ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
-              (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-        (length (remove-if-not #'(lambda (x) (not (= x 1))) 
-              (list-lado estado (estado-lado-sgte-jugador estado))))))
-
-  ; En cuántos hoyos no puede el otro robar semillas. Información sin más.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-                            (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ; En cuántos hoyos no puedo robar semillas. Información sin más.
-  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-
-  ; En cuántos hoyos sí puedo robar semillas.
-  ; #'(lambda (estado)
-  ;   (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
-  ;         (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  ;       (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-  ;         (list-lado estado (estado-lado-sgte-jugador estado))))))
-  ))
-
-(defun f-eval-Avara-SA (estado valores)
-   (reduce #'+ 
-      (mapcar
-         '*
-         (mapcar #'(lambda (x) (funcall x estado)) *heuristics*)
-         valores)))
-
-(defun f-j-mmx-SA (estado profundidad-max f-eval valores)
-;;; (minimax-a-b estado profundidad-max f-eval))
-   (minimax-SA estado profundidad-max f-eval valores))
-
-(setf *jdr-Avara-SA* (make-jugador
-                        :nombre   '|Ju-Mmx-Avara-SA|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-Avara-SA))
-
-;;; Jugador Bueno (pero tramposo: juega con un nivel mas de evaluacion)
-;;; ------------------------------------------------------------------------------------------
-(defun f-eval-Bueno-SA (estado valores)
-  (if (juego-terminado-p estado)
-      -50                              ;; Condicion especial de juego terminado
-    ;; Devuelve el maximo del numero de fichas del lado enemigo menos el numero de propias
-    (max-list (mapcar #'(lambda(x)
-                          (- (suma-fila (estado-tablero x) (lado-contrario (estado-lado-sgte-jugador x)))
-                                    (suma-fila (estado-tablero x) (estado-lado-sgte-jugador x))))
-                (generar-sucesores estado)))))
-
-
-
-(defun f-eval-Regular-SA (estado valores)
-  (- (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado))
-    (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado)))))
-
-
-(setf *jdr-mmx-Bueno-SA* (make-jugador
-                        :nombre   '|Ju-Mmx-Bueno|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-Bueno-SA))
-
-(setf *jdr-mmx-Regular-SA* (make-jugador
-                        :nombre   '|Ju-Mmx-Regular-SA|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-Regular-SA))
-
-(setf weights '(0.5718088 0.087263346 -0.9487088 -0.19075418 0.16493344 0.025273085 0.2732327 -0.0068848133))
-
-
-(defun f-eval-Simon (estado wt)
-  (+ 
-    (* 0.19824123 ( - (suma-fila 
-                        (estado-tablero estado) 
-                        (estado-lado-sgte-jugador estado)) 
-                      (suma-fila 
-                        (estado-tablero estado) 
-                        (lado-contrario (estado-lado-sgte-jugador estado)))))
-    (*  -0.74062204 (max-list-chained 0 estado))
-    (*  0.4447801 (max-list-chained 1 estado))  
-    (* 0.16666222 (max-list (list-lado estado 
-         (lado-contrario (estado-lado-sgte-jugador estado)))))
-    (* 0.925256 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
-    (* -0.89839506 (length (remove-if-not #'(lambda (x) (= x 0)) 
-          (list-lado estado (estado-lado-sgte-jugador estado)))))
-    (* -0.6152954 (length (remove-if-not #'(lambda (x) (= x 0)) 
-          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-    (* -0.030327797
-      ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
-                (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-          (length (remove-if-not #'(lambda (x) (not (= x 1))) 
-                (list-lado estado (estado-lado-sgte-jugador estado))))))
-    (* 0.5465987 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
-          (list-lado estado (estado-lado-sgte-jugador estado)))))
-    (* 0.15208268  (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
-          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-    (* -0.040797234 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-          (list-lado estado (estado-lado-sgte-jugador estado)))))
-    (* 0.6847365
-      (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
-            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-          (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
-            (list-lado estado (estado-lado-sgte-jugador estado))))))))
-
-(setf *Simon* (make-jugador
-                        :nombre   '|Simon|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-Simon))
-
-
-(defun partida-SA-all-games (weights)
-   (list
-     (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Regular-SA*) weights)
-     (SA-partida 0 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 1 1 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 0 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)
-     (SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-bueno-SA*) weights)))
-
-
-;(SA-partida 1 2 (list *jdr-Avara-SA* *jdr-mmx-Bueno-SA*) weights)
-;(setf *random* nil)
-(partida-SA-all-games weights)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
+; (setq estado (crea-estado-inicial 0 mi-posicion))
+; (dotimes (i 20)
+;   (setq *timeout* (* 0.5 (+ 10 i)))
+;   (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
+;   (partida 1 4 (list *jdr-humano* *jdr-mmx-Bueno*)))
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; EJEMPLOS DE PARTIDAS DE PRUEBA
 ;;; ------------------------------------------------------------------------------------------
 ;;; Juego manual contra jugador automatico, saca el humano
 ;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
-;(partida 1 2 (list *Simon-ab*      *jdr-mmx-Bueno* ))
-;(partida 0 1 (list *Simon*      *jdr-mmx-Bueno* ))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
-;(partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
+; (partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
 
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto
@@ -1288,16 +994,6 @@ arguments."
 
 ;;; Ejemplos de partidas para pruebas
 
-
-
-;(print '(Contra el malo))
-;(cons 
-  ;(partida 0 1 (list *jdr-Avara*      *jdr-mmx-Regular-SA*))
-  ;(cons 
-    ;(partida 1 1 (list *jdr-Avara*      *jdr-mmx-Regular-SA*))
-    ;(list
-      ;(partida 0 1 (list *jdr-Avara* *jdr-mmx-bueno*))
-      ;(partida 1 1 (list *jdr-Avara* *jdr-mmx-bueno*)))))
 ;(partida 0 1 (list *jdr-humano*      *jdr-mmx-Regular*))
 ;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
 
@@ -1310,7 +1006,11 @@ arguments."
 ;(partida 2 2 (list *jdr-mmx-Bueno* *challenger-remoto*))
 ;(partida 2 2 (list *boaster-remoto* *jdr-humano*))
 
+;(setf *timeout* 1)
+;(partida 1 8 (list *jdr-humano* *jdr-mmx-bueno*))
 
-
-
+;(dotimes (i 200)
+;  (setq *timeout* (* 0.5 (+ 20 i)))
+ ; (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
+ ; (partida 1 3 (list *jdr-humano* *jdr-mmx-bueno*)))
 
