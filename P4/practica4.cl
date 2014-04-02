@@ -1,0 +1,1 @@
+(load "motor-inferencia.cl")
