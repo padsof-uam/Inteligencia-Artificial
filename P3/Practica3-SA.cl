@@ -245,6 +245,11 @@
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
 
+(setf *jdr-mmx-Regular-SA* (make-jugador
+                        :nombre   '|Mi jugador|
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'mi-f-ev))
+
 (defun partida-SA-all-games (weights)
   (list
    (SA-partida 0 1 (list *jdr-pruebas* *jdr-mmx-Regular-SA*) weights)

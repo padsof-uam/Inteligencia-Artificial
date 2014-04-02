@@ -287,3 +287,50 @@ Results
 (-0.75 0 0.36 0 -0.9 -0.84000003 -0.84000003 0) 
 
 Reventando al bueno.
+=====================================
+
+With heuristics
+(setf *heuristics* (list
+  #'(lambda (estado)(max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado)(max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  #'(lambda (estado)( - (suma-fila 
+                           (estado-tablero estado) 
+                           (estado-lado-sgte-jugador estado)) 
+                        (suma-fila 
+                           (estado-tablero estado) 
+                           (lado-contrario (estado-lado-sgte-jugador estado)))))
+  
+
+  #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+
+  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+         (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  
+
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+                            (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+                            (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  
+  
+  ))
+
+Results
+Average: -0.19875 
+Results: 
+Enemy                 Depth      Starts     Result      
+Ju-Mmx-Regular-SA     1          T          -0.75      
+Ju-Mmx-Regular-SA     2          T          0          
+Ju-Mmx-Bueno-SA       1          T          0.44       
+Ju-Mmx-Bueno-SA       2          T          0.45999998           
+Ju-Mmx-Regular-SA     1          NIL        -0.9       
+Ju-Mmx-Regular-SA     2          NIL        0          
+Ju-Mmx-Bueno-SA       1          NIL        -0.84000003          
+Ju-Mmx-Bueno-SA       2          NIL        0          
+Weights: (0.7880688 -0.668489 0.79436946 -0.78768563 0.065045595 0.2920618
+          0.97934103 0.8868735 0.20814347)
+
+No empeora en exceso con más profundidad

@@ -8,7 +8,7 @@ sbcl.run simancala.fasl 2>&1 | grep -v "\;" > out.dat
 [ $? -ne 0 ] && echo "Run failed" && exit
 echo "Done."
 cat out.dat | grep -e "^-*0\." > evolution.dat
-# gnuplot -e "plot 'evolution.dat' with lines"
+gnuplot -e "plot 'evolution.dat' with lines"
 P=$(cat out.dat | grep -n '>>>RBG' | awk 'BEGIN { FS = ":" } ; { print $1 }')
 awk "NR > $P" out.dat > results.dat
 cat results.dat

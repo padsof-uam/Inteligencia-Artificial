@@ -939,6 +939,10 @@ arguments."
                         :f-eval   #'f-eval-Regular))
 
 
+(setf *jdr-test* (make-jugador
+                        :nombre   '|Mi jugador|
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'mi-f-ev))
 
 ; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 ; (setq estado (crea-estado-inicial 0 mi-posicion))
@@ -954,7 +958,10 @@ arguments."
 ;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
 
 ;;; Juego manual contra jugador automatico, saca el automatico
-; (partida 1 2 (list *jdr-humano*      *jdr-mmx-Bueno* ))
+(defun test-player ()
+  (partida 1 2 (list *jdr-test* *jdr-mmx-Bueno* )))
+
+(test-player)
 
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto
