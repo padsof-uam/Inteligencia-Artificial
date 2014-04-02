@@ -151,7 +151,7 @@
       (* 0.3 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
 
 (setf *jdr-pruebas* (make-jugador
-                        :nombre   '|Ju-Mmx-Avara-SA|
+                        :nombre   '|Jugador de pruebas|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-pruebas-SA))
 
