@@ -647,7 +647,7 @@ arguments."
           (mejor-sucesor nil))
         (cond 
           ((null sucesores) 
-            (if ( = (mod depth-max 2) 0)
+            (if ( = (mod depth 2) 0)
               (unless ret-mov  (funcall f-eval estado))
               (unless ret-mov  (- (funcall f-eval estado)))))
           ((= maximizing 1)
@@ -927,6 +927,12 @@ arguments."
                         :nombre   '|Ju-Mmx-Bueno|
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Bueno))
+
+(setf *jdr-mmx-Bueno-ab* (make-jugador
+                        :nombre   '|Ju-Mmx-Bueno|
+                        :f-juego  #'f-j-mmx-ab
+                        :f-eval   #'f-eval-Bueno))
+
 ;;; Jugador Regular
 ;;; ------------------------------------------------------------------------------------------
 (defun f-eval-Regular (estado)
@@ -937,6 +943,10 @@ arguments."
                         :nombre   '|Ju-Mmx-Regular|
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Regular))
+
+(setf *jdr-mmx-Regular-ab* (make-jugador
+                        :nombre   '|Ju-Mmx-Regular|
+                        :f-juego  #'f-j-mmx-ab
 
 (defun mi-f-ev (estado) T) ; Dummy.
 
@@ -1022,3 +1032,7 @@ arguments."
  ; (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
  ; (partida 1 3 (list *jdr-humano* *jdr-mmx-bueno*)))
 
+(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
+(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
+(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
+(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
