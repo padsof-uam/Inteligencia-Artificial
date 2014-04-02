@@ -938,6 +938,7 @@ arguments."
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Regular))
 
+(defun mi-f-ev (estado) T) ; Dummy.
 
 (setf *jdr-test* (make-jugador
                         :nombre   '|Mi jugador|
@@ -961,7 +962,7 @@ arguments."
 (defun test-player ()
   (partida 1 2 (list *jdr-test* *jdr-mmx-Bueno* )))
 
-(test-player)
+; (test-player)
 
 ;;; Juego automatico sin presentacion del tablero pero con listado de contador
 ;(setq *verjugada* nil)   ; valor por defecto

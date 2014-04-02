@@ -151,7 +151,7 @@
       (* 0.3 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
 
 (setf *jdr-pruebas* (make-jugador
-                        :nombre   '|Ju-Mmx-Avara-SA|
+                        :nombre   '|Jugador de pruebas|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-pruebas-SA))
 
@@ -244,11 +244,6 @@
                         :nombre   '|Ju-Mmx-Regular-SA|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
-
-(setf *jdr-mmx-Regular-SA* (make-jugador
-                        :nombre   '|Mi jugador|
-                        :f-juego  #'f-j-mmx
-                        :f-eval   #'mi-f-ev))
 
 (defun partida-SA-all-games (weights)
   (list
