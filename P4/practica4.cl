@@ -53,8 +53,8 @@
 (erase-facts)
 
 (setq *rule-list*
-	'  ((R1 (concatenar () (?E)  (?E)))
-		(R2 (concatenar (?H . ?_) () ))
+	'  ((R1 (concatenar () ?L ?L))
+		(R2 (concatenar (?X . ?R) ?L (?X . ?R2)) :- ((concatenar ?R ?L ?R2)))
 ))
 
 
@@ -63,6 +63,17 @@
 (motor-inferencia)
 ;;res -> (((?XS 5)))
 
-;; Caso base: añadimos una lista de 2 elementos a una lista vacía.
+;; Caso base: añadimos una lista de 1 elemento a una lista no vacía (como encolar).
+(set-hypothesis-list '((concatenar 	(6 7) (5) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 6 7 5)))
 
-;;res -> (((?XS 5)))
+;; Caso recursivo: 2 listas no vacías
+(set-hypothesis-list '((concatenar 	() (1 2) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 1 2)))
+
+;; Caso recursivo: 2 listas no vacías
+(set-hypothesis-list '((concatenar 	(a b) (1 2) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS a b 1 2)))
