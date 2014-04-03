@@ -416,3 +416,80 @@ Ju-Mmx-Bueno-SA       2          NIL        0
 Weights: (-0.17763829 -0.43314886 -0.40800285 0.36564374 0.50443673)
 
 Bastante bueno contra el regular, no gana al bueno.
+=====================================
+
+With heuristics
+(setf *heuristics* (list
+  #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  
+  #'(lambda (estado)( - (suma-fila 
+                           (estado-tablero estado) 
+                           (estado-lado-sgte-jugador estado)) 
+                        (suma-fila 
+                           (estado-tablero estado) 
+                           (lado-contrario (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (suma-fila 
+      (estado-tablero estado) 
+      (estado-lado-sgte-jugador estado)))
+  #'(lambda (estado) (suma-fila 
+      (estado-tablero estado) 
+      (lado-contrario (estado-lado-sgte-jugador estado))))
+
+  #'(lambda (estado) (if (< (get-tot 1) (get-tot 0))
+    (max-list-chained 0 estado)
+    (max-list-chained 1 estado)))  
+
+  #'(lambda (estado) (max-list-chained 0 estado))
+  #'(lambda (estado) (max-list-chained 1 estado))
+
+  #'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+
+  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+   (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if-not #'(lambda (x) (= x 0)) 
+    (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  
+  #'(lambda (estado) 
+    ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
+      (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+    (length (remove-if-not #'(lambda (x) (not (= x 1))) 
+      (list-lado estado (estado-lado-sgte-jugador estado))))))
+
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+    (list-lado estado (estado-lado-sgte-jugador estado)))))
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+    (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  
+  
+  #'(lambda (estado)
+    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+      (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+    (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+      (list-lado estado (estado-lado-sgte-jugador estado))))))
+
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+      (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  
+  #'(lambda (estado) (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+      (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ))
+
+Results
+Average: -0.26000002 
+Results: 
+Enemy                 Depth      Starts     Result      
+Ju-Mmx-Regular-SA     1          T          -0.83      
+Ju-Mmx-Regular-SA     2          T          -0.59000003          
+Ju-Mmx-Bueno-SA       1          T          0.53999996           
+Ju-Mmx-Bueno-SA       2          T          0.22000003           
+Ju-Mmx-Regular-SA     1          NIL        -0.92      
+Ju-Mmx-Regular-SA     2          NIL        -0.5       
+Ju-Mmx-Bueno-SA       1          NIL        0          
+Ju-Mmx-Bueno-SA       2          NIL        0          
+Weights: (-0.94323397 -0.7057936 0.86797476 0.2741928 -0.46726465 0.8146305
+          -0.58670497 -0.41763878 0.17199922 -0.5764067 0.24967074 0.61843204
+          0.9160948 -0.019191027 -0.5582106 0.1565535 0.86168814 0.0536623)
+
+WTF.

@@ -944,11 +944,11 @@ arguments."
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Regular))
 
+(defun mi-f-ev (estado) T) ; Dummy.
+
 (setf *jdr-mmx-Regular-ab* (make-jugador
                         :nombre   '|Ju-Mmx-Regular|
                         :f-juego  #'f-j-mmx-ab
-
-(defun mi-f-ev (estado) T) ; Dummy.
 
 (setf *jdr-test* (make-jugador
                         :nombre   '|Mi jugador|
