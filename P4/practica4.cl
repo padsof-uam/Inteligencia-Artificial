@@ -76,4 +76,47 @@
 ;; Caso recursivo: 2 listas no vacías
 (set-hypothesis-list '((concatenar 	(a b) (1 2) ?Xs)))
 (motor-inferencia)
-;;res -> (((?XS a b 1 2)))
+;;res -> (((?XS a b '1 2)))
+
+
+;;; Ejercicio 2.c
+(erase-facts)
+
+(setq *rule-list*
+	'  (
+		;(R1 (invertir () ()))
+		;(R2 (invertir (?X . ?Y) (?Y ?X))); :- ((invertir ?Y ?Z)))
+		; da de solución (((((((NIL 5) 4) 3) 2) 1))
+
+
+		;(R2 (invertir ?X ?X))
+		;(R2 (invertir ?L ?R) :- ((InvertirAcc ?L () ?R)))
+		;(R3 (InvertirAcc (?X . ?Y) ?A ?R) :- ((InvertirAcc ?Y (?X . ?A) ?R)))
+		;(R3 (invertir (?X . ?Y) ?Z) :- ((invertir ?Y ?H) (concatenar ?Y ?X ?Z)))
+		;(R2 (invertir (?X ?Y) (?Y ?X))); :- ((invertir ?Y ?Z)))
+		;(R3 (invertir (?X . ?Y) ?Z) :- ((invertir ?Y (?X .?Z))))
+
+
+		;; Internet
+		(R1 (invertir ?L ?R) :- ((rev ?L () ?R)))
+		(R2 (rev () ?R ?R))
+		(R3 (rev (?F . ?R) ?A ?I) :- ((rev ?R (?E . ?A) ?I)))
+))
+
+;; Caso base
+(set-hypothesis-list '((invertir () ?Zs)))
+(motor-inferencia)
+;;res -> (((?ZS)))
+
+;; Ejemplo de prueba
+(set-hypothesis-list '((invertir (1 2) (2 1))))
+(motor-inferencia)
+;;res -> (((NIL)))
+
+;; Ejemplo de prueba
+(set-hypothesis-list '((invertir (1 2 3 4 5) (5 4 3 2 1))))
+(motor-inferencia)
+;;res -> (((NIL)))
+
+
+

@@ -1,4 +1,5 @@
 (load "Practica3.cl")
+(load "heuristics-dj.cl")
 
 ;;;; Definición de funciones necesarias para la evaluación de un estado según nuestras heurísticas poderadas con argumento.
 
@@ -124,8 +125,6 @@
          (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
 
 
-(load "heuristics.cl")
-
 ;;; Funciones de evaluación de los jugadores.
 
 (defun f-eval-pruebas-SA (estado weights)
@@ -223,10 +222,30 @@
 
   ))
 
+(defun oxford-eval (estado)
+  (+
+  (* -0.8994589 (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
+  (* 0.4557817 (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))    
+  (* -0.6944761 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* -0.3170042 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  (* 0.9912045 (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado)))
+  (* -0.5252774 (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado))))
+  (* -0.31688595 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* 0.46690035 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.18874097 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.65226316 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.72952914 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.36823273 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* 0.4678042 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.33338356 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))  (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.45209908 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.84877205 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ))
+
 (setf *Top60* (make-jugador
                         :nombre   '|Top60|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'mi-f-eval))
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'oxford-eval))
 
 ;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
 
@@ -255,6 +274,17 @@
    (SA-partida 1 1 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 0 2 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 2 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)))
+
+(defun partida-all-games ()
+  (list
+   (partida 0 1 (list *Top60* *jdr-mmx-Regular*))
+   (partida 1 1 (list *Top60* *jdr-mmx-Regular*))
+   (partida 0 2 (list *Top60* *jdr-mmx-Regular*))
+   (partida 1 2 (list *Top60* *jdr-mmx-Regular*))
+   (partida 0 1 (list *Top60* *jdr-mmx-bueno*))
+   (partida 1 1 (list *Top60* *jdr-mmx-bueno*))
+   (partida 0 2 (list *Top60* *jdr-mmx-bueno*))
+   (partida 1 2 (list *Top60* *jdr-mmx-bueno*))))
 
 (defun partida-SA-all-games-player (player weights)
   (list
