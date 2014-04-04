@@ -17,7 +17,7 @@
 	(R15 (productorio (?X . ?R) ?Z) :- ((productorio ?R ?P) (?= ?Z (?eval (* ?P ?X)))))
 ))
 ;;;; Ejercicio 1.
-
+(erase-facts)
 ; Prueba de si pertenencia.
 (set-hypothesis-list '((pertenece 1 (2 5 1 6 7))))
 (motor-inferencia)
@@ -134,18 +134,3 @@
 (set-hypothesis-list '((productorio (1 2 3 4) ?R)))
 (motor-inferencia)
 ;;res-> (((?R . 24)))
-
-(erase-facts)
-(setq *rule-list* '(
-	(R16 (posicionN ?X ?_ ?_) :- ((?eval (>= ?X 1))))
-	))
-
-(set-hypothesis-list '((posicionN 0 (A B C D E) ?X)))
-(motor-inferencia)
-;;res-> (((?X . A)))
-(set-hypothesis-list '((posicionN 4 (A B C D E) ?X)))
-(motor-inferencia)
-;;res-> (((?X . D)))
-(set-hypothesis-list '((posicionN 3 (4 5) ?X)))
-(motor-inferencia)
-;;res-> NIL
