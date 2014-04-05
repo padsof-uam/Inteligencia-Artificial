@@ -1,5 +1,5 @@
 (load "Practica3.cl")
-(load "heuristics-dj.cl")
+(load "heuristics.cl")
 
 ;;;; Definición de funciones necesarias para la evaluación de un estado según nuestras heurísticas poderadas con argumento.
 
