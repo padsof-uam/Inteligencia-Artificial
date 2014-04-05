@@ -43,7 +43,7 @@ for i in range(len(contents)):
 
 combs = []
 for l in range(1, len(heurs) + 1):
-	combs += itertools.combinations([x.replace(';') for x in heurs], l)
+	combs += itertools.combinations([x.replace(';','') for x in heurs], l)
 
 pnum = 0
 for comb in combs:
@@ -51,7 +51,7 @@ for comb in combs:
 	heurfile.write('(setf *heuristics* (list\n')
 
 	for heur in comb:
-		heurfile.write()
+		heurfile.write(heur)
 
 	heurfile.write('))')
 	heurfile.close()
