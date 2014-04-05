@@ -8,4 +8,7 @@ echo >> jugadores.res
 echo "Results" >> jugadores.res
 cat results.dat >> jugadores.res
 echo >> jugadores.res
-cat >> jugadores.res
+
+if [ -z $1 ]; then
+	cat >> jugadores.res
+fi

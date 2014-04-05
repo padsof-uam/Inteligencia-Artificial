@@ -948,7 +948,7 @@ arguments."
 
 (setf *jdr-mmx-Regular-ab* (make-jugador
                         :nombre   '|Ju-Mmx-Regular|
-                        :f-juego  #'f-j-mmx-ab
+                        :f-juego  #'f-j-mmx-ab))
 
 (setf *jdr-test* (make-jugador
                         :nombre   '|Mi jugador|
@@ -1032,7 +1032,7 @@ arguments."
  ; (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
  ; (partida 1 3 (list *jdr-humano* *jdr-mmx-bueno*)))
 
-(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
-(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
-(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
-(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
+; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
+; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
+; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
+; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
