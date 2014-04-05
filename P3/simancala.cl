@@ -23,7 +23,7 @@
 		(t (mapcan #'flatten structure))))
 
 (defun repeat-l (ls times)
-	(flatten (make-list times :initial-element ls)))
+	(flatten (make-list times :initiajdr-pruebasl-element ls)))
 
 (repeat-l '(0 1 2 3) 3)
 
