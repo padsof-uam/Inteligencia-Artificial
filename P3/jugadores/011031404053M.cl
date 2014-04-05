@@ -1,6 +1,26 @@
 ; 3MV1SL28IC
 ; SimonDice
 
+(defun mi-f-ev (estado)
+  (+
+  (* -0.8994589 (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
+  (* 0.4557817 (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))    
+  (* -0.6944761 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* -0.3170042 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  (* 0.9912045 (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado)))
+  (* -0.5252774 (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado))))
+  (* -0.31688595 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* 0.46690035 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.18874097 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.65226316 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.72952914 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.36823273 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* 0.4678042 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.33338356 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))  (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.45209908 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.84877205 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ))
+
 (defun max-list-chained (lado estado)
   (max-list (cdr (max-list-chained-aux lado estado 0))))
 
@@ -24,23 +44,3 @@
       (if (or (= mis-fichas 0) (>= sus-fichas 4))
          (+ total sus-fichas)
          (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
-
-(defun mi-f-ev (estado)
-  (+
-  (* -0.8994589 (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
-  (* 0.4557817 (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))    
-  (* -0.6944761 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  (* -0.3170042 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
-  (* 0.9912045 (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado)))
-  (* -0.5252774 (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado))))
-  (* -0.31688595 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  (* 0.46690035 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (estado-lado-sgte-jugador estado)))))
-  (* 0.18874097 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.65226316 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.72952914 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (estado-lado-sgte-jugador estado)))))
-  (* 0.36823273 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* 0.4678042 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.33338356 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))  (list-lado estado (estado-lado-sgte-jugador estado)))))
-  (* 0.45209908 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.84877205 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ))
