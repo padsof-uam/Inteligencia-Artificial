@@ -493,3 +493,70 @@ Weights: (-0.94323397 -0.7057936 0.86797476 0.2741928 -0.46726465 0.8146305
           0.9160948 -0.019191027 -0.5582106 0.1565535 0.86168814 0.0536623)
 
 WTF.
+=====================================
+
+With heuristics
+(setf *heuristics* (list
+#'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
+
+Results
+
+=====================================
+
+With heuristics
+(setf *heuristics* (list
+#'(lambda (estado) (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
+
+Results
+Average: -0.13 
+Results: 
+Enemy                 Depth      Starts     Result      
+Ju-Mmx-Regular-SA     2          T          0.24000001           
+Ju-Mmx-Bueno-SA       2          T          0          
+Ju-Mmx-Regular-SA     2          NIL        -0.76      
+Ju-Mmx-Bueno-SA       2          NIL        0          
+Weights: (0.9709265 0.62347627 -0.735173 -0.50837207 0.64231896 -0.85520816
+          -0.9305308 0.06684446 -0.43534732 -0.8156774 0.2648635 -0.28211212
+          -0.15307546 -0.9315431)
+
+=====================================
+
+With heuristics
+(setf *heuristics* (list
+#'(lambda (estado) (max-list (list-lado estado (estado-lado-sgte-jugador estado))))))
+
+Results
+Average: -0.21000001 
+Results: 
+Enemy                 Depth      Starts     Result      
+Ju-Mmx-Regular-SA     2          T          0          
+Ju-Mmx-Bueno-SA       2          T          0          
+Ju-Mmx-Regular-SA     2          NIL        -0.84000003          
+Ju-Mmx-Bueno-SA       2          NIL        0          
+Weights: (0.21485448 -0.4471631 -0.31403756 -0.122477055 0.7146423 -0.9815879
+          0.45315528 -0.549741 -0.49639106 -0.5163741 -0.71051216 -0.56660724
+          0.8745415 -0.45656133)
+
+=====================================
+
+With heuristics
+(setf *heuristics* (list
+#'(lambda (estado)( - (suma-fila 
+                           (estado-tablero estado) 
+                           (estado-lado-sgte-jugador estado)) 
+                        (suma-fila 
+                           (estado-tablero estado) 
+                           (lado-contrario (estado-lado-sgte-jugador estado)))))))
+
+Results
+Average: -0.2125 
+Results: 
+Enemy                 Depth      Starts     Result      
+Ju-Mmx-Regular-SA     2          T          -0.37      
+Ju-Mmx-Bueno-SA       2          T          0          
+Ju-Mmx-Regular-SA     2          NIL        -0.48000002          
+Ju-Mmx-Bueno-SA       2          NIL        0          
+Weights: (-0.28283668 0.19458771 0.12129736 0.53270173 0.88392043 -0.79977775
+          -0.13669443 -0.2821188 0.16726065 -0.09277749 -0.7088342 -0.07123971
+          -0.3239839 -0.39361167)
+
