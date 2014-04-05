@@ -1,13 +1,23 @@
 (load "motor-inferencia.cl")
 
 (setq *rule-list*
-	'((R1 (pertenece ?E (?E . ?_)))
-		(R2 (pertenece ?E (?_ . ?Xs)) :- ((pertenece ?E ?Xs)))
+	'(
+	(R1 (pertenece ?E (?E . ?_)))
+	(R2 (pertenece ?E (?_ . ?Xs)) :- ((pertenece ?E ?Xs)))
+	(R3 (encolar () ?E  (?E)))
+	(R4 (encolar (?Y . ?L) ?E (?Y . ?Z)) :- ((encolar ?L ?E ?Z)))
+	(R7 (concatenar () ?L ?L))
+	(R8 (concatenar (?X . ?R) ?L (?X . ?R2)) :- ((concatenar ?R ?L ?R2)))
+	(R9 (invertir () ()))
+	(R10 (invertir (?X . ?Y) ?Z) :- ((invertir ?Y ?H) (encolar ?H ?X ?Z)))
+	(R11 (ordenada ()))
+	(R12 (ordenada (?_)))
+	(R13 (ordenada (?x ?y . ?zs)) :- ((?= T (?eval (<= ?x ?y))) (ordenada (?y . ?zs))))
+	(R14 (productorio () 1))
+	(R15 (productorio (?X . ?R) ?Z) :- ((productorio ?R ?P) (?= ?Z (?eval (* ?P ?X)))))
 ))
-
 ;;;; Ejercicio 1.
 (erase-facts)
-
 ; Prueba de si pertenencia.
 (set-hypothesis-list '((pertenece 1 (2 5 1 6 7))))
 (motor-inferencia)
@@ -27,12 +37,6 @@
 ;;;; Ejercicio 2.
 
 ;;; Ejercicio 2.a
-(erase-facts)
-
-(setq *rule-list*
-	'((R1 (encolar () ?E  (?E)))
-	  (R2 (encolar (?Y . ?L) ?E (?Y . ?Z)) :- ((encolar ?L ?E ?Z)))
-))
 
 ;; Caso base: encolamos 1 elemento a una lista vacía.
 (set-hypothesis-list '((encolar () 1 ?L)))
@@ -50,12 +54,7 @@
 ;;res -> (((?RS 1 2 3 4)))
 
 ;;; Ejercicio 2.b
-(erase-facts)
 
-(setq *rule-list*
-	'  ((R1 (concatenar () (?E)  (?E)))
-		(R2 (concatenar (?H . ?_) () ))
-))
 
 
 ;; Caso base: añadimos una lista de un elemento a una lista vacía.
@@ -63,6 +62,75 @@
 (motor-inferencia)
 ;;res -> (((?XS 5)))
 
-;; Caso base: añadimos una lista de 2 elementos a una lista vacía.
+;; Caso base: añadimos una lista de 1 elemento a una lista no vacía (como encolar).
+(set-hypothesis-list '((concatenar 	(6 7) (5) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 6 7 5)))
 
-;;res -> (((?XS 5)))
+;; Caso recursivo: 2 listas no vacías
+(set-hypothesis-list '((concatenar 	() (1 2) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 1 2)))
+
+;; Caso recursivo: 2 listas no vacías
+(set-hypothesis-list '((concatenar 	(a b) (1 2) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS a b '1 2)))
+
+
+;;; Ejercicio 2.c
+
+
+;; Caso base
+(set-hypothesis-list '((invertir () ?Zs)))
+(motor-inferencia)
+;;res -> (((?ZS)))
+
+;; Ejemplo de prueba
+(set-hypothesis-list '((invertir (1 2) ?X)))
+(motor-inferencia)
+;;res -> (((NIL)))
+
+;; Ejemplo de prueba
+(set-hypothesis-list '((invertir (1 2 3 4 5) ?X)))
+(motor-inferencia)
+;;res -> (5 4 3 2 1)
+
+
+;;;; Parte 2
+(unify '(?a ?b (?eval (+ ?a ?b))) '(2 3 ?c))
+;;res-> ((?C . 5) (?B . 3) (?A . 2))
+(unify '(?a (?eval (+ 2 (* 3 ?a)))) '(2 8))
+;;res-> ((?A . 2))
+(unify '(?a ?b (?eval (append ?a ?b))) '((1) (2) ?c))
+;;res-> ((?C 1 2) (?B 2) (?A 1))
+(unify '((?eval (+ ?a 1)) ?a) '(4 3))
+;;res-> NIL
+
+
+;(setq *mundo-abierto* NIL)
+
+(set-hypothesis-list '((ordenada(1 2 3))))
+(motor-inferencia)
+;;res-> (((NIL)))
+
+(set-hypothesis-list  '((ordenada(2 1 3))))
+(motor-inferencia)
+;;res-> NIL
+
+
+(set-hypothesis-list '((productorio () ?R)))
+(motor-inferencia)
+;;res-> (((?R . 1)))
+
+(set-hypothesis-list '((productorio (10) ?R)))
+(motor-inferencia)
+;;res-> (((?R . 10)))
+
+(set-hypothesis-list '((productorio (5 10) ?R)))
+(motor-inferencia)
+;;res-> (((?R . 10)))
+
+(set-hypothesis-list '((productorio (1 2 3 4) ?R)))
+(motor-inferencia)
+;;res-> (((?R . 24)))

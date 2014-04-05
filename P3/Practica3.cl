@@ -625,7 +625,7 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 ;;; Funcion que inicia la busqueda y devuelve el siguiente estado elegido por el jugador que
 ;;; tiene el turno, segun algoritmo minimax mejorado con poda minimax-a-b
-;;; RECIBE:   estado,
+;;; RECIBE:   estado
 ;;;           profundidad-max    : límite de profundidad
 ;;;           f-eval             : función de evaluación
 ;;; DEVUELVE: estado siguiente del juego
@@ -638,8 +638,10 @@ arguments."
 
 (defun minimax-auxab (estado ret-mov depth-max depth maximizing alpha beta f-eval)
   (cond 
-    ((= depth 0) 
+    ((= depth 0) ;; Si hemos llegado al final del arbol:
         (if ( = (mod depth-max 2) 0)
+          ;; Devolvemos el valor cambiado de signo si estamos en profundidad impar
+          ;   para actualizar correctamente los valores de alfa y beta en niveles superiores.
           (unless ret-mov  (funcall f-eval estado))
           (unless ret-mov  (- (funcall f-eval estado)))))
     (t 
@@ -647,21 +649,25 @@ arguments."
           (sucesores (generar-sucesores estado))
           (mejor-sucesor nil))
         (cond 
-          ((null sucesores) 
+          ((null sucesores) ;; Si estamos en el final del árbol (aunque no sea la profunidad máxima de exploración)
             (if ( = (mod depth 2) 0)
+              ;; Realizamos un cambio de signo si es necesario igual que antes.
               (unless ret-mov  (funcall f-eval estado))
               (unless ret-mov  (- (funcall f-eval estado)))))
+          ;;; Distinguimos si tenemos que maximizar o minimizar.
           ((= maximizing 1)
               (loop for sucesor in sucesores do
                 (let* (
+                  ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
                   (result (minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
                   (cond 
-                    ((> result alpha)
+                    ((> result alpha) ;; Actualizaciones de los valores de alfa,beta y de retorno si es necesario.
                       (setq alpha result)
                       (setq mejor-sucesor sucesor))
-                    ((>=  alpha  beta)
+                    ((>=  alpha  beta) ; Devolución del valor o del estado.
                       (if  ret-mov mejor-sucesor alpha)))))
               (if  ret-mov mejor-sucesor alpha))
+          ;;; Misma lógica que antes, pero  minimizando.     
           ((= maximizing 0)
             (loop for sucesor in sucesores do
                 (let* (
@@ -673,18 +679,6 @@ arguments."
                   ((>=  alpha  beta)                    
                     (if  ret-mov mejor-sucesor beta)))))
               (if  ret-mov mejor-sucesor beta)))))))
-
-
-;;;  Intento de poda 
-;;; (mapcar #'(lambda (child) 
-;;;           (let* (
-;;;                   (val (- (minimax-auxab child nil (- depth 1) (- (print betha)) (- (print alpha)) f-eval (- color))))
-;;;                   (mejor-valor (max-list (list val mejor-valor)))
-;;;                   (alpha (max-list (list alpha val))))
-;;;             (when (and (> alpha betha) (eql break nil))
-;;;               (setq (print mejor-valor) (print alpha))
-;;;               (setq (print mejor-sucesor) (print child))
-;;;               (setq break t)))) sucesores)
 ;;; ------------------------------------------------------------------------------------------
 ;;; ALGORITMO MINIMAX
 ;;; ------------------------------------------------------------------------------------------
@@ -703,38 +697,25 @@ arguments."
     estado2))
 
 (defun minimax-1 (estado profundidad devolver-movimiento profundidad-max f-eval)
-  (cond ((>= profundidad profundidad-max)
+  (cond ((>= profundidad profundidad-max) ;; Si hemos llegado al final del árbol.
          (unless devolver-movimiento  (funcall f-eval estado)))
-        (t
+        (t 
          (let* ((sucesores (generar-sucesores estado))
-               (mejor-valor -99999)
+               (mejor-valor -99999) ;; "Inicializamos" al mínimo el valor para poder comparar.
                 (mejor-sucesor nil))
-           (cond ((null sucesores)
+           (cond 
+                ((null sucesores) ;; Si hemos llegado al final del árbol.
                   (unless devolver-movimiento  (funcall f-eval estado)))
-                 (t
+                (t
                   (loop for sucesor in sucesores do
                     (let* ((resultado-sucesor (minimax-1 sucesor (1+ profundidad)
-                                        nil profundidad-max f-eval))
-                           (valor-nuevo (- resultado-sucesor)))
-                      ;(format t "~% Mmx-1 Prof:~A valor-nuevo ~4A de sucesor  ~A" profundidad valor-nuevo (estado-tablero sucesor))
-                      (when (> valor-nuevo mejor-valor)
+                                        nil profundidad-max f-eval)) ; Llamada recursiva al algoritmo devolviendo valor (no estado) con un nivel más de profundidad.
+                           (valor-nuevo (- resultado-sucesor))) ; Cambio de signo necesario para negamax.
+                      (when (> valor-nuevo mejor-valor) ; Actualización de los valores si es se ha encontrado un resultado mejor.
                         (setq mejor-valor valor-nuevo)
                         (setq mejor-sucesor  sucesor ))))
+                  ; Devolución del estado o del valor.
                   (if  devolver-movimiento mejor-sucesor mejor-valor)))))))
-
-
-;;; ------------------------------------------------------------------------------------------
-;;; Implementación del algoritmo minimax con poda alfa-beta
-;;; RECIBE:   estado, profundidad actual, beta, alfa,
-;;;           devolver-movimiento: flag que indica si devolver un estado (llamada raiz) o un valor numérico (resto de llamadas)
-;;;           profundidad-max    : límite de profundidad
-;;;           f-eval             : función de evaluación
-;;; DEVUELVE: valor minimax en todos los niveles de profundidad, excepto en el nivel 0 que devuelve el estado del juego tras el
-;;;           movimiento que escoge realizar
-;;; ------------------------------------------------------------------------------------------
-
-;;; (defun minimax-a-b (estado profundidad-max f-eval)
-;;;   )
 
 
 ;;; ------------------------------------------------------------------------------------------
@@ -929,11 +910,7 @@ arguments."
                         :f-juego  #'f-j-mmx
                         :f-eval   #'f-eval-Bueno))
 
-(setf *jdr-mmx-Bueno-ab* (make-jugador
-                        :nombre   '|Ju-Mmx-Bueno|
-                        :f-juego  #'f-j-mmx-ab
-                        :f-eval   #'f-eval-Bueno))
-
+;;; ------------------------------------------------------------------------------------------
 ;;; Jugador Regular
 ;;; ------------------------------------------------------------------------------------------
 (defun f-eval-Regular (estado)
@@ -947,93 +924,219 @@ arguments."
 
 (defun mi-f-ev (estado) T) ; Dummy.
 
+
+
+
+;;; ------------------------------------------------------------------------------------------
+;;; DEFINICIÓN DE JUGADORES DE PRUEBAS
+;;; ------------------------------------------------------------------------------------------
+
+(setf *jdr-mmx-Bueno-ab* (make-jugador
+                        :nombre   '|Ju-Mmx-Bueno|
+                        :f-juego  #'f-j-mmx-ab
+                        :f-eval   #'f-eval-Bueno))
+
 (setf *jdr-mmx-Regular-ab* (make-jugador
                         :nombre   '|Ju-Mmx-Regular|
                         :f-juego  #'f-j-mmx-ab
+                        :f-eval   #'f-eval-Regular))
 
 (setf *jdr-test* (make-jugador
                         :nombre   '|Mi jugador|
                         :f-juego  #'f-j-mmx
                         :f-eval   #'mi-f-ev))
 
-; (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
-; (setq estado (crea-estado-inicial 0 mi-posicion))
-; (dotimes (i 20)
-;   (setq *timeout* (* 0.5 (+ 10 i)))
-;   (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
-;   (partida 1 4 (list *jdr-humano* *jdr-mmx-Bueno*)))
+
+(defun max-list-chained (lado estado)
+  (max-list (cdr (max-list-chained-aux lado estado 0))))
+
+(defun max-list-chained-aux (milado estado cont)
+  (if (> cont 7)
+    0
+    (let ((L2 (chain-ate milado (estado-tablero estado) cont 0 0))
+         (L1 (max-list-chained-aux milado estado (+ cont 1))))
+        (if (and (consp  L1) (consp  L2))
+          (append L1 L2)
+          (if (consp L1)
+          (append L1 (list L2))
+          (list L1 L2)
+          )))))
+
+(defun chain-ate (milado tablero pos total cont)
+  (if (> cont 7)
+    total
+   (let ((mis-fichas (get-fichas tablero milado pos)) 
+         (sus-fichas (get-fichas tablero (mod (+ milado 1) 2) pos)))
+      (if (or (= mis-fichas 0) (>= sus-fichas 4))
+         (+ total sus-fichas)
+         (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
+
+(defun oxford-eval (estado)
+  (+
+  (* -0.8994589 (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
+  (* 0.4557817 (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))    
+  (* -0.6944761 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* -0.3170042 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  (* 0.9912045 (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado)))
+  (* -0.5252774 (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado))))
+  (* -0.31688595 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* 0.46690035 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.18874097 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.65226316 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.72952914 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.36823273 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* 0.4678042 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.33338356 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))  (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.45209908 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.84877205 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ))
+
+
+(setf *Top60* (make-jugador
+                        :nombre   '|Top60|
+                        :f-juego  #'f-j-mmx
+                        :f-eval   #'oxford-eval))
+
+
+(defun partida-all-games ()
+  (list
+   (partida 0 1 (list *Top60* *jdr-mmx-Regular*))
+   (partida 1 1 (list *Top60* *jdr-mmx-Regular*))
+   (partida 0 2 (list *Top60* *jdr-mmx-Regular*))
+   (partida 1 2 (list *Top60* *jdr-mmx-Regular*))
+   (partida 0 1 (list *Top60* *jdr-mmx-bueno*))
+   (partida 1 1 (list *Top60* *jdr-mmx-bueno*))
+   (partida 0 2 (list *Top60* *jdr-mmx-bueno*))
+   (partida 1 2 (list *Top60* *jdr-mmx-bueno*))
+  ))
+
+; (print (partida-all-games))
+; (-0.87 -0.92 -0.089999974 -0.64 0 0.32999998 0 0)
 
 ;;; ------------------------------------------------------------------------------------------
-;;; EJEMPLOS DE PARTIDAS DE PRUEBA
+;;; PRUEBAS DE LA PODA
 ;;; ------------------------------------------------------------------------------------------
-;;; Juego manual contra jugador automatico, saca el humano
-;(partida 1 2 (list *jdr-humano* *Simon-ab* ))
-
-;;; Juego manual contra jugador automatico, saca el automatico
-(defun test-player ()
-  (partida 1 2 (list *jdr-test* *jdr-mmx-Bueno* )))
-
-; (test-player)
-
-;;; Juego automatico sin presentacion del tablero pero con listado de contador
-;(setq *verjugada* nil)   ; valor por defecto
-;(setq *vermarcador* t)   ; valor por defecto
-;(partida 0 1 (list *jdr-humano*   *jdr-mmx-Regular*))
-
-;;; Juego automatico con salida mimima por eficiencia, profundidad=2
-;(setq *verjugada* nil)
-;(setq *vermarcador* nil)
-;(partida 1 2 (list *jdr-mmx-Regular* *jdr-mmx-Regular*))
-
-;;; Activa comentarios para seguir la evolucion de la partida
-;(setq *verb* t)
-
-
-
-;;; Fuerza posicion para jugar a partir de ella (ejemplo pag.4 del enunciado)
-;(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
-
-
-;;; Juega a partir de posicion dada (ejemplo pag.4 del enunciado)
-;(partida 0 2 (list *jdr-humano*      *jdr-human2*) mi-posicion)
-
-;;; Fuerza posicion: casi mate en 1 si juega 0
-;(setq mi-posicion (list '(3 2 2 2 6 2 2 2) (reverse '(1 0 4 0 0 0 2 2)) ))
-
-
-;;; Ejemplo de experimentación a varias profundidades
-;;;(setq *debug-level* 2)
-;;;(setq *verjugada*   nil)
-;;;(setq *vermarcador* nil)
-;;;(dolist (n '(1 2 3 4 5))  (partida 2 n (list *jdr-mmx-regular* *jdr-mmx-bueno*)))
-
-;;; Timeout jugada: a nivel 8 el aleatorio pierde por tiempo
-;(partida 0 1 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
-;(partida 0 8 (list *jdr-humano*      *jdr-mmx-eval-aleatoria*))
-
-;;; Ejemplos de partidas para pruebas
-
-;(partida 0 1 (list *jdr-humano*      *jdr-mmx-Regular*))
-;(partida 0 1 (list *jdr-humano*      *jdr-last-opt*))
-
-
-;;; Partida contra chulo remoto (boaster)
-;(if (string= (machine-instance) "HIPOMENES")
-;    (partida 2 2 (list *jdr-humano* *challenger-remoto*))
-;    (partida 2 2 (list *boaster-remoto* *jdr-humano*)))
-
-;(partida 2 2 (list *jdr-mmx-Bueno* *challenger-remoto*))
-;(partida 2 2 (list *boaster-remoto* *jdr-humano*))
-
-;(setf *timeout* 1)
-;(partida 1 8 (list *jdr-humano* *jdr-mmx-bueno*))
-
-;(dotimes (i 200)
-;  (setq *timeout* (* 0.5 (+ 20 i)))
- ; (format t "~%----- Probando t = ~D ----- (si turno Humano = pasa la prueba)" *timeout*)
- ; (partida 1 3 (list *jdr-humano* *jdr-mmx-bueno*)))
 
 (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
 (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
 (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
 (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
+
+
+;;; ------------------------------------------------------------------------------------------
+;;; PRUEBAS DE TIEMPO
+;;; ------------------------------------------------------------------------------------------
+
+(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
+(setq estado (crea-estado-inicial 0 mi-posicion))
+(time (minimax estado 1 'oxford-eval))
+(time (minimax estado 2 'f-eval-Bueno))
+
+;;; ------------------------------------------------------------------------------------------
+;;; Comparación ejecución profundidad par y profundida impar.
+;;; ------------------------------------------------------------------------------------------
+
+(partida 0 1 (list *Top60* *jdr-mmx-Regular*))
+(partida 0 2 (list *Top60* *jdr-mmx-Regular*))
+
+;;; ------------------------------------------------------------------------------------------
+;;; COMPARACIÓN UTILIZANDO PODA Y SIN PODAR
+;;;   Utilizando el jugador aleatorio para evitar el tiempo de cálculo de la heurística.
+;;; ------------------------------------------------------------------------------------------
+
+(time (minimax estado 2 'f-eval-Regular)) ; Run time: 0.016814 sec.
+(time (minimax-a-b estado 2 'f-eval-Regular)) ; Run time: 0.008159 sec.
+
+(time (minimax estado 5 'f-eval-Regular)) 
+; Run time: 1.279404 sec.
+; Run time: 1.293841 sec.
+
+(time (minimax-a-b estado 5 'f-eval-Regular)) 
+; Run time: 1.311433 sec.
+; Run time: 1.261489 sec.
+
+
+;;; ------------------------------------------------------------------------------------------
+;;; COMPARACIÓN ALTERANDO EL ORDEN DE LOS SUCESORES
+;;; ------------------------------------------------------------------------------------------
+
+(defun aleat-minimax-a-b (estado profundidad-max f-eval)
+  (let* ((oldverb *verb*)  (*verb* nil)
+         (estado2 (aleat-minimax-auxab estado t profundidad-max profundidad-max 1 -999999 999999 f-eval))
+         (*verb* oldverb))
+    estado2))
+
+(defun aleat-minimax-auxab (estado ret-mov depth-max depth maximizing alpha beta f-eval)
+  (cond 
+    ((= depth 0) ;; Si hemos llegado al final del arbol:
+        (if ( = (mod depth-max 2) 0)
+          ;; Devolvemos el valor cambiado de signo si estamos en profundidad impar
+          ;   para actualizar correctamente los valores de alfa y beta en niveles superiores.
+          (unless ret-mov  (funcall f-eval estado))
+          (unless ret-mov  (- (funcall f-eval estado)))))
+    (t 
+      (let* (
+          (sucesores (reverse (generar-sucesores estado)))
+          (mejor-sucesor nil))
+        (cond 
+          ((null sucesores) ;; Si estamos en el final del árbol (aunque no sea la profunidad máxima de exploración)
+            (if ( = (mod depth 2) 0)
+              ;; Realizamos un cambio de signo si es necesario igual que antes.
+              (unless ret-mov  (funcall f-eval estado))
+              (unless ret-mov  (- (funcall f-eval estado)))))
+          ;;; Distinguimos si tenemos que maximizar o minimizar.
+          ((= maximizing 1)
+              (loop for sucesor in sucesores do
+                (let* (
+                  ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
+                  (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
+                  (cond 
+                    ((> result alpha) ;; Actualizaciones de los valores de alfa,beta y de retorno si es necesario.
+                      (setq alpha result)
+                      (setq mejor-sucesor sucesor))
+                    ((>=  alpha  beta) ; Devolución del valor o del estado.
+                      (if  ret-mov mejor-sucesor alpha)))))
+              (if  ret-mov mejor-sucesor alpha))
+          ;;; Misma lógica que antes, pero  minimizando.     
+          ((= maximizing 0)
+            (loop for sucesor in sucesores do
+                (let* (
+                  (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
+                  (cond 
+                    ((< result beta)
+                      (setq beta result)
+                      (setq mejor-sucesor sucesor))
+                  ((>=  alpha  beta)                    
+                    (if  ret-mov mejor-sucesor beta)))))
+              (if  ret-mov mejor-sucesor beta)))))))
+
+(time (minimax-a-b estado 5 'f-eval-Regular)) 
+  ; Run time: 1.36966 sec.
+  ; Run time: 1.348135 sec.
+  ; Run time: 1.345875 sec.
+  ; Run time: 1.338407 sec.
+
+(time (aleat-minimax-a-b estado 5 'f-eval-Regular)) 
+  ; Run time: 1.338015 sec.
+  ; Run time: 1.334534 sec.
+  ; Run time: 1.333455 sec.
+  ; Run time: 1.335938 sec.
+
+
+
+(time (minimax-a-b estado 2 'f-eval-Regular)) 
+  ; Run time: 0.015907 sec.
+  ; Run time: 0.015142 sec.
+  ; Run time: 0.015485 sec.
+  ; Run time: 0.010236 sec.
+
+
+; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
+; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
+; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
+; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
+(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
+  ; Run time: 0.005631 sec.
+  ; Run time: 0.005679 sec.
+  ; Run time: 0.005685 sec.
+  ; Run time: 0.005733 sec.
