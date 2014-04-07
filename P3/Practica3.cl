@@ -656,7 +656,7 @@ arguments."
               (unless ret-mov  (- (funcall f-eval estado)))))
           ;;; Distinguimos si tenemos que maximizar o minimizar.
           ((= maximizing 1)
-              (loop for sucesor in sucesores do
+              (loop for sucesor in sucesores until (>=  alpha  beta) do
                 (let* (
                   ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
                   (result (minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
@@ -669,7 +669,7 @@ arguments."
               (if  ret-mov mejor-sucesor alpha))
           ;;; Misma lógica que antes, pero  minimizando.     
           ((= maximizing 0)
-            (loop for sucesor in sucesores do
+            (loop for sucesor in sucesores until (>= alpha beta) do
                 (let* (
                   (result (minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
                   (cond 
@@ -1045,15 +1045,15 @@ arguments."
 ;;; ------------------------------------------------------------------------------------------
 
 (time (minimax estado 2 'f-eval-Regular)) ; Run time: 0.016814 sec.
-(time (minimax-a-b estado 2 'f-eval-Regular)) ; Run time: 0.008159 sec.
+(time (minimax-a-b estado 2 'f-eval-Regular)) ; Run time: 0.013248 sec.
 
 (time (minimax estado 5 'f-eval-Regular)) 
 ; Run time: 1.279404 sec.
 ; Run time: 1.293841 sec.
 
 (time (minimax-a-b estado 5 'f-eval-Regular)) 
-; Run time: 1.311433 sec.
-; Run time: 1.261489 sec.
+; Run time: 0.644046 sec.
+; Run time: 0.638829 sec.
 
 
 ;;; ------------------------------------------------------------------------------------------
@@ -1086,7 +1086,7 @@ arguments."
               (unless ret-mov  (- (funcall f-eval estado)))))
           ;;; Distinguimos si tenemos que maximizar o minimizar.
           ((= maximizing 1)
-              (loop for sucesor in sucesores do
+              (loop for sucesor in sucesores  until (>=  alpha  beta) do
                 (let* (
                   ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
                   (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
@@ -1099,7 +1099,7 @@ arguments."
               (if  ret-mov mejor-sucesor alpha))
           ;;; Misma lógica que antes, pero  minimizando.     
           ((= maximizing 0)
-            (loop for sucesor in sucesores do
+            (loop for sucesor in sucesores  until (>=  alpha  beta) do
                 (let* (
                   (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
                   (cond 
@@ -1110,33 +1110,28 @@ arguments."
                     (if  ret-mov mejor-sucesor beta)))))
               (if  ret-mov mejor-sucesor beta)))))))
 
+
 (time (minimax-a-b estado 5 'f-eval-Regular)) 
-  ; Run time: 1.36966 sec.
-  ; Run time: 1.348135 sec.
-  ; Run time: 1.345875 sec.
-  ; Run time: 1.338407 sec.
+  ; Run time: 0.666123 sec.
+  ; Run time: 0.646479 sec.
 
 (time (aleat-minimax-a-b estado 5 'f-eval-Regular)) 
-  ; Run time: 1.338015 sec.
-  ; Run time: 1.334534 sec.
-  ; Run time: 1.333455 sec.
-  ; Run time: 1.335938 sec.
-
+  ; Run time: 0.293419 sec.
+  ; Run time: 0.288963 sec.
 
 
 (time (minimax-a-b estado 2 'f-eval-Regular)) 
   ; Run time: 0.015907 sec.
   ; Run time: 0.015142 sec.
   ; Run time: 0.015485 sec.
-  ; Run time: 0.010236 sec.
 
+(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
+  ; Run time: 0.010086 sec.
+  ; Run time: 0.007218 sec.
+  ; Run time: 0.015323 sec.
 
 ; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
 ; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
 ; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
 ; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
-(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
-  ; Run time: 0.005631 sec.
-  ; Run time: 0.005679 sec.
-  ; Run time: 0.005685 sec.
-  ; Run time: 0.005733 sec.
+
