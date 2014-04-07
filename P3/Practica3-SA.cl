@@ -222,7 +222,8 @@
 
   ))
 
-(defun oxford-eval (estado)
+
+(defun oxford-eval (estado w)
   (+
   (* -0.8994589 (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
   (* 0.4557817 (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))    
@@ -244,8 +245,33 @@
 
 (setf *Top60* (make-jugador
                         :nombre   '|Top60|
-                        :f-juego  #'f-j-mmx
+                        :f-juego  #'f-j-mmx-SA
                         :f-eval   #'oxford-eval))
+
+
+(defun f-ox-eval (estado w)
+  (+
+  (* 0.6369469  (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
+  (* -0.6356125  (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
+  (* -0.6221688  (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* 0.18836808  (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  (* 0.53891873  (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado)))
+  (* -0.8880861  (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado))))
+  (* 0.28905392  (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (* -0.73657346  (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* -0.815063  (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.57688975  (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* -0.1341896  (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  (* 0.9039304  (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* 0.8639517 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* 0.29104614  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
+  ))
+
+(setf *Top50* (make-jugador
+                        :nombre   '|Top50|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-ox-eval))
+
 
 ;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
 
@@ -275,12 +301,31 @@
    (SA-partida 0 2 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 2 (list *jdr-pruebas* *jdr-mmx-bueno-SA*) weights)))
 
-(defun partida-all-games ()
+(defun partida-all-games-50 ()
+  (list
+   (partida 0 1 (list *Top50* *jdr-mmx-Regular*))
+   (partida 1 1 (list *Top50* *jdr-mmx-Regular*))
+   (partida 0 2 (list *Top50* *jdr-mmx-Regular*))
+   (partida 1 2 (list *Top50* *jdr-mmx-Regular*))
+   (partida 0 1 (list *Top50* *Top60*))
+   (partida 1 1 (list *Top50* *Top60*))
+   (partida 0 2 (list *Top50* *Top60*))
+   (partida 1 2 (list *Top50* *Top60*))
+   (partida 0 1 (list *Top50* *jdr-mmx-bueno*))
+   (partida 1 1 (list *Top50* *jdr-mmx-bueno*))
+   (partida 0 2 (list *Top50* *jdr-mmx-bueno*))
+   (partida 1 2 (list *Top50* *jdr-mmx-bueno*))))
+
+(defun partida-all-games-60 ()
   (list
    (partida 0 1 (list *Top60* *jdr-mmx-Regular*))
    (partida 1 1 (list *Top60* *jdr-mmx-Regular*))
    (partida 0 2 (list *Top60* *jdr-mmx-Regular*))
    (partida 1 2 (list *Top60* *jdr-mmx-Regular*))
+   (partida 0 1 (list *Top60* *Top50*))
+   (partida 1 1 (list *Top60* *Top50*))
+   (partida 0 2 (list *Top60* *Top50*))
+   (partida 1 2 (list *Top60* *Top50*))
    (partida 0 1 (list *Top60* *jdr-mmx-bueno*))
    (partida 1 1 (list *Top60* *jdr-mmx-bueno*))
    (partida 0 2 (list *Top60* *jdr-mmx-bueno*))
