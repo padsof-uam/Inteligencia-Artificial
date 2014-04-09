@@ -244,7 +244,7 @@
   ))
 
 (setf *Top60* (make-jugador
-                        :nombre   '|Top60|
+                        :nombre   '|Ju-Mmx-Top60-SA|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'oxford-eval))
 
@@ -268,7 +268,7 @@
   ))
 
 (setf *Top50* (make-jugador
-                        :nombre   '|Top50|
+                        :nombre   '|Ju-Mmx-Top50-SA|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-ox-eval))
 

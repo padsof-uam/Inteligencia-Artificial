@@ -84,7 +84,7 @@
 			0.2
 			20))))
 
-(setf result (simancala 1000))
+(setf result (simancala 10000))
 (setf wths (first result))
 (format T "~&>>>RBG ~%")
 (format T "Average: ~a ~%" (second result))
