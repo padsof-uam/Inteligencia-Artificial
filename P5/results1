@@ -1,0 +1,57 @@
+=== Evaluation result ===
+
+Scheme: IBk
+Options: -K 1 -W 0 -A "weka.core.neighboursearch.LinearNNSearch -A \"weka.core.EuclideanDistance -R first-last\""
+Relation: problemaIA
+
+
+Correctly Classified Instances          51               98.0769 %
+Incorrectly Classified Instances         1                1.9231 %
+Kappa statistic                          0.9356
+Mean absolute error                      0.0287
+Root mean squared error                  0.1377
+Relative absolute error                  8.2073 %
+Root relative squared error             34.4962 %
+Total Number of Instances               52     
+
+=== Detailed Accuracy By Class ===
+
+               TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+                 1         0.1        0.977     1         0.988      0.95     Class_1
+                 0.9       0          1         0.9       0.947      0.95     Class_2
+Weighted Avg.    0.981     0.081      0.981     0.981     0.98       0.95 
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 42  0 |  a = Class_1
+  1  9 |  b = Class_2
+
+=== Evaluation result ===
+
+Scheme: NaiveBayes
+Relation: problemaIA
+
+
+Correctly Classified Instances          46               88.4615 %
+Incorrectly Classified Instances         6               11.5385 %
+Kappa statistic                          0.6549
+Mean absolute error                      0.1052
+Root mean squared error                  0.3036
+Relative absolute error                 30.1221 %
+Root relative squared error             76.0825 %
+Total Number of Instances               52     
+
+=== Detailed Accuracy By Class ===
+
+               TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+                 0.905     0.2        0.95      0.905     0.927      0.952    Class_1
+                 0.8       0.095      0.667     0.8       0.727      0.948    Class_2
+Weighted Avg.    0.885     0.18       0.896     0.885     0.888      0.951
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 38  4 |  a = Class_1
+  2  8 |  b = Class_2
+
