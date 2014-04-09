@@ -55,7 +55,7 @@
 
 (setf *evaluators* 
 	(remove-if-not #'(lambda (ev) (= (mc-evaluator-depth ev) 2))
-		(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA*) 2 1)))
+		(generate-evaluators (list *jdr-mmx-Regular-SA* *jdr-mmx-Bueno-SA* *Top50* *Top60*) 2 1)))
 
 ; Dar valor a un estado: ejecutamos la partida con cada uno de los jugadores,
 ;	que reciben el estado como vector de pesos.
@@ -84,7 +84,7 @@
 			0.2
 			20))))
 
-(setf result (simancala 1000))
+(setf result (simancala 10000))
 (setf wths (first result))
 (format T "~&>>>RBG ~%")
 (format T "Average: ~a ~%" (second result))

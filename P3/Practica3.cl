@@ -1,5 +1,4 @@
 ;;; ==========================================================================================
-;;; PENE
 ;;; PRACTICAS IA. PRACTICA 4 (JUEGOS)
 ;;;
 ;;; MANCALA - v.7 P2P   A. de Salabert 2014
@@ -656,7 +655,7 @@ arguments."
               (unless ret-mov  (- (funcall f-eval estado)))))
           ;;; Distinguimos si tenemos que maximizar o minimizar.
           ((= maximizing 1)
-              (loop for sucesor in sucesores do
+              (loop for sucesor in sucesores until (>=  alpha  beta) do
                 (let* (
                   ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
                   (result (minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
@@ -669,7 +668,7 @@ arguments."
               (if  ret-mov mejor-sucesor alpha))
           ;;; Misma lógica que antes, pero  minimizando.     
           ((= maximizing 0)
-            (loop for sucesor in sucesores do
+            (loop for sucesor in sucesores until (>= alpha beta) do
                 (let* (
                   (result (minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
                   (cond 
@@ -971,89 +970,49 @@ arguments."
          (+ total sus-fichas)
          (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
 
-(defun oxford-eval (estado)
-  (+
-  (* -0.8994589 (if (> (get-pts 1) (get-pts 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))  
-  (* 0.4557817 (if (> (get-tot 1) (get-tot 0)) (max-list-chained 0 estado) (max-list-chained 1 estado)))    
-  (* -0.6944761 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  (* -0.3170042 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
-  (* 0.9912045 (suma-fila (estado-tablero estado) (estado-lado-sgte-jugador estado)))
-  (* -0.5252774 (suma-fila (estado-tablero estado) (lado-contrario (estado-lado-sgte-jugador estado))))
-  (* -0.31688595 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
-  (* 0.46690035 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (estado-lado-sgte-jugador estado)))))
-  (* 0.18874097 (length (remove-if-not #'(lambda (x) (= x 0)) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.65226316 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.72952914 (length (remove-if-not #'(lambda (x) (not (= x 1))) (list-lado estado (estado-lado-sgte-jugador estado)))))
-  (* 0.36823273 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* 0.4678042 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.33338356 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))  (list-lado estado (estado-lado-sgte-jugador estado)))))
-  (* 0.45209908 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
-  (* -0.84877205 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
-  ))
 
-
-(setf *Top60* (make-jugador
-                        :nombre   '|Top60|
-                        :f-juego  #'f-j-mmx
-                        :f-eval   #'oxford-eval))
-
-
-(defun partida-all-games ()
-  (list
-   (partida 0 1 (list *Top60* *jdr-mmx-Regular*))
-   (partida 1 1 (list *Top60* *jdr-mmx-Regular*))
-   (partida 0 2 (list *Top60* *jdr-mmx-Regular*))
-   (partida 1 2 (list *Top60* *jdr-mmx-Regular*))
-   (partida 0 1 (list *Top60* *jdr-mmx-bueno*))
-   (partida 1 1 (list *Top60* *jdr-mmx-bueno*))
-   (partida 0 2 (list *Top60* *jdr-mmx-bueno*))
-   (partida 1 2 (list *Top60* *jdr-mmx-bueno*))
-  ))
-
-; (print (partida-all-games))
-; (-0.87 -0.92 -0.089999974 -0.64 0 0.32999998 0 0)
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; PRUEBAS DE LA PODA
 ;;; ------------------------------------------------------------------------------------------
 
-(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
-(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
-(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
-(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
+;(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
+;(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
+;(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
+;(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
 
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; PRUEBAS DE TIEMPO
 ;;; ------------------------------------------------------------------------------------------
 
-(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
-(setq estado (crea-estado-inicial 0 mi-posicion))
-(time (minimax estado 1 'oxford-eval))
-(time (minimax estado 2 'f-eval-Bueno))
+;(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
+;(setq estado (crea-estado-inicial 0 mi-posicion))
+;(time (minimax estado 1 'oxford-eval))
+;(time (minimax estado 2 'f-eval-Bueno))
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; Comparación ejecución profundidad par y profundida impar.
 ;;; ------------------------------------------------------------------------------------------
 
-(partida 0 1 (list *Top60* *jdr-mmx-Regular*))
-(partida 0 2 (list *Top60* *jdr-mmx-Regular*))
+;(partida 0 1 (list *Top60* *jdr-mmx-Regular*))
+;(partida 0 2 (list *Top60* *jdr-mmx-Regular*))
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; COMPARACIÓN UTILIZANDO PODA Y SIN PODAR
 ;;;   Utilizando el jugador aleatorio para evitar el tiempo de cálculo de la heurística.
 ;;; ------------------------------------------------------------------------------------------
 
-(time (minimax estado 2 'f-eval-Regular)) ; Run time: 0.016814 sec.
-(time (minimax-a-b estado 2 'f-eval-Regular)) ; Run time: 0.008159 sec.
+;(time (minimax estado 2 'f-eval-Regular)) ; Run time: 0.016814 sec.
+;(time (minimax-a-b estado 2 'f-eval-Regular)) ; Run time: 0.013248 sec.
 
-(time (minimax estado 5 'f-eval-Regular)) 
+;(time (minimax estado 5 'f-eval-Regular)) 
 ; Run time: 1.279404 sec.
 ; Run time: 1.293841 sec.
 
-(time (minimax-a-b estado 5 'f-eval-Regular)) 
-; Run time: 1.311433 sec.
-; Run time: 1.261489 sec.
+;(time (minimax-a-b estado 5 'f-eval-Regular)) 
+; Run time: 0.644046 sec.
+; Run time: 0.638829 sec.
 
 
 ;;; ------------------------------------------------------------------------------------------
@@ -1086,7 +1045,7 @@ arguments."
               (unless ret-mov  (- (funcall f-eval estado)))))
           ;;; Distinguimos si tenemos que maximizar o minimizar.
           ((= maximizing 1)
-              (loop for sucesor in sucesores do
+              (loop for sucesor in sucesores  until (>=  alpha  beta) do
                 (let* (
                   ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
                   (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
@@ -1099,7 +1058,7 @@ arguments."
               (if  ret-mov mejor-sucesor alpha))
           ;;; Misma lógica que antes, pero  minimizando.     
           ((= maximizing 0)
-            (loop for sucesor in sucesores do
+            (loop for sucesor in sucesores  until (>=  alpha  beta) do
                 (let* (
                   (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
                   (cond 
@@ -1110,33 +1069,28 @@ arguments."
                     (if  ret-mov mejor-sucesor beta)))))
               (if  ret-mov mejor-sucesor beta)))))))
 
-(time (minimax-a-b estado 5 'f-eval-Regular)) 
-  ; Run time: 1.36966 sec.
-  ; Run time: 1.348135 sec.
-  ; Run time: 1.345875 sec.
-  ; Run time: 1.338407 sec.
 
-(time (aleat-minimax-a-b estado 5 'f-eval-Regular)) 
-  ; Run time: 1.338015 sec.
-  ; Run time: 1.334534 sec.
-  ; Run time: 1.333455 sec.
-  ; Run time: 1.335938 sec.
+;(time (minimax-a-b estado 5 'f-eval-Regular)) 
+  ; Run time: 0.666123 sec.
+  ; Run time: 0.646479 sec.
+
+;(time (aleat-minimax-a-b estado 5 'f-eval-Regular)) 
+  ; Run time: 0.293419 sec.
+  ; Run time: 0.288963 sec.
 
 
-
-(time (minimax-a-b estado 2 'f-eval-Regular)) 
+;(time (minimax-a-b estado 2 'f-eval-Regular)) 
   ; Run time: 0.015907 sec.
   ; Run time: 0.015142 sec.
   ; Run time: 0.015485 sec.
-  ; Run time: 0.010236 sec.
 
+;(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
+  ; Run time: 0.010086 sec.
+  ; Run time: 0.007218 sec.
+  ; Run time: 0.015323 sec.
 
 ; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno*))
 ; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno*))
 ; (partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
 ; (partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
-(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
-  ; Run time: 0.005631 sec.
-  ; Run time: 0.005679 sec.
-  ; Run time: 0.005685 sec.
-  ; Run time: 0.005733 sec.
+
