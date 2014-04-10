@@ -125,7 +125,7 @@
          (chain-ate milado tablero (mod (+ pos sus-fichas) 8) (+ total sus-fichas) (+ cont 1))))))
 
 
-;;; Funciones de evaluación de los jugadores.
+;;;;;;;;;;;;;;;;====== FUNCIONES DE EVALUACIÓN ======;;;;;;;;;;;;;;;;;;;;;
 
 (defun f-eval-pruebas-SA (estado weights)
    (reduce #'+ 
@@ -149,21 +149,7 @@
       ; Evitamos tener muchas fichas en un mismo hoyo.
       (* 0.3 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))))
 
-(setf *jdr-pruebas* (make-jugador
-                        :nombre   '|Jugador de pruebas|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-pruebas-SA))
 
-
-(setf *Simon* (make-jugador
-                        :nombre   '|Simon|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-eval-pruebas))
-
-(setf *Simon-ab* (make-jugador
-                        :nombre   '|Simon|
-                        :f-juego  #'f-j-mmx-ab
-                        :f-eval   #'f-eval-pruebas))
 
 ;;; Jugador Bueno (pero tramposo: juega con un nivel mas de evaluacion)
 ;;; ------------------------------------------------------------------------------------------
@@ -243,10 +229,6 @@
   (* -0.84877205 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
   ))
 
-(setf *Top60* (make-jugador
-                        :nombre   '|Ju-Mmx-Top60-SA|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'oxford-eval))
 
 
 (defun f-ox-eval (estado w)
@@ -266,12 +248,6 @@
   (* 0.8639517 (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
   (* 0.29104614  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) (list-lado estado (estado-lado-sgte-jugador estado)))))
   ))
-
-(setf *Top50* (make-jugador
-                        :nombre   '|Ju-Mmx-Top50-SA|
-                        :f-juego  #'f-j-mmx-SA
-                        :f-eval   #'f-ox-eval))
-
 
 
 (defun f-80-eval (estado weights)
@@ -303,6 +279,34 @@
 ))
 
 
+;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
+
+
+(setf *jdr-pruebas* (make-jugador
+                        :nombre   '|Jugador de pruebas|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-pruebas-SA))
+
+
+(setf *Simon* (make-jugador
+                        :nombre   '|Simon|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-eval-pruebas))
+
+(setf *Simon-ab* (make-jugador
+                        :nombre   '|Simon|
+                        :f-juego  #'f-j-mmx-ab
+                        :f-eval   #'f-eval-pruebas))
+(setf *Top60* (make-jugador
+                        :nombre   '|Ju-Mmx-Top60-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'oxford-eval))
+
+
+(setf *Top50* (make-jugador
+                        :nombre   '|Ju-Mmx-Top50-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-ox-eval))
 
 
 (setf *Top80* (make-jugador
@@ -311,12 +315,6 @@
                         :f-eval   #'f-80-eval))
 
 
-;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
-
-(setq *timeout* 0)
-(setf *random* nil)
-
-(setf weights '(0.19824123 -0.74062204 0.4447801 0.16666222 0.925256 -0.89839506 -0.6152954 -0.030327797 0.5465987 0.15208268 -0.040797234 0.6847365))
 
 (setf *jdr-mmx-Bueno-SA* (make-jugador
                         :nombre   '|Ju-Mmx-Bueno-SA|
@@ -327,6 +325,11 @@
                         :nombre   '|Ju-Mmx-Regular-SA|
                         :f-juego  #'f-j-mmx-SA
                         :f-eval   #'f-eval-Regular-SA))
+
+
+;;; ------------------------------------------------------------------------------------------
+;;;   FUNCIONES AUXILIARES PARA PROBAR JUGADORES
+;;; ------------------------------------------------------------------------------------------
 
 (defun partida-SA-all-games (weights)
   (list
@@ -383,5 +386,3 @@
    (SA-partida 1 1 (list player *jdr-mmx-bueno-SA*) weights)
    (SA-partida 0 2 (list player *jdr-mmx-bueno-SA*) weights)
    (SA-partida 1 2 (list player *jdr-mmx-bueno-SA*) weights)))
-
-
