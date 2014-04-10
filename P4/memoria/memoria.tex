@@ -1,0 +1,202 @@
+\documentclass[nochap]{apuntes}
+
+\usepackage{listings}
+\author{Guillermo Julián y Víctor de Juan}
+\date{10-Abril}
+\title{Inteligencia Artificial - Practica 4}
+
+\lstset{
+	 inputencoding=utf8
+}
+
+\begin{document}
+\maketitle
+\section*{Parte 1}
+\paragraph{Realiza todas las pruebas posibles para conocer a fondo el funcionamiento del motor de inferencia. ¿Que ocurre si introducimos variables en nuestra hipotesis, como '(pertenece ?x (2 5 3 6 7))?}
+
+\begin{lstlisting}
+(set-hypothesis-list '((pertenece ?x (2 5 3 6 Y))))
+(motor-inferencia)
+;; res-> (((?X . 2)) ((?X . 5)) ((?X . 3)) ((?X . 6)) ((?X . Y)))
+\end{lstlisting}
+
+
+\paragraph{ Haz trazas del codigo siguiendo las funciones más importantes\\}
+
+\begin{verbatim}
+3. Trace: (CONSULTA '((PERTENECE 1 (2 5 1 6 7))))
+4. Trace: (FIND-HYPOTHESIS-VALUE '(PERTENECE 1 (2 5 1 6 7)))
+5. Trace: 
+(EVAL-RULE '(PERTENECE 1 (2 5 1 6 7))
+ '(R2 (PERTENECE ?E.34078 (?_ . ?XS.34079)) :-
+   ((PERTENECE ?E.34078 ?XS.34079))))
+6. Trace: (CONSULTA '((PERTENECE 1 (5 1 6 7))))
+7. Trace: (FIND-HYPOTHESIS-VALUE '(PERTENECE 1 (5 1 6 7)))
+8. Trace: 
+(EVAL-RULE '(PERTENECE 1 (5 1 6 7))
+ '(R2 (PERTENECE ?E.34102 (?_ . ?XS.34103)) :-
+   ((PERTENECE ?E.34102 ?XS.34103))))
+9. Trace: (CONSULTA '((PERTENECE 1 (1 6 7))))
+10. Trace: (FIND-HYPOTHESIS-VALUE '(PERTENECE 1 (1 6 7)))
+11. Trace: (EVAL-RULE '(PERTENECE 1 (1 6 7)) '(R1 (PERTENECE ?E.34125 (?E.34125 . ?_))))
+11. Trace: EVAL-RULE ==> (((NIL)))
+11. Trace: 
+(EVAL-RULE '(PERTENECE 1 (1 6 7))
+ '(R2 (PERTENECE ?E.34126 (?_ . ?XS.34127)) :-
+   ((PERTENECE ?E.34126 ?XS.34127))))
+12. Trace: (CONSULTA '((PERTENECE 1 (6 7))))
+13. Trace: (FIND-HYPOTHESIS-VALUE '(PERTENECE 1 (6 7)))
+14. Trace: 
+(EVAL-RULE '(PERTENECE 1 (6 7))
+ '(R2 (PERTENECE ?E.34150 (?_ . ?XS.34151)) :-
+   ((PERTENECE ?E.34150 ?XS.34151))))
+15. Trace: (CONSULTA '((PERTENECE 1 (7))))
+16. Trace: (FIND-HYPOTHESIS-VALUE '(PERTENECE 1 (7)))
+17. Trace: 
+(EVAL-RULE '(PERTENECE 1 (7))
+ '(R2 (PERTENECE ?E.34174 (?_ . ?XS.34175)) :-
+   ((PERTENECE ?E.34174 ?XS.34175))))
+18. Trace: (CONSULTA '((PERTENECE 1 NIL)))
+19. Trace: (FIND-HYPOTHESIS-VALUE '(PERTENECE 1 NIL))
+19. Trace: FIND-HYPOTHESIS-VALUE ==> NIL
+18. Trace: CONSULTA ==> NIL
+17. Trace: EVAL-RULE ==> NIL
+16. Trace: FIND-HYPOTHESIS-VALUE ==> NIL
+15. Trace: CONSULTA ==> NIL
+14. Trace: EVAL-RULE ==> NIL
+13. Trace: FIND-HYPOTHESIS-VALUE ==> NIL
+12. Trace: CONSULTA ==> NIL
+11. Trace: EVAL-RULE ==> NIL
+10. Trace: FIND-HYPOTHESIS-VALUE ==> (((NIL)))
+10. Trace: (CONSULTA 'NIL)
+10. Trace: CONSULTA ==> (((NIL)))
+9. Trace: CONSULTA ==> (((NIL)))
+8. Trace: EVAL-RULE ==> (((NIL)))
+7. Trace: FIND-HYPOTHESIS-VALUE ==> (((NIL)))
+7. Trace: (CONSULTA 'NIL)
+7. Trace: CONSULTA ==> (((NIL)))
+6. Trace: CONSULTA ==> (((NIL)))
+5. Trace: EVAL-RULE ==> (((NIL)))
+4. Trace: FIND-HYPOTHESIS-VALUE ==> (((NIL)))
+4. Trace: (CONSULTA 'NIL)
+4. Trace: CONSULTA ==> (((NIL)))
+3. Trace: CONSULTA ==> (((NIL)))
+\end{verbatim}
+
+
+\paragraph{ Explica mediante un esquema de llamadas (utilizando un  ́árbol a por ejemplo) qué pasos va haciendo el motor de inferencia hasta llegar a la solución. ¿En qué se parece esto a Prolog? ¿En qué se diferencia?\\}
+
+GUILEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+
+\section{Predicados implementados}
+
+\subsection*{Encolar}
+\begin{lstlisting}
+;; Caso base: encolamos 1 elemento a una lista vacía.
+(set-hypothesis-list '((encolar () 1 ?L)))
+(motor-inferencia)
+;;res -> (((?L 1)))
+
+;; Caso recursivo: encolamos 1 elemento a una lista no vacía.
+(set-hypothesis-list '((encolar (1 2 3) 4 ?Rs)))
+(motor-inferencia)
+;;res -> (((?RS 1 2 3 4)))
+
+;; Caso base: encolamos 1 elemento a una lista vacía.
+(set-hypothesis-list '((encolar () 1 (1))))
+(motor-inferencia)
+;;res -> (((NIL)))
+\end{lstlisting}
+
+\subsection*{Concatenar}
+\begin{lstlisting}
+
+;; Caso base: agregamos una lista de un elemento a una lista vacía.
+(set-hypothesis-list '((concatenar () (5) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 5)))
+
+;; Caso base: agregamos una lista de 1 elemento a una lista no vacía (como encolar).
+(set-hypothesis-list '((concatenar (6 7) (5) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 6 7 5)))
+
+;; Caso recursivo: 2 listas no vacías
+(set-hypothesis-list '((concatenar () (1 2) ?Xs)))
+(motor-inferencia)
+;;res -> (((?XS 1 2)))
+\end{lstlisting}
+
+
+\subsection*{Invertir}
+\begin{lstlisting}
+(set-hypothesis-list '((invertir () ?Zs)))
+(motor-inferencia)
+;;res -> (((?ZS)))
+
+(set-hypothesis-list '((invertir (1 2 3 4 5) ?X)))
+(motor-inferencia)
+;;res -> (5 4 3 2 1)
+
+
+;;; Estos ejemplos se comen la pila.
+;(set-hypothesis-list '((invertir  ?X () )))
+;(motor-inferencia)
+;; Program stack overflow.
+;(set-hypothesis-list '((invertir  ?X (1 2 3 4 5))))
+;(motor-inferencia)
+;; Program stack overflow.
+
+\end{lstlisting}
+
+
+\section*{Parte 2}
+
+
+\subsection*{Productorio}
+\begin{lstlisting}
+(set-hypothesis-list '((productorio () ?R)))
+(motor-inferencia)
+;;res-> (((?R . 1)))
+
+(set-hypothesis-list '((productorio (10) ?R)))
+(motor-inferencia)
+;;res-> (((?R . 10)))
+
+(set-hypothesis-list '((productorio (5 10) ?R)))
+(motor-inferencia)
+;;res-> (((?R . 10)))
+
+(set-hypothesis-list '((productorio (1 2 3 4) ?R)))
+(motor-inferencia)
+;;res-> (((?R . 24)))
+\end{lstlisting}
+
+\subsection*{Elemento N de una lista}
+
+\begin{lstlisting}
+
+(set-hypothesis-list '((posicionN 0 (A B C D E) ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+(set-hypothesis-list '((posicionN 7 (A B C D E) ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+(set-hypothesis-list '((posicionN 3 () ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+(set-hypothesis-list '((posicionN 4 (A B C D E) ?X)))
+(motor-inferencia)
+;;res-> (((?X . D)))
+
+(set-hypothesis-list '((posicionN -2 (4 5) ?X)))
+(motor-inferencia)
+;;res-> NIL
+\end{lstlisting}
+
+
+\end{document}

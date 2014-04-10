@@ -2,7 +2,7 @@
 
 \usepackage{alltt}
 \author{Guillermo Julián y Víctor de Juan}
-\date{28-Marzo}
+\date{10-Abril}
 \title{Inteligencia Artificial - Practica 3}
 
 \begin{document}
@@ -21,13 +21,13 @@ Tras jugar varias partidas descubrimos factores importantes
 \item El número de hoyos ocupados.
 \item El máximo de semillas en un hoyo.
 \item Cuántos hoyos hay libres.
-\item El máximo de semillas que puedo robar (encadenadamente. Contando con que al robar hay que seguir sembrando y se pueden volver a robar)
+\item El máximo de semillas que puedo robar encadenadamente. (Contando con que al robar hay que seguir sembrando y se pueden volver a robar)
 \item El número de hoyos en los que no nos pueden robar semillas (por tener más de 4 semillas o por no tener ninguna)
 \item El número de hoyos en los que si se pueden robar semillas.
 \item El número de hoyos con 1 semilla (si tenemos todos los hoyos con una única semilla es muy fácil perder, porque en cuanto nos roben una, siembran y nos roban la siguiente (si el oponente tiene semillas en sus hoyos claro)
 \end{itemize}
 
-Estos factores son computables para ambos jugadores de la partida.
+Estos factores son computables para ambos jugadores de la partida. La implementación de estas heurísitcas se encuentra en el \textit{*heuristics*}
 
 El problema que nos encontramos fue cómo ponderar los diversos factores. Lo que hemos hecho para resolver este sistema ha sido utilizar un algoritmo de optimización llamado \textit{Simulated-annealing}. El empleo de este algoritmo nos posibilitó encontrar la mejor combinación de ponderaciones para los factores.
 
@@ -78,10 +78,13 @@ Observamos que \textit{mi-f-eval} es más rápida que la función de evaluación
 Está comentado el código de la función minimax.
 
 \subsubsection*{Apartado B2.2}
+\paragraph{Implementa la poda alfa-beta:}
+Está implementado en el código.
 
 \subsubsection*{Apartado B2.3}
 
-\paragraph{Compare el tiempo que tarda un jugador utilizando minimax y utilizando minimax con poda alfa-beta. Comente los resultados.}
+\paragraph{Compare el tiempo que tarda un jugador utilizando minimax y utilizando minimax con poda alfa-beta. Comente los resultados.\\\\}
+
 
 La poda tarda mucho menos en el caso de profundidad 2 todas las veces que lo comprobamos. A continuación se muestran los resultados de una ejecución típica:
 \begin{alltt}
@@ -107,9 +110,9 @@ Si aumentamos la profundidad, cada vez se nota más la diferencia. Inlustramos c
 Se observa una variación de los tiempos a pesar de ser la misma función evaluada. Esto se debe a que al medir tiempos de ejecución, el programa puede tardar más o menos dependiendo del estado de la máquina.
 
 \subsubsection*{Apartado B2.4}
-\paragraph{ Modifique el orden el que se exploran las jugadas. Comente el efecto que tiene en la poda alfa-beta modificar dicho orden.}
+\paragraph{ Modifique el orden el que se exploran las jugadas. Comente el efecto que tiene en la poda alfa-beta modificar dicho orden.\\\\}
 
-Con el mismo tablero que en las pruebas anteriores, utilizando la función \textit{aleat-minimax-a-b} (que simplemente hace un \textit{reverse} de la lista de los sucesores) obtenemos unos resultados ligeramente mejores (a pesar de haber tenido que emplear la función reverse que no será un tiempo despreciable por ser de orden O(n)).
+Con el mismo tablero que en las pruebas anteriores, utilizando la función \textit{rever-minimax-a-b} (que simplemente hace un \textit{reverse} de la lista de los sucesores) obtenemos unos resultados ligeramente mejores (a pesar de haber tenido que emplear la función reverse que no será un tiempo muy despreciable).
 
 Tanto a profundidad 2 como a profundidad 5 se nota la diferencia (aunque a mayor profuncidad mayor diferencia):
 
@@ -119,7 +122,7 @@ Tanto a profundidad 2 como a profundidad 5 se nota la diferencia (aunque a mayor
   ; Run time: 0.015142 sec.
   ; Run time: 0.015485 sec.
 
-(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
+(time (rever-minimax-a-b estado 2 'f-eval-Regular)) 
   ; Run time: 0.010086 sec.
   ; Run time: 0.007218 sec.
   ; Run time: 0.015323 sec.
@@ -128,7 +131,7 @@ Tanto a profundidad 2 como a profundidad 5 se nota la diferencia (aunque a mayor
   ; Run time: 0.666123 sec.
   ; Run time: 0.646479 sec.
 
-(time (aleat-minimax-a-b estado 5 'f-eval-Regular)) 
+(time (rever-minimax-a-b estado 5 'f-eval-Regular)) 
   ; Run time: 0.293419 sec.
   ; Run time: 0.288963 sec.
 \end{alltt}
@@ -138,7 +141,6 @@ Lo que está pasando es que al hacer \textit{reverse} de la lista estamos explor
 \subsubsection*{Apartado B2.5}
 Si se pudiera ordenar los nodos a explorar de mejor a peor según la heurística, se podarían siempre todas las opciones menos la primera, teniendo simplemente un algoritmo de recorrido y no de búsqueda. El problema es que no podemos saber de antemano que estado es mejor que otro.
 
-Se podría definir una posible regla que fuera ordenar aleatoriamente la lista de sucesores u ordenar según una heurística de profundidad 1
-
+Se podría definir una posible regla que fuera ordenar aleatoriamente la lista de sucesores u ordenar según la heurística pero no se pueden evaluar los nodos antes de generarlos, asique sólo cabría esperar que el aleatorio fuera suficiente o una vez generados los sucesores evaluarlos con una heurística rápida e intentar ordenarlos así, una vez generados.
 
 \end{document}

@@ -1,5 +1,0 @@
-../sbcl.compile Practica3.cl
-../sbcl.compile Practica3-SA.cl
-../sbcl.compile siman.cl
-../sbcl.compile simancala.cl
-../sbcl.run simancala.fasl

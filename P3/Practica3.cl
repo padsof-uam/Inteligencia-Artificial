@@ -80,10 +80,6 @@
 (defvar *random*           nil)
 (defvar *jugfactor*        1)
 
-(setf *tournament* T)
-(setf *verb*      nil)
-(setf *verjugada* nil)
-
 (defun range(n m)
   (if (< m n)
     (reverse (range m n))
@@ -981,6 +977,7 @@ arguments."
 ;(partida 1 2 (list *jdr-mmx-regular* *jdr-mmx-Bueno-ab*))
 ;(partida 1 2 (list *jdr-mmx-regular-ab* *jdr-mmx-Bueno-ab*))
 
+;; Comprobamos que sale el mismo resultado en todas.
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; PRUEBAS DE TIEMPO
@@ -988,47 +985,50 @@ arguments."
 
 ;(setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 ;(setq estado (crea-estado-inicial 0 mi-posicion))
-;(time (minimax estado 1 'oxford-eval))
+;(time (minimax estado 1 'f-eval-Regular))
 ;(time (minimax estado 2 'f-eval-Bueno))
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; Comparación ejecución profundidad par y profundida impar.
 ;;; ------------------------------------------------------------------------------------------
 
-;(partida 0 1 (list *Top60* *jdr-mmx-Regular*))
-;(partida 0 2 (list *Top60* *jdr-mmx-Regular*))
+;(partida 0 1 (list *jdr-mmx-Bueno* *jdr-mmx-Regular*))
+;(partida 0 2 (list *jdr-mmx-Bueno* *jdr-mmx-Regular*))
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; COMPARACIÓN UTILIZANDO PODA Y SIN PODAR
 ;;;   Utilizando el jugador aleatorio para evitar el tiempo de cálculo de la heurística.
 ;;; ------------------------------------------------------------------------------------------
 
-;(time (minimax estado 2 'f-eval-Regular)) ; Run time: 0.016814 sec.
-;(time (minimax-a-b estado 2 'f-eval-Regular)) ; Run time: 0.013248 sec.
+;(time (minimax estado 2 'f-eval-Regular))
+  ; Run time: 0.016814 sec.
+;(time (minimax-a-b estado 2 'f-eval-Regular)) 
+  ; Run time: 0.013248 sec.
 
 ;(time (minimax estado 5 'f-eval-Regular)) 
-; Run time: 1.279404 sec.
-; Run time: 1.293841 sec.
+  ; Run time: 1.279404 sec.
+  ; Run time: 1.293841 sec.
 
 ;(time (minimax-a-b estado 5 'f-eval-Regular)) 
-; Run time: 0.644046 sec.
-; Run time: 0.638829 sec.
+  ; Run time: 0.644046 sec.
+  ; Run time: 0.638829 sec.
 
 
 ;;; ------------------------------------------------------------------------------------------
 ;;; COMPARACIÓN ALTERANDO EL ORDEN DE LOS SUCESORES
 ;;; ------------------------------------------------------------------------------------------
 
-(defun aleat-minimax-a-b (estado profundidad-max f-eval)
+(defun rever-minimax-a-b (estado profundidad-max f-eval)
   (let* ((oldverb *verb*)  (*verb* nil)
-         (estado2 (aleat-minimax-auxab estado t profundidad-max profundidad-max 1 -999999 999999 f-eval))
+         (estado2 (rever-minimax-auxab estado t profundidad-max profundidad-max 1 -999999 999999 f-eval))
          (*verb* oldverb))
     estado2))
 
-(defun aleat-minimax-auxab (estado ret-mov depth-max depth maximizing alpha beta f-eval)
+(defun rever-minimax-auxab (estado ret-mov depth-max depth maximizing alpha beta f-eval)
   (cond 
     ((= depth 0) ;; Si hemos llegado al final del arbol:
         (if ( = (mod depth-max 2) 0)
+
           ;; Devolvemos el valor cambiado de signo si estamos en profundidad impar
           ;   para actualizar correctamente los valores de alfa y beta en niveles superiores.
           (unless ret-mov  (funcall f-eval estado))
@@ -1048,7 +1048,7 @@ arguments."
               (loop for sucesor in sucesores  until (>=  alpha  beta) do
                 (let* (
                   ; Llamada recursiva al algoritmo con un nivel menos de profundidad y minimizando.
-                  (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
+                  (result (rever-minimax-auxab sucesor nil depth-max (- depth 1) 0 alpha beta f-eval)))
                   (cond 
                     ((> result alpha) ;; Actualizaciones de los valores de alfa,beta y de retorno si es necesario.
                       (setq alpha result)
@@ -1060,7 +1060,7 @@ arguments."
           ((= maximizing 0)
             (loop for sucesor in sucesores  until (>=  alpha  beta) do
                 (let* (
-                  (result (aleat-minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
+                  (result (rever-minimax-auxab sucesor nil depth-max (- depth 1) 1 alpha beta f-eval)))
                   (cond 
                     ((< result beta)
                       (setq beta result)
@@ -1074,7 +1074,7 @@ arguments."
   ; Run time: 0.666123 sec.
   ; Run time: 0.646479 sec.
 
-;(time (aleat-minimax-a-b estado 5 'f-eval-Regular)) 
+;(time (rever-minimax-a-b estado 5 'f-eval-Regular)) 
   ; Run time: 0.293419 sec.
   ; Run time: 0.288963 sec.
 
@@ -1084,7 +1084,7 @@ arguments."
   ; Run time: 0.015142 sec.
   ; Run time: 0.015485 sec.
 
-;(time (aleat-minimax-a-b estado 2 'f-eval-Regular)) 
+;(time (rever-minimax-a-b estado 2 'f-eval-Regular)) 
   ; Run time: 0.010086 sec.
   ; Run time: 0.007218 sec.
   ; Run time: 0.015323 sec.
