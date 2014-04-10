@@ -15,24 +15,24 @@
 	(R13 (ordenada (?x ?y . ?zs)) :- ((?= T (?eval (<= ?x ?y))) (ordenada (?y . ?zs))))
 	(R14 (productorio () 1))
 	(R15 (productorio (?X . ?R) ?Z) :- ((productorio ?R ?P) (?= ?Z (?eval (* ?P ?X)))))
-	(R16 (doblar ?X ?R) :- ((?= ?R (?eval (* ?X 2)))))
-	(R17 (map ?_ () ()))
-	(R18 (map ?Pred (?First . ?Rest) ?Retval) :- (
+	(R16 (posicionN 1 (?X . ?_) ?X))
+	(R17 (posicionN ?X (?_ . ?L) ?R) :- ((?= T (?eval (> ?X 1))) (?= ?P (?eval (- ?X 1))) (posicionN ?P ?L ?R)))
+	(R18 (doblar ?X ?R) :- ((?= ?R (?eval (* ?X 2)))))
+	(R19 (map ?_ () ()))
+	(R20 (map ?Pred (?First . ?Rest) ?Retval) :- (
 				 (?Pred ?First ?FirstRes)
 				 (concatenar (?FirstRes) ?Recur ?Retval)
 				 (map ?Pred ?Rest ?Recur)
 				 ))
-	(R19 (neutro + 0))
-	(R20 (neutro * 1))
-	(R21 (+ ?A ?B (?eval (+ ?A ?B))))
-	(R22 (* ?A ?B (?eval (* ?A ?B))))
-	(R23 (reduce ?Pred () ?R) :- ((neutro ?Pred ?R)))
-	(R24 (reduce ?Pred (?First . ?Rest) ?Retval) :- (
+	(R21 (neutro + 0))
+	(R22 (neutro * 1))
+	(R23 (+ ?A ?B (?eval (+ ?A ?B))))
+	(R24 (* ?A ?B (?eval (* ?A ?B))))
+	(R25 (reduce ?Pred () ?R) :- ((neutro ?Pred ?R)))
+	(R26 (reduce ?Pred (?First . ?Rest) ?Retval) :- (
 		(reduce ?Pred ?Rest ?Partial)
 		(?Pred ?First ?Partial ?Retval)
 		))
-	(R25 (posicionN 1 (?X . ?_) ?X))
-	(R26 (posicionN ?X (?_ . ?L) ?R) :- ((?= T (?eval (> ?X 1))) (?= ?P (?eval (- ?X 1))) (posicionN ?P ?L ?R)))
 
 ))
 ;;;; Ejercicio 1.
@@ -51,11 +51,14 @@
 (untrace find-hypothesis-value eval-rule consulta)
 
 
-(set-hypothesis-list '((pertenece ?x (2 5 3 6 Y))))
+(set-hypothesis-list '((pertenece ?x (2 5 3 6 ?Y))))
 (motor-inferencia)
-;; res-> (((?X . 2)) ((?X . 5)) ((?X . 3)) ((?X . 6)) ((?X . Y)))
+;; res -> (((?X . 2)) ((?X . 5)) ((?X . 3)) ((?X . 6)) ((?X . Y)))
 
 
+(set-hypothesis-list '((pertenece ?x (2 2 2 2))))
+(motor-inferencia)
+;; res -> (((?X . 2)) ((?X . 2)) ((?X . 2)) ((?X . 2)))
 ;;;; Ejercicio 2.
 
 ;;; Ejercicio 2.a
@@ -141,11 +144,11 @@
 
 
 ;;; Estos ejemplos se comen la pila.
-(set-hypothesis-list '((invertir  ?X () )))
-(motor-inferencia)
+;(set-hypothesis-list '((invertir  ?X () )))
+;(motor-inferencia)
 ;;res ->
-(set-hypothesis-list '((invertir  ?X (1 2 3 4 5))))
-(motor-inferencia)
+;(set-hypothesis-list '((invertir  ?X (1 2 3 4 5))))
+;(motor-inferencia)
 
 
 ;;;; Parte 2
@@ -205,26 +208,62 @@
 (motor-inferencia)
 ;;res-> (((?RS 4)))
 
-;;;;;;;; Pruebas Map ;;;;;;;;
+
+
+;;;------------------------------------------------------------------------------
+;;; Posición N
+;;;------------------------------------------------------------------------------
+
+(set-hypothesis-list '((posicionN 0 (A B C D E) ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+(set-hypothesis-list '((posicionN 7 (A B C D E) ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+(set-hypothesis-list '((posicionN 3 () ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+(set-hypothesis-list '((posicionN 4 (A B C D E) ?X)))
+(motor-inferencia)
+;;res-> (((?X . D)))
+
+(set-hypothesis-list '((posicionN -2 (4 5) ?X)))
+(motor-inferencia)
+;;res-> NIL
+
+;;;;; Otros ejemplos
+
+(set-hypothesis-list '((posicionN ?X (4 5) ?Y)))
+(motor-inferencia)
+;;res-> (((?X . 1) (?Y . 4)))
+
+
+;;;------------------------------------------------------------------------------
+;;; Map
+;;;------------------------------------------------------------------------------
 
 (set-hypothesis-list '((map doblar () ?Rs)))
 (motor-inferencia)
-
-;;; Caso base
-(set-hypothesis-list '((map doblar (1) ?Rs)))
-(motor-inferencia)
 ;;res-> (((?RS)))
 
-;;; Caso normal.
+(set-hypothesis-list '((map doblar (1) ?Rs)))
+(motor-inferencia)
+;;res-> (((?RS 2)))
+
 (set-hypothesis-list '((map doblar (2 1) ?Rs)))
 (motor-inferencia)
 ;;res-> (((?RS 4 2)))
 
 (set-hypothesis-list '((map doblar (2 1 3 0 25) ?Rs)))
 (motor-inferencia)
-;;res-> (((?RS 4 2)))
+;;res-> (((?RS 4 2 6 0 50)))
 
-;;;;;;;;; Pruebas reduce ;;;;;;
+;;;------------------------------------------------------------------------------
+;;; Reduce
+;;;------------------------------------------------------------------------------
 
 (set-hypothesis-list '((+ 1 2 ?R)))
 (motor-inferencia)
@@ -263,33 +302,3 @@
 ;; res -> (((?RS . 1))
 
 
-
-;;;------------------------------------------------------------------------------
-;;; Posición N
-;;;------------------------------------------------------------------------------
-
-(set-hypothesis-list '((posicionN 0 (A B C D E) ?X)))
-(motor-inferencia)
-;;res-> NIL
-
-(set-hypothesis-list '((posicionN 7 (A B C D E) ?X)))
-(motor-inferencia)
-;;res-> NIL
-
-(set-hypothesis-list '((posicionN 3 () ?X)))
-(motor-inferencia)
-;;res-> NIL
-
-(set-hypothesis-list '((posicionN 4 (A B C D E) ?X)))
-(motor-inferencia)
-;;res-> (((?X . D)))
-
-(set-hypothesis-list '((posicionN -2 (4 5) ?X)))
-(motor-inferencia)
-;;res-> NIL
-
-;;;;; Otros ejemplos
-
-(set-hypothesis-list '((posicionN ?X (4 5) ?Y)))
-(motor-inferencia)
-;;res-> (((?X . 1) (?Y . 4)))
