@@ -692,25 +692,40 @@ arguments."
     estado2))
 
 (defun minimax-1 (estado profundidad devolver-movimiento profundidad-max f-eval)
-  (cond ((>= profundidad profundidad-max) ;; Si hemos llegado al final del árbol.
-         (unless devolver-movimiento  (funcall f-eval estado)))
-        (t 
-         (let* ((sucesores (generar-sucesores estado))
-               (mejor-valor -99999) ;; "Inicializamos" al mínimo el valor para poder comparar.
-                (mejor-sucesor nil))
-           (cond 
-                ((null sucesores) ;; Si hemos llegado al final del árbol.
-                  (unless devolver-movimiento  (funcall f-eval estado)))
-                (t
-                  (loop for sucesor in sucesores do
-                    (let* ((resultado-sucesor (minimax-1 sucesor (1+ profundidad)
-                                        nil profundidad-max f-eval)) ; Llamada recursiva al algoritmo devolviendo valor (no estado) con un nivel más de profundidad.
-                           (valor-nuevo (- resultado-sucesor))) ; Cambio de signo necesario para negamax.
-                      (when (> valor-nuevo mejor-valor) ; Actualización de los valores si es se ha encontrado un resultado mejor.
-                        (setq mejor-valor valor-nuevo)
-                        (setq mejor-sucesor  sucesor ))))
-                  ; Devolución del estado o del valor.
-                  (if  devolver-movimiento mejor-sucesor mejor-valor)))))))
+  (cond 
+    ((>= profundidad profundidad-max) ; Si hemos llegado al final del árbol
+      (unless devolver-movimiento ; y si no queremos devolver sólo el movimiento
+        (funcall f-eval estado)))
+         ; devolvemos el valor de la función en este estado.
+    (t ; En otro caso 
+      (let* (
+        (sucesores (generar-sucesores estado)) ; Generamos sucesores
+        (mejor-valor -99999) ; Inicializamos el menor valor al mínimo
+        (mejor-sucesor nil)) ; Y marcamos el mejor sucesor como nulo de momento.
+        
+        (cond 
+          ((null sucesores) ;; Si hemos llegado al final del árbol.
+            (unless devolver-movimiento 
+              (funcall f-eval estado)))
+              ; Devolvemos el valor salvo que sólo queramos el movmiento.
+          (t ; Si no hemos llegado al final
+            (loop for sucesor in sucesores do 
+              (let* ((resultado-sucesor (minimax-1 sucesor (1+ profundidad)
+                                  nil profundidad-max f-eval)) ; Llamada 
+                ; recursiva al algoritmo devolviendo valor (no estado)
+                ; con un nivel más de profundidad.
+                     (valor-nuevo (- resultado-sucesor))) ; Cambio de signo 
+                ; necesario para negamax.
+
+                ; Actualización de los valores si se ha encontrado 
+                ; un resultado mejor.
+                (when (> valor-nuevo mejor-valor) 
+                  (setq mejor-valor valor-nuevo)
+                  (setq mejor-sucesor  sucesor ))))
+            ; Devolución del estado o del valor según nos pidan
+            (if devolver-movimiento 
+              mejor-sucesor 
+              mejor-valor)))))))
 
 
 ;;; ------------------------------------------------------------------------------------------

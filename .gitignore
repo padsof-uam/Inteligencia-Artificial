@@ -10,3 +10,7 @@
 *.dat
 *.idx
 *.out
+*.bbl
+*.blg
+*.ilg
+*.ind

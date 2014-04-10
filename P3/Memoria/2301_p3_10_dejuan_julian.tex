@@ -1,18 +1,19 @@
-\documentclass[nochap]{apuntes}
-
+\documentclass{apuntes}
 \usepackage{alltt}
+\usepackage[square]{natbib}
+
 \author{Guillermo Julián y Víctor de Juan}
-\date{10-Abril}
-\title{Inteligencia Artificial - Practica 3}
+\date{\today}
+\title{Inteligencia Artificial - Práctica 3}
 
 \begin{document}
 \maketitle
 
-\section*{Parte B}
-\subsection*{Pregunta B1. Función de Evaluación}
-\subsubsection*{Apartado B1.1}
+\chapter*{Parte B}
+\section*{B1. Función de Evaluación}
+\subsection*{Apartado B1.1}
 
-Todas nuestras funciones de evaluación siguen el mismo formato. Varios factores dependientes del tablero que podían ser influyentes, ponderados según su importancia.
+Todas nuestras funciones de evaluación siguen el mismo formato. Obtenemos un valor para cada jugada sumando varios factores dependientes del tablero que hemos creído influyentes, ponderados según su importancia.
 
 \subsubsection*{Fundamentos, razonamiento y pruebas}
 Tras jugar varias partidas descubrimos factores importantes
@@ -21,32 +22,35 @@ Tras jugar varias partidas descubrimos factores importantes
 \item El número de hoyos ocupados.
 \item El máximo de semillas en un hoyo.
 \item Cuántos hoyos hay libres.
-\item El máximo de semillas que puedo robar encadenadamente. (Contando con que al robar hay que seguir sembrando y se pueden volver a robar)
-\item El número de hoyos en los que no nos pueden robar semillas (por tener más de 4 semillas o por no tener ninguna)
+\item El máximo de semillas que puedo robar teniendo en cuenta los robos encadenados.
+\item El número de hoyos en los que no nos pueden robar semillas (por tener más de 4 semillas o por no tener ninguna).
 \item El número de hoyos en los que si se pueden robar semillas.
-\item El número de hoyos con 1 semilla (si tenemos todos los hoyos con una única semilla es muy fácil perder, porque en cuanto nos roben una, siembran y nos roban la siguiente (si el oponente tiene semillas en sus hoyos claro)
+\item El número de hoyos con 1 semilla.
 \end{itemize}
 
-Estos factores son computables para ambos jugadores de la partida. La implementación de estas heurísitcas se encuentra en el \textit{*heuristics*}
+Estos factores son computables para ambos jugadores de la partida. La implementación de estas heurísticas se encuentra en la lista \texttt{*heuristics*}
 
-El problema que nos encontramos fue cómo ponderar los diversos factores. Lo que hemos hecho para resolver este sistema ha sido utilizar un algoritmo de optimización llamado \textit{Simulated-annealing}. El empleo de este algoritmo nos posibilitó encontrar la mejor combinación de ponderaciones para los factores.
+El problema que nos encontramos fue cómo ponderar los diversos factores. Lo que hemos hecho para resolver este sistema ha sido utilizar un algoritmo de optimización llamado \textit{Simulated Annealing} \citep{kirkpatrick83}. El empleo de este algoritmo nos posibilitó encontrar la mejor combinación de ponderaciones para los factores.
 
-\paragraph{Simulated Annealing}
-La implementación de este algoritmo se encuentra repartida entre los ficheros \textit{siman.cl} (que contiene el algoritmo general de simmulated annealing) y \textit{simancala.cl} (que es la concreción del algoritmo para partidas de mancala).
+El algoritmo está implementado de forma genérica (de hecho, las pruebas las hemos hecho para buscar el mínimo de una función matemática), y después hemos concretado las funciones para adaptarlo a la partida de Mancala. El algoritmo modificará una lista de pesos, cada uno correspondiente a una heurística. Para obtener el valor correspondiente a cada combinación de pesos ejecutamos una versión modificada de \texttt{partida}, \texttt{SA-partida}, que además de todos los parámetros recibe una lista de pesos que después pasa a cada jugador. En nuestra implementación, sólo el jugador de prueba la aplica, mientras que el resto (los contrincantes contra los que probamos el jugador) la ignoran.
 
-El resultado de la ejecución de \textit{simancala.cl} es una lista de números entre -1 y 1. Por ejemplo -0.83 significa partida ganada en 17 turnos, y de manera similar, 0.36 significa partida perdida en 0.64 turnos. De esta forma cuanto más negativa sea la media de las partidas jugadas mejor. 
+El resultado de la ejecución de  \texttt{simancala} es una lista de números entre -1 y 1 calculados de la siguiente forma: \[ \mathrm{resultado} = g - g \frac{t}{100} \], donde $g$ es $-1$, $0$ ó $1$ según se haya ganado, empatado o perdido la partida, y $t$ es el número de turnos que ha durado la partida. Por ejemplo -0.83 significa partida ganada en 17 turnos;  0.36 indica partida perdida en 64 turnos.
 
+Así conseguimos una meta clara para el algoritmo de Simulated Annealing, que es buscar un mínimo de la suma de esos números. El hecho de añadir los turnos evita saltos en el espacio de valores que se asignan a los pesos y hace más efectivo el algoritmo. Por supuesto, también nos permite encontrar jugadores que ganen más rápido y tarden más en perder.
 
-\paragraph{Pruebas}
+\subsubsection*{Pruebas}
 
-Implementamos pequeñas modificaciones en el código recibido para poder tener una función (partida-SA-all-games) que dada una lista de ponderaciones jugara contra los jugadores de referencia \textit{Bueno} y \textit{Regular} a profundidades 1 y 2 (por no emplear demasiado tiempo en la simulación). 
+Una vez diseñado el algoritmo, lo pusimos a ejecutar varias veces a profundidades 1 y 2 contra los jugadores de referencia \textit{Bueno} y \textit{Regular} a profundidades 1 y 2, y modificamos la salida para que imprimiese por pantalla con un formato concreto que nos permitiera ver rápidamente los resultados.
 
-Para ello fue necesario crear una función de evaluación de cada jugador que también recibiera una lista de ponderaciones aunque luego no la usara y una función de minimax que recibiera como argumento las ponderaciones además del jugador de pruebas que tuviera una fución de evaluación dependiente de las heurísticas definidas en \textit{heuristics.cl}. Todas estas funciones están agrupadas en el fichero Practica3-SA.cl. 
+Además, creamos varias funciones que ejecutaban el jugador óptimo según el algoritmo de Simulated Annealing contra los jugadores de referencia, para así asegurarnos que cumplía los requisitos. Más adelante en la práctica, pasamos a automatizar este proceso y crear \textit{scripts} para buscar la mejor combinación de heurísticas y no sólo el mejor vector de pesos.
 
+\subsection*{Apartado B1.2}
 
-\subsubsection*{Apartado B1.2}
+La insistencia en el tiempo es importante. Si no tuviésemos esta limitación, simplemente generaríamos todo el árbol de posibles jugadas y escogeríamos la mejor. El problema es que esa estrategia sería muy costosa en tiempo y no es razonable.
+
 \subsubsection*{Pruebas de tiempo}
-Para medir los tiempos de ejecución de las heurísticas hicimos pruebas del estilo:
+Para medir los tiempos de ejecución de las heurísticas hicimos pruebas con la función \texttt{time} de Lisp:
+
 \begin{alltt}
 (setq mi-posicion (list '(1 0 1 3 3 4 0 3) (reverse '(4 0 3 5 1 1 0 1))))
 (setq estado (crea-estado-inicial 0 mi-posicion))
@@ -70,23 +74,53 @@ GC: 18, GC time: 0.07669 sec.
 
 Observamos que \textit{mi-f-eval} es más rápida que la función de evaluación del bueno, pero no llega al 50\% recomendado.
 
-\subsection*{Pregunta B2. Minimax y Minimax a-b}
-\subsubsection*{Apartado B2.1}
+\section*{B2. Minimax y Minimax a-b}
+\subsection*{Apartado B2.1}
 
-\paragraph{Explicación el código entregado:}
+Comentamos el código entregado línea a línea:
 
-Está comentado el código de la función minimax.
+\begin{alltt}
+(defun minimax-1 (estado profundidad devolver-movimiento profundidad-max f-eval)
+  (cond 
+    ((>= profundidad profundidad-max) ; Si hemos llegado al final del árbol
+      (unless devolver-movimiento ; y si no queremos devolver sólo el movimiento
+        (funcall f-eval estado)))
+         ; devolvemos el valor de la función en este estado.
+    (t ; En otro caso 
+      (let* (
+        (sucesores (generar-sucesores estado)) ; Generamos sucesores
+        (mejor-valor -99999) ; Inicializamos el menor valor al mínimo
+        (mejor-sucesor nil)) ; Y marcamos el mejor sucesor como nulo de momento.
+        
+        (cond 
+          ((null sucesores) ;; Si hemos llegado al final del árbol.
+            (unless devolver-movimiento 
+              (funcall f-eval estado)))
+              ; Devolvemos el valor salvo que sólo queramos el movmiento.
+          (t ; Si no hemos llegado al final
+            (loop for sucesor in sucesores do 
+              (let* ((resultado-sucesor (minimax-1 sucesor (1+ profundidad)
+                                  nil profundidad-max f-eval)) ; Llamada 
+                ; recursiva al algoritmo devolviendo valor (no estado)
+                ; con un nivel más de profundidad.
+                     (valor-nuevo (- resultado-sucesor))) ; Cambio de signo 
+                ; necesario para negamax.
 
-\subsubsection*{Apartado B2.2}
-\paragraph{Implementa la poda alfa-beta:}
-Está implementado en el código.
-
+                ; Actualización de los valores si se ha encontrado 
+                ; un resultado mejor.
+                (when (> valor-nuevo mejor-valor) 
+                  (setq mejor-valor valor-nuevo)
+                  (setq mejor-sucesor  sucesor ))))
+            ; Devolución del estado o del valor según nos pidan
+            (if devolver-movimiento 
+              mejor-sucesor 
+              mejor-valor)))))))
+\end{alltt}
 \subsubsection*{Apartado B2.3}
 
-\paragraph{Compare el tiempo que tarda un jugador utilizando minimax y utilizando minimax con poda alfa-beta. Comente los resultados.\\\\}
+\paragraph{Compare el tiempo que tarda un jugador utilizando minimax y utilizando minimax con poda alfa-beta. Comente los resultados. \\\\} 
 
-
-La poda tarda mucho menos en el caso de profundidad 2 todas las veces que lo comprobamos. A continuación se muestran los resultados de una ejecución típica:
+La poda tarda mucho menos en el caso de profundidad 2. A continuación se muestran los resultados de una ejecución típica:
 \begin{alltt}
 (time (minimax estado 2 'f-eval-Regular)) 
   ; Run time: 0.016814 sec.
@@ -94,7 +128,7 @@ La poda tarda mucho menos en el caso de profundidad 2 todas las veces que lo com
   ; Run time: 0.013248 sec.
 \end{alltt}
 
-Si aumentamos la profundidad, cada vez se nota más la diferencia. Inlustramos con 2 ejemplos de ejecuciones:
+La diferencia aumenta mucho al aumentar la profundidad. Por ejemplo, a profundidad la poda alfa-beta es casi dos veces más rápida.
 
 \begin{alltt}
 (time (minimax estado 5 'f-eval-Regular)) 
@@ -107,14 +141,15 @@ Si aumentamos la profundidad, cada vez se nota más la diferencia. Inlustramos c
 
 \end{alltt}
 
-Se observa una variación de los tiempos a pesar de ser la misma función evaluada. Esto se debe a que al medir tiempos de ejecución, el programa puede tardar más o menos dependiendo del estado de la máquina.
+Se observa una variación de los tiempos a pesar de ser la misma función evaluada. Esto se debe a que al medir tiempos de ejecución, el programa puede tardar más o menos dependiendo del estado de la máquina en la que se esté ejecutando.
 
 \subsubsection*{Apartado B2.4}
-\paragraph{ Modifique el orden el que se exploran las jugadas. Comente el efecto que tiene en la poda alfa-beta modificar dicho orden.\\\\}
 
-Con el mismo tablero que en las pruebas anteriores, utilizando la función \textit{rever-minimax-a-b} (que simplemente hace un \textit{reverse} de la lista de los sucesores) obtenemos unos resultados ligeramente mejores (a pesar de haber tenido que emplear la función reverse que no será un tiempo muy despreciable).
+\paragraph{Modifique el orden el que se exploran las jugadas. Comente el efecto que tiene en la poda alfa-beta modificar dicho orden. \\} 
 
-Tanto a profundidad 2 como a profundidad 5 se nota la diferencia (aunque a mayor profuncidad mayor diferencia):
+Con el mismo tablero que en las pruebas anteriores y utilizando la función \textit{rever-minimax-a-b}, que simplemente invierte la lista de sucesores, obtenemos unos resultados ligeramente mejores. 
+
+Tanto a profundidad 2 como a profundidad 5 se nota la diferencia, de nuevo repitiéndose el patrón de a mayor profundidad, mayor diferencia.
 
 \begin{alltt}
 (time (minimax-a-b estado 2 'f-eval-Regular)) 
@@ -136,11 +171,14 @@ Tanto a profundidad 2 como a profundidad 5 se nota la diferencia (aunque a mayor
   ; Run time: 0.288963 sec.
 \end{alltt}
 
-Lo que está pasando es que al hacer \textit{reverse} de la lista estamos explorando antes la mejor rama y podando el resto, evitando tiempo de procesado inútil.
+Lo que está pasando es que al invertir la lista estamos explorando antes la mejor rama y podando el resto, evitando tiempo de procesado inútil.
 
 \subsubsection*{Apartado B2.5}
-Si se pudiera ordenar los nodos a explorar de mejor a peor según la heurística, se podarían siempre todas las opciones menos la primera, teniendo simplemente un algoritmo de recorrido y no de búsqueda. El problema es que no podemos saber de antemano que estado es mejor que otro.
+Si se pudiera ordenar los nodos a explorar de mejor a peor según la heurística, se podarían siempre todas las opciones menos la primera, teniendo simplemente un algoritmo de recorrido y no de búsqueda. El problema es que no podemos saber de antemano qué estado es mejor que otro.
 
-Se podría definir una posible regla que fuera ordenar aleatoriamente la lista de sucesores u ordenar según la heurística pero no se pueden evaluar los nodos antes de generarlos, asique sólo cabría esperar que el aleatorio fuera suficiente o una vez generados los sucesores evaluarlos con una heurística rápida e intentar ordenarlos así, una vez generados.
+Se podría definir una posible regla que fuera ordenar aleatoriamente la lista de sucesores, de tal forma que tendríamos que examinar $O(b^{\frac{3m}{4}})$ nodos\footnote{$b$ es el factor de ramificación, $m$ la profundidad máxima del árbol de jugadas} \citep[sec. 5.3.1]{russellAI}. Otra posibilidad sería buscar una función rápida que asigne un valor a cada sucesor, de tal forma que si conseguimos de media una ordenación mejor que la aleatoria aumentaríamos el número de podas sin que repercuta en exceso en el tiempo de ejecución. Por supuesto, habría que tener también en cuenta el factor de ramificación: aunque la función sea rápida, el mejor algoritmo que tengamos de ordenación será $O ( b \log b)$. Es decir, que con factores de ramificación muy altos es posible que ni siquiera el enfoque de heurística rápida sea plausible.
+
+\bibliographystyle{plainnat}
+\bibliography{2301_p3_10_dejuan_julian}
 
 \end{document}
