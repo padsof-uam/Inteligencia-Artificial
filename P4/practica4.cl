@@ -15,6 +15,13 @@
 	(R13 (ordenada (?x ?y . ?zs)) :- ((?= T (?eval (<= ?x ?y))) (ordenada (?y . ?zs))))
 	(R14 (productorio () 1))
 	(R15 (productorio (?X . ?R) ?Z) :- ((productorio ?R ?P) (?= ?Z (?eval (* ?P ?X)))))
+	(R16 (doblar ?X ?R) :- ((?= ?R (?eval (* ?X 2)))))
+	(R17 (map ?_ () ()))
+	(R18 (map ?Pred (?First . ?Rest) ?Retval) :- (
+				 (?Pred ?First ?FirstRes)
+				 (concatenar (?FirstRes) ?Recur ?Retval)
+				 (map ?Pred ?Rest ?Recur)
+				 ))
 ))
 ;;;; Ejercicio 1.
 (erase-facts)
@@ -134,3 +141,25 @@
 (set-hypothesis-list '((productorio (1 2 3 4) ?R)))
 (motor-inferencia)
 ;;res-> (((?R . 24)))
+
+;;; Prueba de doblar
+(set-hypothesis-list '((doblar 2 ?R)))
+(motor-inferencia)
+;;res-> (((?RS 4)))
+
+(set-hypothesis-list '((map doblar () ?Rs)))
+(motor-inferencia)
+
+;;; Caso base
+(set-hypothesis-list '((map doblar (1) ?Rs)))
+(motor-inferencia)
+;;res-> (((?RS)))
+
+;;; Caso normal.
+(set-hypothesis-list '((map doblar (2 1) ?Rs)))
+(motor-inferencia)
+;;res-> (((?RS 4 2)))
+
+(set-hypothesis-list '((map doblar (2 1 3 0 25) ?Rs)))
+(motor-inferencia)
+;;res-> (((?RS 4 2)))
