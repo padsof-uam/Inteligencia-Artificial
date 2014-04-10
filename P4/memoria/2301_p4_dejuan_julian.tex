@@ -1,28 +1,27 @@
 \documentclass[nochap]{apuntes}
 
 \usepackage{listings}
-\lstset{language=Lisp}
+\lstset{language=Lisp, columns=flexible, basicstyle=\ttfamily, frame=single, }
 \author{Guillermo Julián y Víctor de Juan}
-\date{10-Abril}
-\title{Inteligencia Artificial - Practica 4}
+\date{\today}
+\title{Inteligencia Artificial - Práctica 4}
 
 
 \begin{document}
 \maketitle
 \section*{Parte 1}
 
-\paragraph{Realiza todas las pruebas posibles para conocer a fondo el funcionamiento del motor de inferencia. ¿Que ocurre si introducimos variables en nuestra hipotesis, como '(pertenece ?x (2 5 3 6 ?Y))?\\\\}
+\paragraph{Realiza todas las pruebas posibles para conocer a fondo el funcionamiento del motor de inferencia. ¿Que ocurre si introducimos variables en nuestra hipótesis, como \texttt{(pertenece ?x (2 5 3 6 ?Y))}?\\\\}
 
-Ocurre lo mismo que si fueran constantes. Esta regla también unifica si \textit{X=Y}, con lo que en el resultado observaremos una unificación como ((?X . ?Y)).\\
+Esta regla unifica con las constantes y además si \textit{X=Y}, con lo que en el resultado observaremos una unificación adicional como \texttt{((?X . ?Y))}.\\
 
-\begin{lstlisting}[frame=single]
-
+\begin{lstlisting}
 (set-hypothesis-list '((pertenece ?x (2 5 3 6 Y))))
 (motor-inferencia)
 ;; (((?X . 2)) ((?X . 5)) ((?X . 3)) ((?X . 6)) ((?X . ?Y)))
 \end{lstlisting}
 
-\paragraph{Haz las trazas del códifo siguiendo las funciones más importantes}
+\paragraph{Haz las trazas del código siguiendo las funciones más importantes}
 
 \begin{verbatim}
 1. Trace: (CONSULTA '((PERTENECE 1 (2 5 1 6 7))))
@@ -82,13 +81,13 @@ Ocurre lo mismo que si fueran constantes. Esta regla también unifica si \textit
 \end{verbatim}
 \paragraph{Explica mediante un esquema de llamadas (utilizando un árbol por ejemplo) qué pasos va haciendo el motor de inferencia hasta llegar a la solución. ¿En qué se parece esto a Prolog? ¿En qué se diferencia?\\\\}
 
-Cuando encontramos una regla con la que unificar la parte izquierda, tomamos como objeto de estudio cada una de las partes de la derecha (las implicaciones necesarias) y empezamos a buscar reglas que unifiquen con esa parte izquierda y mediante un proceso recursivo, (como indican las trazas) llegamos a un árbol binario en este caso (porque el predicadod \textit{pertenece} sólo tiene 2 reglas).
+Cuando encontramos una regla con la que unificar la parte izquierda, tomamos como objeto de estudio cada una de las partes de la derecha (las implicaciones necesarias) y empezamos a buscar reglas que unifiquen con esa parte izquierda y mediante un proceso recursivo, (como indican las trazas) llegamos a un árbol binario en este caso, dado que el predicado \texttt{pertenece} sólo tiene 2 reglas.
 
 Está indicado si unifica o no, y en caso de unificar, la llamada recursiva con la parte de la derecha de la regla (que es la que implica la parte izquierda).
 
 Como encontramos una coincidencia, devolvemos esa unificación.
 
-En este caso se han omitido las llamadas que realiza este motor de inferencia a las funciones concretas (como consulta, find-hypothesis-value y eval-rule) ya que esa información se encuentra en la traza y deja el diagrama en árbol más sencillo, claro y comprensible. El árbol simplemente modeliza el proceso de \textit{backtracking} seguido en el caso \textit{(set-hypothesis-list '((pertenece 1 (2 5 1 6 7))))}
+En este caso se han omitido las llamadas que realiza este motor de inferencia a las funciones concretas (como \texttt{consulta}, \texttt{find-hypothesis-value} y \texttt{eval-rule}) ya que esa información se encuentra en la traza y deja el diagrama en árbol más sencillo, claro y comprensible. El árbol simplemente modeliza el proceso de \textit{backtracking} seguido en el caso \texttt{(set-hypothesis-list '((pertenece 1 (2 5 1 6 7))))}
 \newpage
 \easyimgw{arb.png}{Arbol de backtracking}{Arb}{1.05}
 
@@ -104,7 +103,7 @@ Hay 3 grandes diferencias (aparte de la sintaxis obviamente) que son:
 ;; res -> (((?X . 2)) ((?X . 2)) ((?X . 2)) ((?X . 2)))
 \end{lstlisting}
 Mientras que Prolog devolvería simplemente \textit{X = 2}, ya que ese es el único valor con el que unifica.
-\item En Prolog las salidas booleanas son \textit{True} o \textit{False}. En el motor de inferencia el \textit{False} se representa con \textit{Nil} y el \textit{true} se representa con \textit{(((NIL)))}.
+\item En Prolog las salidas booleanas son \textit{True} o \textit{False}. En el motor de inferencia el \textit{False} se representa con \texttt{nil} y el \textit{true} se representa con \texttt{(((NIL)))}.
 \item El motor de inferencia no para hasta que no ha encontrado todas las posibles soluciones. Prolog permite parar cuando haya encontrado una.
 \end{itemize}
 
@@ -113,7 +112,6 @@ Mientras que Prolog devolvería simplemente \textit{X = 2}, ya que ese es el ún
 \subsection*{Encolar}
 Las reglas implementadas son:\\
 \begin{lstlisting}[frame=single]
-
 (R3 (encolar () ?E  (?E)))
 (R4 (encolar (?Y . ?L) ?E (?Y . ?Z)) :- ((encolar ?L ?E ?Z)))
 \end{lstlisting}
@@ -121,7 +119,6 @@ Las reglas implementadas son:\\
 Y los ejemplos que hemos probado han sido:\\
 
 \begin{lstlisting}[frame=single]
-
 ;; Caso base: encolamos 1 elemento a una lista vacía.
 (set-hypothesis-list '((encolar () 1 ?L)))
 (motor-inferencia)
@@ -141,7 +138,6 @@ Y los ejemplos que hemos probado han sido:\\
 \subsection*{Concatenar}
 Las reglas implementadas son:\\
 \begin{lstlisting}[frame=single]
-
 (R7 (concatenar () ?L ?L))
 (R8 (concatenar (?X . ?R) ?L (?X . ?R2)) 
 	:- ((concatenar ?R ?L ?R2)))
@@ -149,8 +145,6 @@ Las reglas implementadas son:\\
 Y los ejemplos que hemos probado han sido:\\
 
 \begin{lstlisting}[frame=single]
-
-
 ;; Caso base: agregamos una lista de 
 ;;		un elemento a una lista vacía.
 (set-hypothesis-list '((concatenar () (5) ?Xs)))
@@ -173,7 +167,6 @@ Y los ejemplos que hemos probado han sido:\\
 \subsection*{Invertir}
 Las reglas implementadas son:\\
 \begin{lstlisting}[frame=single]
-
 (R9 (invertir () ()))
 (R10 (invertir (?X . ?Y) ?Z) 
 		:- ((invertir ?Y ?H) (encolar ?H ?X ?Z)))
@@ -181,8 +174,6 @@ Las reglas implementadas son:\\
 Y los ejemplos que hemos probado han sido:\\
 
 \begin{lstlisting}[frame=single]
-
-
 (set-hypothesis-list '((invertir () ?Zs)))
 (motor-inferencia)
 ;;res -> (((?ZS)))
@@ -202,7 +193,6 @@ Y los ejemplos que hemos probado han sido:\\
 ;(set-hypothesis-list '((invertir  ?X (1 2 3 4 5))))
 ;(motor-inferencia)
 ;; Program stack overflow.
-
 \end{lstlisting}
 
 
@@ -211,8 +201,8 @@ Y los ejemplos que hemos probado han sido:\\
 
 \subsection*{Productorio}
 Las reglas implementadas son:\\
-\begin{lstlisting}[frame=single]
 
+\begin{lstlisting}[frame=single]
 (R14 (productorio () 1))
 (R15 (productorio (?X . ?R) ?Z) :- 
 	((productorio ?R ?P) (?= ?Z (?eval (* ?P ?X)))))
@@ -220,7 +210,6 @@ Las reglas implementadas son:\\
 Y los ejemplos que hemos probado han sido:\\
 
 \begin{lstlisting}[frame=single]
-
 (set-hypothesis-list '((productorio () ?R)))
 (motor-inferencia)
 ;;res-> (((?R . 1)))
@@ -241,7 +230,6 @@ Y los ejemplos que hemos probado han sido:\\
 \subsection*{Elemento N de una lista}
 Las reglas implementadas son:\\
 \begin{lstlisting}[frame=single]
-
 (R16 (posicionN 1 (?X . ?_) ?X))
 (R17 (posicionN ?X (?_ . ?L) ?R) 
 		:- ((?= T (?eval (> ?X 1)))
@@ -252,8 +240,6 @@ Y los ejemplos que hemos probado han sido:\\
 
 
 \begin{lstlisting}[frame=single]
-
-
 (set-hypothesis-list '((posicionN 0 (A B C D E) ?X)))
 (motor-inferencia)
 ;;res-> NIL
@@ -277,8 +263,8 @@ Y los ejemplos que hemos probado han sido:\\
 
 \subsection*{Map}
 Las reglas implementadas son:\\
-\begin{lstlisting}[frame=single]
 
+\begin{lstlisting}[frame=single]
 (R18 (doblar ?X ?R) :- ((?= ?R (?eval (* ?X 2)))))
 (R19 (map ?_ () ()))
 (R20 (map ?Pred (?First . ?Rest) ?Retval) :- (
@@ -291,19 +277,22 @@ Y los ejemplos que hemos probado han sido:\\
 
 
 \begin{lstlisting}[frame=single]
-
+; Prueba con lista vacía
 (set-hypothesis-list '((map doblar () ?Rs)))
 (motor-inferencia)
 ;;res-> (((?RS)))
 
+; Prueba con un único elemento
 (set-hypothesis-list '((map doblar (1) ?Rs)))
 (motor-inferencia)
 ;;res-> (((?RS 2)))
 
+; Prueba con dos elementos
 (set-hypothesis-list '((map doblar (2 1) ?Rs)))
 (motor-inferencia)
 ;;res-> (((?RS 4 2)))
 
+; Prueba con varios elementos
 (set-hypothesis-list '((map doblar (2 1 3 0 25) ?Rs)))
 (motor-inferencia)
 ;;res-> (((?RS 4 2 6 0 50)))
@@ -312,7 +301,6 @@ Y los ejemplos que hemos probado han sido:\\
 \subsection*{Reduce}
 Las reglas implementadas son:\\
 \begin{lstlisting}[frame=single]
-
 (R21 (neutro + 0))
 	(R22 (neutro * 1))
 	(R23 (+ ?A ?B (?eval (+ ?A ?B))))
@@ -327,8 +315,6 @@ Y los ejemplos que hemos probado han sido:\\
 
 
 \begin{lstlisting}[frame=single]
-
-
 (set-hypothesis-list '((+ 1 2 ?R)))
 (motor-inferencia)
 ;; res -> (((?R . 3)))
