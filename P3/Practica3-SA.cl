@@ -273,6 +273,44 @@
                         :f-eval   #'f-ox-eval))
 
 
+
+(defun f-80-eval (estado weights)
+  (+ 
+  (* 0.46744132 ( - (suma-fila 
+                           (estado-tablero estado) 
+                           (estado-lado-sgte-jugador estado)) 
+                        (suma-fila 
+                           (estado-tablero estado) 
+                           (lado-contrario (estado-lado-sgte-jugador estado)))))
+  
+  (*  0.054709673 (max-list-chained 0 estado))
+  (*  -0.55915236 (max-list (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+  (*  -0.62158394 (max-list (list-lado estado (estado-lado-sgte-jugador estado))))
+  (*  0.36024094
+    ( - (length (remove-if-not #'(lambda (x) (not (= x 1)))
+              (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+        (length (remove-if-not #'(lambda (x) (not (= x 1))) 
+              (list-lado estado (estado-lado-sgte-jugador estado))))))
+   (* 0.008761644 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4))) 
+                             (list-lado estado (estado-lado-sgte-jugador estado)))))
+   (* -0.29862142 (length (remove-if #'(lambda (x) (or (= x 0) (>= x 4)))
+                             (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado))))))
+  (* 0.07100725
+    (-  (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4)))
+          (list-lado estado (lado-contrario (estado-lado-sgte-jugador estado)))))
+        (length (remove-if #'(lambda (x) (and (>= x 1) (< x 4))) 
+          (list-lado estado (estado-lado-sgte-jugador estado))))))
+))
+
+
+
+
+(setf *Top80* (make-jugador
+                        :nombre   '|Ju-Mmx-Top80-SA|
+                        :f-juego  #'f-j-mmx-SA
+                        :f-eval   #'f-80-eval))
+
+
 ;;;;;;;;;;;;;;;;====== JUGADORES ======;;;;;;;;;;;;;;;;;;;;;
 
 (setq *timeout* 0)
