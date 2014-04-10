@@ -22,6 +22,15 @@
 				 (concatenar (?FirstRes) ?Recur ?Retval)
 				 (map ?Pred ?Rest ?Recur)
 				 ))
+	(R19 (neutro + 0))
+	(R20 (neutro * 1))
+	(R21 (+ ?A ?B (?eval (+ ?A ?B))))
+	(R22 (* ?A ?B (?eval (* ?A ?B))))
+	(R23 (reduce ?Pred () ?R) :- ((neutro ?Pred ?R)))
+	(R24 (reduce ?Pred (?First . ?Rest) ?Retval) :- (
+		(reduce ?Pred ?Rest ?Partial)
+		(?Pred ?First ?Partial ?Retval)
+		))
 ))
 ;;;; Ejercicio 1.
 (erase-facts)
@@ -147,6 +156,8 @@
 (motor-inferencia)
 ;;res-> (((?RS 4)))
 
+;;;;;;;; Pruebas Map ;;;;;;;;
+
 (set-hypothesis-list '((map doblar () ?Rs)))
 (motor-inferencia)
 
@@ -163,3 +174,43 @@
 (set-hypothesis-list '((map doblar (2 1 3 0 25) ?Rs)))
 (motor-inferencia)
 ;;res-> (((?RS 4 2)))
+
+;;;;;;;;; Pruebas reduce ;;;;;;
+
+(set-hypothesis-list '((+ 1 2 ?R)))
+(motor-inferencia)
+;; res -> (((?R . 3)))
+
+(set-hypothesis-list '((neutro + ?R)))
+(motor-inferencia)
+;; res -> (((?R . 0)))
+
+(set-hypothesis-list '((reduce + (1 2 3) ?R)))
+(motor-inferencia)
+;; res -> (((?RS . 6)))
+
+(set-hypothesis-list '((reduce + () ?Rs)))
+(motor-inferencia)
+;; res -> (((?RS . 0)))
+
+(set-hypothesis-list '((neutro * ?R)))
+(motor-inferencia)
+;; res -> (((?R . 1)))
+
+(set-hypothesis-list '((reduce * (1 2 3 4) ?R)))
+(motor-inferencia)
+;; res -> (((?RS . 24)))
+
+(set-hypothesis-list '((reduce * () ?Rs)))
+(motor-inferencia)
+;; res -> (((?RS . 1))
+
+(set-hypothesis-list '((reduce * (0) ?Rs)))
+(motor-inferencia)
+;; res -> (((?RS . 0))
+
+(set-hypothesis-list '((reduce + (1) ?Rs)))
+(motor-inferencia)
+;; res -> (((?RS . 1))
+
+
